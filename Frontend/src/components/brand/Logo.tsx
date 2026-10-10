@@ -10,7 +10,7 @@ export function Logo({ variant = 'full', onDark = false, className }: LogoProps)
   if (variant === 'icon') {
     return (
       <img
-        src="/brand/health-id-icon.png"
+        src="/logo.webp"
         alt="HealthID Card"
         className={cn('h-10 w-10 object-contain', className)}
       />
@@ -19,7 +19,7 @@ export function Logo({ variant = 'full', onDark = false, className }: LogoProps)
 
   const logo = (
     <img
-      src="/brand/health-id-logo.png"
+      src="/logo.webp"
       alt="HealthID Card — Care Beyond Borders"
       className={cn(
         variant === 'compact' ? 'h-10 w-auto max-w-[190px] object-contain' : 'h-14 w-auto max-w-[320px] object-contain',
@@ -40,5 +40,5 @@ export function Logo({ variant = 'full', onDark = false, className }: LogoProps)
 }
 
 export function LogoImage({ className }: { className?: string }) {
-  return <img src="/brand/health-id-logo.png" alt="HealthID Card" className={className} />
+  return <img src="/logo.webp" alt="HealthID Card" className={className} />
 }

@@ -1,12 +1,11 @@
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AuthFrame } from './LoginPage'
 import { Input } from '@/components/ui/Input'
-import { Button } from '@/components/ui/Button'
 import api from '@/services/api'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const schema = z
   .object({
@@ -21,8 +20,17 @@ const schema = z
   })
   .refine((v) => v.password === v.confirmPassword, { message: 'Passwords do not match', path: ['confirmPassword'] })
 
+type SignupLocationState = {
+  fullName?: string
+  mobile?: string
+  email?: string
+  dateOfBirth?: string
+  gender?: 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY'
+}
+
 export function SignupPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [error, setError] = useState('')
   const form = useForm({
     resolver: zodResolver(schema),
@@ -38,6 +46,16 @@ export function SignupPage() {
     },
   })
 
+  useEffect(() => {
+    const state = location.state as SignupLocationState | null
+    if (!state) return
+    if (state.fullName) form.setValue('fullName', state.fullName)
+    if (state.mobile) form.setValue('mobile', state.mobile)
+    if (state.email) form.setValue('email', state.email)
+    if (state.dateOfBirth) form.setValue('dateOfBirth', state.dateOfBirth)
+    if (state.gender) form.setValue('gender', state.gender)
+  }, [location.state])
+
   async function onSubmit(values: z.infer<typeof schema>) {
     setError('')
     try {
@@ -45,7 +63,7 @@ export function SignupPage() {
       localStorage.removeItem('hc_user')
       localStorage.removeItem('hc_access')
       localStorage.removeItem('hc_refresh')
-      navigate('/login', { replace: true, state: { registered: true, email: values.email } })
+      navigate('/login/password', { replace: true, state: { registered: true, email: values.email } })
     } catch (e: unknown) {
       const err = e as { response?: { data?: { message?: string } } }
       setError(err.response?.data?.message ?? 'Unable to create account')
@@ -72,7 +90,9 @@ export function SignupPage() {
         <Input label="Confirm password" type="password" {...form.register('confirmPassword')} error={form.formState.errors.confirmPassword?.message} />
         <Input label="Referral code (optional)" placeholder="Friend's HealthID code" {...form.register('referralCode')} />
         {error ? <p className="text-sm text-danger">{error}</p> : null}
-        <Button className="w-full" size="lg" type="submit">Create account</Button>
+        <button className="hid-btn hid-btn-primary hid-btn-block" type="submit">
+          Create account
+        </button>
       </form>
       <p className="mt-4 text-sm text-ink-soft">Already have an account? <Link to="/login" className="text-teal">Log in</Link></p>
     </AuthFrame>

@@ -5,7 +5,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
 import { store } from '@/store'
 import App from './App.tsx'
+import { AccountProvider } from '@/account/AccountContext'
 import './index.css'
+import './styles/healthid-tailwind.css'
+import './styles/healthid-account.css'
+import './styles/hid-landing.css'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,7 +26,9 @@ createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <App />
+          <AccountProvider>
+            <App />
+          </AccountProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </Provider>

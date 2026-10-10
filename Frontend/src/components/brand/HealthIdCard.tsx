@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { QRCodeSVG } from 'qrcode.react'
-import { Globe, Mail, Phone, RotateCcw, Shield } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 import { cn, formatDate } from '@/lib/utils'
 
 export type HealthIdCardData = {
@@ -14,17 +14,6 @@ export type HealthIdCardData = {
   flatDiscountPercent: number
   familyMembers: { name: string; relation: string; isPrimary: boolean }[]
   qrPayload: string
-}
-
-const COMPANY = {
-  name: 'HealthID Card Pvt. Ltd.',
-  tagline: 'Care Beyond Borders',
-  address: '401, Skyline Heights, Veera Desai Road, Andheri West, Mumbai — 400053',
-  helpline: '1800-123-4567',
-  email: 'care@healthidcard.com',
-  website: 'www.healthidcard.com',
-  cin: 'U85110MH2024PTC123456',
-  supportHours: '24×7 customer support',
 }
 
 type HealthIdCardProps = {
@@ -56,20 +45,20 @@ export function HealthIdCard({
   }
 
   return (
-    <div className={cn('mx-auto w-full max-w-[440px]', className)}>
+    <div className={cn('mx-auto w-full max-w-[420px]', className)}>
       <div className="perspective-[1200px]">
         <motion.div
           className={cn(
-            'relative w-full [transform-style:preserve-3d]',
-            compact ? 'h-[240px]' : 'h-[292px]',
+            'relative aspect-[1.586/1] w-full [transform-style:preserve-3d]',
+            compact && 'max-h-[240px]',
             !disableTapFlip && 'cursor-pointer',
           )}
           animate={{ rotateY: flipped ? 180 : 0 }}
           transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
           onClick={disableTapFlip ? undefined : toggleFlip}
         >
-          <CardFront data={data} />
-          <CardBack />
+          <CardMarketingFront data={data} />
+          <CardQrBack data={data} />
         </motion.div>
       </div>
       {!hideBuiltInFlipHint && !disableTapFlip ? (
@@ -86,11 +75,47 @@ export function HealthIdCard({
   )
 }
 
-function CardFront({ data }: { data: HealthIdCardData }) {
+/** Branded card face — official HealthID Card artwork with live member fields. */
+export function CardMarketingFront({ data, className }: { data: HealthIdCardData; className?: string }) {
+  return (
+    <div
+      className={cn(
+        'absolute inset-0 overflow-hidden rounded-[24px] shadow-[0_24px_60px_rgba(43,90,121,0.28)] [backface-visibility:hidden]',
+        className,
+      )}
+    >
+      <img
+        src="/brand/health-id-card-marketing.png"
+        alt=""
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
+        draggable={false}
+      />
+      <div className="absolute inset-x-0 bottom-0 h-[21.5%] bg-[#003b73] px-[8%] pb-[4%] pt-[2.5%] text-white">
+        <div className="flex h-full items-center gap-3 sm:gap-5">
+          <div className="min-w-0 flex-1 text-left">
+            <p className="text-[8px] font-medium uppercase tracking-[0.14em] text-white/70">Member ID</p>
+            <p className="mt-0.5 truncate font-display text-[clamp(11px,3vw,15px)] font-bold leading-tight tracking-wide">
+              {data.membershipId}
+            </p>
+          </div>
+          <div className="h-8 w-px shrink-0 bg-white/30" aria-hidden />
+          <div className="min-w-0 flex-1 text-left">
+            <p className="text-[8px] font-medium uppercase tracking-[0.14em] text-white/70">Valid till</p>
+            <p className="mt-0.5 font-display text-[clamp(12px,3.4vw,16px)] font-bold leading-tight">
+              {formatDate(data.validUntil)}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CardQrBack({ data }: { data: HealthIdCardData }) {
   const members = data.familyMembers.length ? data.familyMembers : [{ name: data.memberName, relation: 'Self', isPrimary: true }]
 
   return (
-    <div className="absolute inset-0 overflow-hidden rounded-[24px] shadow-[0_24px_60px_rgba(43,90,121,0.35)] [backface-visibility:hidden]">
+    <div className="absolute inset-0 overflow-hidden rounded-[24px] shadow-[0_24px_60px_rgba(43,90,121,0.35)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
       <div className="absolute inset-0 bg-gradient-to-br from-[#1a3d56] via-[#2B5A79] to-[#1f4460]" />
       <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand-red/20 blur-2xl" />
       <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
@@ -176,76 +201,9 @@ function CardFront({ data }: { data: HealthIdCardData }) {
   )
 }
 
-function CardBack() {
-  return (
-    <div className="absolute inset-0 overflow-hidden rounded-[24px] shadow-[0_24px_60px_rgba(43,90,121,0.35)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#152a3a] via-[#1f4460] to-[#2B5A79]" />
-
-      <div className="relative flex h-full flex-col text-left text-white">
-        <div className="mx-0 h-12 shrink-0 bg-gradient-to-r from-[#0d1820] via-[#1a1a1a] to-[#0d1820]" />
-
-        <div className="flex flex-1 flex-col justify-between px-6 py-5">
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2.5">
-                <Shield className="h-4 w-4 shrink-0 text-brand-red" />
-                <p className="font-display text-[17px] leading-tight">{COMPANY.name}</p>
-              </div>
-              <p className="pl-[26px] text-[10px] uppercase tracking-[0.22em] text-white/50">{COMPANY.tagline}</p>
-            </div>
-
-            <div className="space-y-3 border-t border-white/10 pt-4">
-              <div className="space-y-1">
-                <FieldLabel>Registered office</FieldLabel>
-                <p className="text-[11px] leading-relaxed text-white/80">{COMPANY.address}</p>
-              </div>
-
-              <div className="space-y-2">
-                <ContactRow icon={Phone} label="Helpline" value={`${COMPANY.helpline} · ${COMPANY.supportHours}`} />
-                <ContactRow icon={Mail} label="Email" value={COMPANY.email} />
-                <ContactRow icon={Globe} label="Website" value={COMPANY.website} />
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 space-y-3 border-t border-white/10 pt-4">
-            <div className="flex flex-wrap gap-2">
-              {['30% discount', 'Home collection', 'WhatsApp updates', 'Digital reports'].map((b) => (
-                <span key={b} className="rounded-md bg-white/10 px-2.5 py-1 text-[8px] font-medium uppercase tracking-[0.1em] text-white/70">
-                  {b}
-                </span>
-              ))}
-            </div>
-
-            <p className="text-[9px] leading-[1.55] text-white/40">
-              CIN: {COMPANY.cin} · Authorized NABL partner network · Non-transferable card.
-              Present at home collection or partner lab.
-            </p>
-
-            <div className="flex items-center justify-between gap-4 text-[8px] uppercase tracking-[0.1em] text-white/35">
-              <span>ISO 27001 certified</span>
-              <span>Issued in India</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 function FieldLabel({ children }: { children: ReactNode }) {
   return (
     <p className="text-[8px] font-medium uppercase tracking-[0.18em] text-white/45">{children}</p>
-  )
-}
-
-function ContactRow({ icon: Icon, label, value }: { icon: typeof Phone; label: string; value: string }) {
-  return (
-    <div className="grid grid-cols-[14px_52px_1fr] items-start gap-x-2.5 text-[11px] leading-snug">
-      <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-red" />
-      <span className="text-white/45">{label}</span>
-      <span className="text-white/80">{value}</span>
-    </div>
   )
 }
 
