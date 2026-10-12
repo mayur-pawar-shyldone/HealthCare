@@ -40,6 +40,21 @@
   --color-accent-violet: #6366f1;
   --color-danger: #e03a28;
   --color-success: #059669;
+  /* Magic Patterns account dashboard (scoped tokens) */
+  --color-navy: #12344d;
+  --color-navy-600: #1d4562;
+  --color-navy-50: #e8eef2;
+  --color-mp-teal: #3aa6a6;
+  --color-mp-teal-700: #2a8585;
+  --color-mp-teal-50: #e3f3f2;
+  --color-mp-coral: #ef7b5f;
+  --color-mp-coral-600: #e5664a;
+  --color-mp-coral-50: #fdf1ee;
+  --color-brick: #c4472c;
+  --color-canvas: #eef6f5;
+  --color-muted: #5d6d79;
+  --color-alert-bg: #fde9e5;
+  --color-alert-text: #c4472c;
 }
 
 html, body, #root {

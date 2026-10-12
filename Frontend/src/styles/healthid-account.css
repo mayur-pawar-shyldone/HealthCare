@@ -927,3 +927,23 @@ label.field {
     display: flex;
   }
 }
+
+/* Magic Patterns account shell */
+.account-mp-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.shell.account-mp-legacy-wrap {
+  display: block;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  grid-template-columns: unset;
+  background: transparent;
+  color: inherit;
+}

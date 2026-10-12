@@ -1,7 +1,10 @@
 import type { FormEvent } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { ACCOUNT_PACKAGES, BOOKING_DATES } from '@/account/account-data'
 import { AccountDashboardPageContent } from '@/account/AccountDashboardHub'
+import { AccountMpBookingsReportsPage } from '@/account/mp/AccountMpBookingsReportsPage'
+import { AccountMpHelpSupportPage } from '@/account/mp/AccountMpHelpSupportPage'
+import { AccountMpMyAccountPage } from '@/account/mp/AccountMpMyAccountPage'
 import { rupee, useAccount } from '@/account/AccountContext'
 import { BookSteps, PageHead } from '@/account/account-ui'
 import { readForm } from '@/account/form-utils'
@@ -11,51 +14,7 @@ export function AccountDashboardPage() {
 }
 
 export function AccountBookingsPage() {
-  const acc = useAccount()
-  const navigate = useNavigate()
-  const tabs = ['Upcoming', 'Completed', 'Cancelled', 'Rescheduled']
-  const q = acc.search.trim().toLowerCase()
-  const rows = acc.bookings.filter(
-    (b) => b.status === acc.tab && (!q || (b.id + acc.pkg(b.packageId).name).toLowerCase().includes(q)),
-  )
-
-  return (
-    <>
-      <PageHead title="My Bookings" text="Current and past collections." />
-      <div className="tabs">
-        {tabs.map((t) => (
-          <button key={t} type="button" className={acc.tab === t ? 'on' : ''} onClick={() => acc.setTab(t)}>
-            {t}
-          </button>
-        ))}
-      </div>
-      <div className="list">
-        {rows.length ? (
-          rows.map((b) => (
-            <article className="item" key={b.id}>
-              <div>
-                <strong>{acc.pkg(b.packageId).name}</strong>
-                <small>
-                  {b.id} · {acc.member(b.memberId)?.name} · {b.date} · {b.slot}
-                </small>
-              </div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                <span>{rupee(b.amount)}</span>
-                <span className={`badge ${b.status === 'Completed' ? 'ok' : b.status === 'Cancelled' ? 'muted' : b.status === 'Rescheduled' ? 'warn' : ''}`}>
-                  {b.status}
-                </span>
-                <button type="button" className="hid-btn hid-btn-ghost hid-btn-sm" onClick={() => navigate(`/account/bookings/${b.id}`)}>
-                  View
-                </button>
-              </div>
-            </article>
-          ))
-        ) : (
-          <div className="card empty">Nothing in {acc.tab.toLowerCase()} right now.</div>
-        )}
-      </div>
-    </>
-  )
+  return <AccountMpBookingsReportsPage />
 }
 
 export function AccountBookingDetailPage() {
@@ -151,213 +110,15 @@ export function AccountBookingDetailPage() {
 }
 
 export function AccountReportsPage() {
-  const acc = useAccount()
-  const people = ['All', ...acc.family.map((m) => m.name)]
-  const rows = acc.bookings.filter(
-    (b) =>
-      b.report &&
-      (acc.reportMember === 'All' || acc.member(b.memberId)?.name === acc.reportMember) &&
-      (!acc.search || (acc.pkg(b.packageId).name + b.id).toLowerCase().includes(acc.search.toLowerCase())),
-  )
-
-  return (
-    <>
-      <PageHead title="Reports & Records" text="Lab reports for people on this card." />
-      <div className="tabs">
-        {people.map((n) => (
-          <button key={n} type="button" className={acc.reportMember === n ? 'on' : ''} onClick={() => acc.setReportMember(n)}>
-            {n}
-          </button>
-        ))}
-      </div>
-      <div className="list">
-        {rows.length ? (
-          rows.map((b) => (
-            <article className="item" key={b.id}>
-              <div>
-                <strong>{acc.pkg(b.packageId).name}</strong>
-                <small>
-                  {acc.member(b.memberId)?.name} · {b.date} · Partner lab · Ready
-                </small>
-              </div>
-              <button type="button" className="hid-btn hid-btn-ghost hid-btn-sm" onClick={() => acc.showToast('Report download is locked until the lab file is linked.')}>
-                Download PDF
-              </button>
-            </article>
-          ))
-        ) : (
-          <div className="card empty">No report matches this filter. Completed visits appear here once the lab releases them.</div>
-        )}
-      </div>
-    </>
-  )
+  return <Navigate to="/account/bookings" replace />
 }
 
 export function AccountProfilePage() {
-  const acc = useAccount()
-  return (
-    <>
-      <PageHead title="Profile & Settings" text="Account details, addresses and sign-in." />
-      {acc.profileSaved ? <div className="ok">Saved on this device for the preview.</div> : null}
-      <form
-        className="card"
-        onSubmit={(e) => {
-          e.preventDefault()
-          const name = new FormData(e.currentTarget).get('name')?.toString() || acc.name
-          acc.saveProfile(name)
-        }}
-      >
-        <div className="grid-2">
-          <label className="field">
-            Full name
-            <input name="name" defaultValue={acc.name} />
-          </label>
-          <label className="field">
-            Mobile
-            <input value={acc.mobile} readOnly />
-          </label>
-          <label className="field">
-            City
-            <input value="Mumbai" readOnly />
-          </label>
-          <label className="field">
-            Member ID
-            <input value={acc.memberId()} readOnly />
-          </label>
-        </div>
-        <button className="hid-btn hid-btn-primary" type="submit">
-          Save profile
-        </button>
-      </form>
-      <h3>Saved addresses</h3>
-      <div className="list">
-        {acc.addresses.map((a) => (
-          <article className="item" key={a.id}>
-            <div>
-              <strong>{a.label}</strong>
-              <small>
-                {a.line} · {a.note}
-              </small>
-            </div>
-          </article>
-        ))}
-      </div>
-      <div className="card" style={{ marginTop: 14 }}>
-        <strong>Security</strong>
-        <p className="muted">This number is verified for OTP login. Communication is limited to booking and report updates.</p>
-        <LinkishLogout />
-      </div>
-    </>
-  )
-}
-
-function LinkishLogout() {
-  const acc = useAccount()
-  const navigate = useNavigate()
-  return (
-    <button
-      type="button"
-      className="hid-btn hid-btn-ghost"
-      onClick={() => {
-        acc.logout()
-        navigate('/login')
-      }}
-    >
-      Log out
-    </button>
-  )
+  return <AccountMpMyAccountPage />
 }
 
 export function AccountSupportPage() {
-  const acc = useAccount()
-  return (
-    <>
-      <PageHead title="Help & Support" text="Booking, reports and membership." />
-      <div className="grid-3">
-        <article className="card">
-          <strong>Call</strong>
-          <p className="muted">1800-123-4567 · 7am–9pm</p>
-        </article>
-        <article className="card">
-          <strong>Email</strong>
-          <p className="muted">care@healthidcard.com</p>
-        </article>
-        <article className="card">
-          <strong>WhatsApp</strong>
-          <p className="muted">Same hours as the call line</p>
-        </article>
-      </div>
-      <div className="grid-2" style={{ marginTop: 14 }}>
-        <form
-          className="card"
-          onSubmit={(e) => {
-            e.preventDefault()
-            const data = readForm(e.currentTarget)
-            acc.submitTicket(String(data.issue || 'General'))
-            e.currentTarget.reset()
-          }}
-        >
-          <h3 style={{ marginTop: 0 }}>Create a request</h3>
-          <label className="field">
-            Booking
-            <select name="booking">
-              <option value="">General</option>
-              {acc.bookings.map((b) => (
-                <option key={b.id}>{b.id}</option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            Issue
-            <select name="issue">
-              <option>Reschedule a visit</option>
-              <option>Report not visible</option>
-              <option>Membership question</option>
-              <option>Payment or refund</option>
-            </select>
-          </label>
-          <label className="field">
-            What happened?
-            <textarea name="note" required placeholder="A short description" />
-          </label>
-          <button className="hid-btn hid-btn-primary" type="submit">
-            Submit request
-          </button>
-        </form>
-        <div>
-          <article className="card">
-            <h3 style={{ marginTop: 0 }}>Common questions</h3>
-            <p>
-              <strong>When is the report ready?</strong>
-              <br />
-              <span className="muted">Most panels are released within 6 hours of collection.</span>
-            </p>
-            <p>
-              <strong>Can I add a parent?</strong>
-              <br />
-              <span className="muted">Yes, up to six people on one card.</span>
-            </p>
-          </article>
-          <div className="list" style={{ marginTop: 12 }}>
-            {acc.tickets.length ? (
-              acc.tickets.map((t) => (
-                <article className="item" key={t.id}>
-                  <div>
-                    <strong>{t.id}</strong>
-                    <small>
-                      {t.issue} · {t.status}
-                    </small>
-                  </div>
-                </article>
-              ))
-            ) : (
-              <div className="card empty">No open requests.</div>
-            )}
-          </div>
-        </div>
-      </div>
-    </>
-  )
+  return <AccountMpHelpSupportPage />
 }
 
 export function AccountCataloguePage() {
