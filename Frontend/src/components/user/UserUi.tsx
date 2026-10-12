@@ -5,16 +5,15 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 
 export function UserPage({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('mx-auto w-full max-w-6xl space-y-6', className)}>{children}</div>
+  return <div className={cn('w-full space-y-6', className)}>{children}</div>
 }
 
 export function UserPageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="page-head">
       <div>
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal">HealthID Card</p>
-        <h1 className="mt-1 font-display text-3xl text-ink md:text-4xl">{title}</h1>
-        {subtitle ? <p className="mt-1.5 text-sm text-ink-soft">{subtitle}</p> : null}
+        <h1>{title}</h1>
+        {subtitle ? <p>{subtitle}</p> : null}
       </div>
       {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
     </div>

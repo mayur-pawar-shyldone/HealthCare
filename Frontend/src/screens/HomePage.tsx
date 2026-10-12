@@ -49,7 +49,7 @@ export function HomePage() {
   })
 
   useEffect(() => {
-    if (params.get('edit') === 'card' || location.hash === '#healthid-card-section') {
+    if (params.get('edit') === 'card' || location.hash === '#healthid-card-section' || location.hash === '#card-family') {
       scrollToCardSection()
     }
   }, [params, location.hash])

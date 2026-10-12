@@ -1,15 +1,17 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronRight, CreditCard, Sparkles } from 'lucide-react'
+import { ChevronRight, CreditCard, Sparkles, Users } from 'lucide-react'
 import api, { unwrap } from '@/services/api'
 import type { MembershipPlan } from '@/types'
+import { PLATFORM } from '@/data/platform-content'
 import { HealthIdCard, type HealthIdCardData } from '@/components/brand/HealthIdCard'
 import { Loading } from '@/components/ui/Loading'
 import { MembershipEditPanel } from './MembershipEditPanel'
 import { HomeWalletPanel } from './HomeWalletPanel'
 import { HomeCardActions } from './HomeCardActions'
 import { HomeActivatePanel } from './HomeActivatePanel'
+import { CardBenefitsList, FamilyOnCardPanel, hubSectionClassName } from './CardFamilyHubPanels'
 
 type HomeHealthIdCardProps = {
   hasMembership: boolean
@@ -32,6 +34,11 @@ export function HomeHealthIdCard({ hasMembership, editOpen, onEditOpen, hasAddre
     enabled: !hasMembership,
     queryFn: async () => unwrap<MembershipPlan[]>((await api.get('/membership/plans')).data),
   })
+  const familyQuery = useQuery({
+    queryKey: ['family'],
+    enabled: hasMembership,
+    queryFn: async () => unwrap<{ id: string }[]>((await api.get('/family')).data),
+  })
 
   const subscribe = useMutation({
     mutationFn: async (planId: string) => api.post('/membership', { planId }),
@@ -52,28 +59,26 @@ export function HomeHealthIdCard({ hasMembership, editOpen, onEditOpen, hasAddre
   }
 
   const plan = plans.data?.[0]
+  const maxFamily = plan?.maxFamilyMembers ?? PLATFORM.familyMembers
+  const familyCount = familyQuery.data?.length ?? cardQuery.data?.familyMembers.length ?? 0
+  const discount = cardQuery.data?.flatDiscountPercent
 
   return (
-    <section
-      id="healthid-card-section"
-      aria-labelledby="healthid-card-heading"
-      className="overflow-hidden rounded-[28px] border border-line/80 bg-white shadow-[0_16px_48px_rgba(12,25,41,0.08)]"
-    >
-      {/* Section header */}
+    <section id="healthid-card-section" aria-labelledby="healthid-card-heading" className={hubSectionClassName()}>
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line/60 bg-gradient-to-r from-teal-light/40 via-white to-[#fff8e6]/80 px-5 py-4 md:px-6 md:py-5">
         <div className="flex items-start gap-3">
           <span className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-teal text-white shadow-sm">
-            <CreditCard className="h-5 w-5" />
+            <Users className="h-5 w-5" />
           </span>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal">Member hub</p>
             <h2 id="healthid-card-heading" className="font-display text-xl text-ink md:text-2xl">
-              HealthID Card & Wallet
+              HealthID Card &amp; family
             </h2>
             <p className="mt-0.5 text-sm text-ink-soft">
               {hasMembership
-                ? 'Show your card at collection · Spend wallet credits at checkout'
-                : 'Activate once for member rates, family coverage & ₹250 bonus'}
+                ? 'Your digital card, member benefits, and family you can book for'
+                : 'Activate once for member rates, family coverage & wallet bonus'}
             </p>
           </div>
         </div>
@@ -83,15 +88,11 @@ export function HomeHealthIdCard({ hasMembership, editOpen, onEditOpen, hasAddre
             Active member
           </div>
         ) : (
-          <span className="rounded-full bg-[#e03a28]/10 px-3 py-1.5 text-xs font-bold text-[#e03a28]">
-            Free · 1 year
-          </span>
+          <span className="rounded-full bg-[#e03a28]/10 px-3 py-1.5 text-xs font-bold text-[#e03a28]">Free · 1 year</span>
         )}
       </div>
 
-      {/* Two-pane layout */}
-      <div className="grid lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
-        {/* Card pane */}
+      <div className="grid lg:grid-cols-2 lg:items-start">
         <div className="border-b border-line/60 bg-gradient-to-b from-[#f4f8fb] to-white p-5 md:p-6 lg:border-b-0 lg:border-r">
           <div className="mb-4 flex items-center justify-between gap-2">
             <p className="text-xs font-bold uppercase tracking-wider text-ink-soft">Digital card</p>
@@ -146,20 +147,29 @@ export function HomeHealthIdCard({ hasMembership, editOpen, onEditOpen, hasAddre
           )}
         </div>
 
-        {/* Wallet pane */}
-        <div className="flex flex-col bg-white p-5 md:p-6">
-          <div className="mb-4 flex items-center justify-between gap-2">
-            <p className="text-xs font-bold uppercase tracking-wider text-ink-soft">Wallet credits</p>
-            <Link
-              to="/wallet"
-              className="flex items-center gap-0.5 text-xs font-semibold text-teal transition hover:underline"
-            >
-              Manage wallet
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
+        <div className="space-y-6 p-5 md:p-6">
+          <div>
+            <p className="mb-3 text-xs font-bold uppercase tracking-wider text-ink-soft">Card benefits</p>
+            <CardBenefitsList
+              active={hasMembership}
+              familyCount={familyCount}
+              maxFamily={maxFamily}
+              memberDiscount={discount}
+            />
           </div>
-          <HomeWalletPanel hasMembership={hasMembership} />
+          <FamilyOnCardPanel hasMembership={hasMembership} maxFamily={maxFamily} />
         </div>
+      </div>
+
+      <div className="border-t border-line/60 bg-white p-5 md:p-6">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-soft">Wallet credits</p>
+          <Link to="/wallet" className="flex items-center gap-0.5 text-xs font-semibold text-teal transition hover:underline">
+            Manage wallet
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        <HomeWalletPanel hasMembership={hasMembership} />
       </div>
     </section>
   )

@@ -1,0 +1,210 @@
+[
+  {
+    "id": "diabetic-panel",
+    "name": "Diabetic Panel",
+    "category": "Diabetes",
+    "testCount": 14,
+    "includes": [
+      "GFR (GLOMERULAR FILTRATION RATE)",
+      "Lipid Profile",
+      "IRON PROFILE",
+      "Ketone (Acetone, Hydroxybutyrate)",
+      "serum electrolytes",
+      "Fasting glucose"
+    ],
+    "tags": [
+      "12 hrs fasting",
+      "Quarterly check",
+      "Home collection"
+    ],
+    "memberPrice": 1999,
+    "listPrice": 1999,
+    "mrp": 3800,
+    "reportHours": 24,
+    "tint": "peach"
+  },
+  {
+    "id": "be-healthy-comprehensive",
+    "name": "Be Healthy Comprehensive",
+    "category": "Full body",
+    "testCount": 95,
+    "includes": [
+      "Complete Blood Count",
+      "Lipid Profile",
+      "Liver Function Test",
+      "Kidney Function Test",
+      "Thyroid Profile"
+    ],
+    "tags": [
+      "12 hrs fasting",
+      "All adults",
+      "Home collection"
+    ],
+    "memberPrice": 1896,
+    "listPrice": 3792,
+    "mrp": 21066,
+    "reportHours": 9,
+    "tint": "teal"
+  },
+  {
+    "id": "summer-wellness-male",
+    "name": "Summer Wellness — Male",
+    "category": "Full body",
+    "testCount": 96,
+    "includes": [
+      "Complete Blood Count",
+      "Lipid Profile",
+      "PSA Total",
+      "Vitamin D & B12",
+      "Kidney Function Test"
+    ],
+    "tags": [
+      "12 hrs fasting",
+      "For men",
+      "Cancer markers"
+    ],
+    "memberPrice": 2237,
+    "listPrice": 4473,
+    "mrp": 24850,
+    "reportHours": 9,
+    "tint": "peach"
+  },
+  {
+    "id": "summer-wellness-female",
+    "name": "Summer Wellness — Female",
+    "category": "Full body",
+    "testCount": 98,
+    "includes": [
+      "Complete Blood Count",
+      "Lipid Profile",
+      "Hormone Panel",
+      "Vitamin D & B12",
+      "Iron Studies"
+    ],
+    "tags": [
+      "12 hrs fasting",
+      "For women",
+      "Hormone panel"
+    ],
+    "memberPrice": 2237,
+    "listPrice": 4473,
+    "mrp": 24850,
+    "reportHours": 9,
+    "tint": "lilac"
+  },
+  {
+    "id": "diabetes-care",
+    "name": "Diabetes Care Panel",
+    "category": "Diabetes",
+    "testCount": 32,
+    "includes": [
+      "HbA1c",
+      "Fasting Glucose",
+      "Kidney Profile",
+      "Lipid Profile",
+      "Urine Routine"
+    ],
+    "tags": [
+      "10 hrs fasting",
+      "HbA1c included",
+      "Quarterly"
+    ],
+    "memberPrice": 749,
+    "listPrice": 1498,
+    "mrp": 4200,
+    "reportHours": 6,
+    "tint": "mint"
+  },
+  {
+    "id": "heart-health",
+    "name": "Heart Health Advance",
+    "category": "Heart",
+    "testCount": 44,
+    "includes": [
+      "Lipid Profile",
+      "hs-CRP",
+      "Homocysteine",
+      "Apo B",
+      "Lipoprotein (a)"
+    ],
+    "tags": [
+      "12 hrs fasting",
+      "Lipid + HsCRP",
+      "Age 35+"
+    ],
+    "memberPrice": 1129,
+    "listPrice": 2258,
+    "mrp": 7650,
+    "reportHours": 8,
+    "tint": "rose"
+  },
+  {
+    "id": "thyroid-complete",
+    "name": "Thyroid Complete",
+    "category": "Thyroid",
+    "testCount": 12,
+    "includes": [
+      "T3",
+      "T4",
+      "TSH Ultrasensitive",
+      "Anti-TPO Antibodies",
+      "Free T4"
+    ],
+    "tags": [
+      "No fasting",
+      "T3 T4 TSH",
+      "Anti-TPO"
+    ],
+    "memberPrice": 499,
+    "listPrice": 998,
+    "mrp": 2400,
+    "reportHours": 5,
+    "tint": "sand"
+  },
+  {
+    "id": "vitamin-essentials",
+    "name": "Vitamin & Mineral Essentials",
+    "category": "Vitamins",
+    "testCount": 18,
+    "includes": [
+      "25-Hydroxy Vitamin D",
+      "Vitamin B12",
+      "Serum Calcium",
+      "Magnesium",
+      "Zinc"
+    ],
+    "tags": [
+      "No fasting",
+      "D + B12",
+      "Fatigue check"
+    ],
+    "memberPrice": 899,
+    "listPrice": 1798,
+    "mrp": 5100,
+    "reportHours": 7,
+    "tint": "teal"
+  },
+  {
+    "id": "liver-function",
+    "name": "Liver Function Plus",
+    "category": "Liver",
+    "testCount": 22,
+    "includes": [
+      "Bilirubin Total & Direct",
+      "SGOT & SGPT",
+      "Alkaline Phosphatase",
+      "GGT",
+      "Total Protein"
+    ],
+    "tags": [
+      "8 hrs fasting",
+      "LFT + GGT",
+      "Home collection"
+    ],
+    "memberPrice": 649,
+    "listPrice": 1298,
+    "mrp": 3600,
+    "reportHours": 6,
+    "tint": "peach"
+  }
+]
