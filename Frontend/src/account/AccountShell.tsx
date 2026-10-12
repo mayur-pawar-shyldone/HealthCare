@@ -15,7 +15,7 @@ export function AccountShell() {
 
   return (
     <div className="account-mp-root flex min-h-full w-full bg-canvas">
-      <aside className="sticky top-0 hidden h-screen w-[300px] shrink-0 border-r border-line lg:block">
+      <aside className="sticky top-0 hidden h-screen w-[260px] shrink-0 border-r border-line lg:block">
         <AccountMpSidebar />
       </aside>
 
@@ -45,18 +45,18 @@ export function AccountShell() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {reminder ? (
-          <div role="status" className="flex items-start gap-2 bg-alert-bg px-5 py-2.5 text-sm text-alert-text lg:px-10">
+          <div role="status" className="flex items-start gap-2 bg-alert-bg px-4 py-2 text-sm text-alert-text lg:px-6">
             <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
             <span>{reminder}</span>
           </div>
         ) : null}
         <AccountMpTopbar onMenu={() => setMenuOpen(true)} />
-        <main className="account-mp-main flex-1 overflow-y-auto px-5 py-8 lg:px-[70px] lg:py-10">
-          <div className="shell account-mp-legacy-wrap mx-auto w-full max-w-[1360px]">
+        <main className="account-mp-main flex-1 overflow-y-auto px-4 py-5 lg:px-6 lg:py-5">
+          <div className="shell account-mp-legacy-wrap mx-auto w-full max-w-[1180px]">
             <Outlet />
           </div>
         </main>
-        <footer className="border-t border-line bg-white py-5 text-center text-sm text-muted">
+        <footer className="border-t border-line bg-white py-3 text-center text-sm text-muted">
           © 2026 HealthIDCard · Care beyond borders
         </footer>
       </div>

@@ -13,8 +13,8 @@ export function AccountMpSidebar({ onNavigate }: Props) {
   const { pathname } = useLocation()
 
   return (
-    <div className="flex h-full flex-col bg-white px-3 pb-5 pt-6">
-      <div className="px-3">
+    <div className="flex h-full flex-col bg-white px-2 pb-4 pt-5">
+      <div className="px-2">
         <AccountMpLogo />
       </div>
 

@@ -9,12 +9,12 @@ export function AccountMpMyAccountPage() {
   const acc = useAccount()
 
   return (
-    <div className="grid items-start gap-7 lg:grid-cols-[400px_1fr]">
+    <div className="grid items-start gap-5 lg:grid-cols-[min(360px,100%)_1fr]">
       <div className="lg:sticky lg:top-6">
         <AccountMpProfileCard />
       </div>
 
-      <div className="space-y-7">
+      <div className="space-y-5">
         <AccountMpPersonalDetails />
 
         <AccountDashboardPanel

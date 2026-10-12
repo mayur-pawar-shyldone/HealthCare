@@ -12,6 +12,7 @@ type Props = {
   onAddMember?: () => void
 }
 
+
 export function AccountDashboardFamilyPanel({ onAddMember }: Props) {
   const acc = useAccount()
   const navigate = useNavigate()
@@ -43,13 +44,13 @@ export function AccountDashboardFamilyPanel({ onAddMember }: Props) {
     <AccountDashboardPanel
       title="Family on this card"
       action={
-        <span className="whitespace-nowrap pt-1.5 text-sm text-muted">
+        <span className="whitespace-nowrap pt-1 text-xs text-muted">
           {acc.family.length} of {MAX_FAMILY} added
         </span>
       }
       className="flex flex-col"
     >
-      <div role="tablist" aria-label="Family members" className="flex gap-5">
+      <div role="tablist" aria-label="Family members" className="flex gap-3">
         {acc.family.map((f) => {
           const active = f.id === selectedId
           return (
@@ -59,11 +60,11 @@ export function AccountDashboardFamilyPanel({ onAddMember }: Props) {
               role="tab"
               aria-selected={active}
               onClick={() => setSelectedId(f.id)}
-              className="flex w-16 flex-col items-center gap-2 text-sm focus:outline-none"
+              className="flex w-14 flex-col items-center gap-1.5 text-xs focus:outline-none"
             >
               <span
-                className={`grid h-[60px] w-[60px] place-items-center rounded-full text-[15px] font-bold transition-colors duration-150 ${
-                  active ? 'bg-navy text-white ring-4 ring-mp-teal-50' : 'bg-mp-teal-50 text-muted hover:bg-[#d3ecea]'
+                className={`grid h-12 w-12 place-items-center rounded-full text-[13px] font-bold transition-colors duration-150 ${
+                  active ? 'bg-navy text-white ring-2 ring-mp-teal-50' : 'bg-mp-teal-50 text-muted hover:bg-[#d3ecea]'
                 }`}
               >
                 {memberInitials(f.name)}
@@ -75,25 +76,25 @@ export function AccountDashboardFamilyPanel({ onAddMember }: Props) {
         <button
           type="button"
           onClick={onAddMember}
-          className="flex w-16 flex-col items-center gap-2 text-sm text-muted"
+          className="flex w-14 flex-col items-center gap-1.5 text-xs text-muted"
         >
-          <span className="grid h-[60px] w-[60px] place-items-center rounded-full border-2 border-dashed border-line transition-colors duration-150 hover:border-mp-teal hover:text-mp-teal-700">
-            <Plus className="h-5 w-5" aria-hidden />
+          <span className="grid h-12 w-12 place-items-center rounded-full border-2 border-dashed border-line transition-colors duration-150 hover:border-mp-teal hover:text-mp-teal-700">
+            <Plus className="h-4 w-4" aria-hidden />
           </span>
           Add
         </button>
       </div>
 
-      <dl className="mt-6 grid grid-cols-2 gap-3">
+      <dl className="mt-4 grid grid-cols-2 gap-2">
         {facts.map((fact) => (
-          <div key={fact.label} className="rounded-xl bg-mp-coral-50 px-4 py-3">
-            <dt className="text-sm text-brick">{fact.label}</dt>
-            <dd className="mt-0.5 truncate text-[15px] font-medium text-navy">{fact.value}</dd>
+          <div key={fact.label} className="rounded-lg bg-mp-coral-50 px-3 py-2">
+            <dt className="text-xs text-brick">{fact.label}</dt>
+            <dd className="mt-0.5 truncate text-[13px] font-medium text-navy">{fact.value}</dd>
           </div>
         ))}
       </dl>
 
-      <div className="mt-auto grid grid-cols-2 gap-3 pt-6">
+      <div className="mt-auto grid grid-cols-2 gap-2 pt-4">
         <button
           type="button"
           onClick={() => {
@@ -101,13 +102,13 @@ export function AccountDashboardFamilyPanel({ onAddMember }: Props) {
             acc.setDraftPartial({ memberId: selected.id })
             navigate('/account/book/member')
           }}
-          className="rounded-full bg-navy py-3.5 text-center text-[15px] font-semibold text-white transition-colors duration-150 hover:bg-navy-600"
+          className="rounded-full bg-navy py-2.5 text-center text-[13px] font-semibold text-white transition-colors hover:bg-navy-600"
         >
           Book for {memberShortName(selected.name)}
         </button>
         <Link
           to="/account/bookings"
-          className="rounded-full border border-line py-3.5 text-center text-[15px] font-semibold text-navy transition-colors duration-150 hover:bg-canvas"
+          className="rounded-full border border-line py-2.5 text-center text-[13px] font-semibold text-navy transition-colors hover:bg-canvas"
         >
           View reports
         </Link>

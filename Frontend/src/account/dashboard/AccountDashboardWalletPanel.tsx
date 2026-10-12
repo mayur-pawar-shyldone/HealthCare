@@ -26,16 +26,16 @@ export function AccountDashboardWalletPanel() {
   return (
     <AccountDashboardPanel
       title="Wallet"
-      action={<Wallet className="mt-1 h-6 w-6 text-mp-teal-700" aria-hidden />}
+      action={<Wallet className="mt-0.5 h-5 w-5 text-mp-teal-700" aria-hidden />}
       className="flex flex-col"
     >
-      <p className="text-[15px] text-muted">Available to spend</p>
-      <p className="mt-1 text-[56px] font-extrabold leading-none tracking-tight text-navy">
+      <p className="text-[13px] text-muted">Available to spend</p>
+      <p className="mt-0.5 text-[2rem] font-extrabold leading-none tracking-tight text-navy">
         {formatMoney(walletBalance + referralCredits)}
       </p>
-      <p className="mt-2 text-[15px] text-muted">Applied automatically at checkout</p>
+      <p className="mt-1.5 text-[13px] text-muted">Applied automatically at checkout</p>
 
-      <div className="mt-6 grid grid-cols-2 divide-x divide-line">
+      <div className="mt-4 grid grid-cols-2 divide-x divide-line">
         <div className="px-4">
           <p className="text-sm text-muted">Balance</p>
           <p className="text-lg font-bold text-navy">{formatMoney(walletBalance)}</p>

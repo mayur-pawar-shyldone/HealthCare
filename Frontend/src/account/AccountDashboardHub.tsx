@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FileText, FlaskConical, Sparkles } from 'lucide-react'
 import { ACCOUNT_PACKAGES } from '@/account/account-data'
 import { useAccount } from '@/account/AccountContext'
+import { AccountCardWalletSection } from '@/account/AccountCardWalletSection'
 import { AccountDashboardFamilyPanel } from '@/account/dashboard/AccountDashboardFamilyPanel'
 import { AccountDashboardHeroCard } from '@/account/dashboard/AccountDashboardHeroCard'
 import { AccountDashboardNextVisitPanel } from '@/account/dashboard/AccountDashboardNextVisitPanel'
@@ -10,57 +11,67 @@ import { AccountDashboardWalletPanel } from '@/account/dashboard/AccountDashboar
 import { dashboardGreeting } from '@/account/dashboard/mp-utils'
 import { PLATFORM } from '@/data/platform-content'
 
-/** Account dashboard — Magic Patterns home layout wired to account context. */
+/** Account dashboard — Magic Patterns home + card & wallet hub. */
 export function AccountDashboardPageContent() {
   const acc = useAccount()
   const navigate = useNavigate()
   const firstName = acc.name.split(' ')[0]
 
+  function scrollToCardHub(openAdd?: boolean) {
+    if (openAdd && !acc.showAdd) acc.toggleShowAdd()
+    document.getElementById(openAdd ? 'card-family' : 'card-wallet')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
-    <div className="account-dashboard-mp space-y-7">
-      <section className="flex flex-col gap-8 rounded-[28px] bg-navy p-7 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
-        <div className="max-w-[700px]">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium text-[#8fe0d6]">
-            <Sparkles className="h-4 w-4" aria-hidden />
+    <div className="account-dashboard-mp space-y-4 text-[14px]">
+      <section className="relative min-h-[260px] overflow-hidden rounded-[20px] bg-navy py-6 pb-7 pl-5 pr-5 sm:min-h-[280px] sm:py-8 sm:pb-8 sm:pl-6 sm:pr-6 md:py-8 md:pl-6 md:pr-6">
+        <div className="relative z-[1] min-w-0 md:max-w-[calc(100%-384px)] md:pr-4">
+          <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-[#8fe0d6]">
+            <Sparkles className="h-3.5 w-3.5" aria-hidden />
             Active · {PLATFORM.membership.flatDiscount}% member pricing
           </span>
-          <h2 className="mt-5 text-4xl font-extrabold tracking-tight text-white sm:text-[46px]">
+          <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-white sm:text-[28px]">
             {dashboardGreeting()}, {firstName}
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-white/80">
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80">
             Your family card covers {acc.family.length} people. Book any test at member price with free home collection.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-4 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => {
                 acc.choosePackage(ACCOUNT_PACKAGES[0].id)
                 navigate('/account/book/member')
               }}
-              className="inline-flex items-center gap-2 rounded-full bg-mp-coral px-6 py-3.5 text-[17px] font-semibold text-white transition-colors duration-150 hover:bg-mp-coral-600"
+              className="inline-flex items-center gap-1.5 rounded-full bg-mp-coral px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-mp-coral-600"
             >
-              <FlaskConical className="h-5 w-5" aria-hidden />
+              <FlaskConical className="h-4 w-4" aria-hidden />
               Book a test
             </button>
             <Link
               to="/account/bookings"
-              className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3.5 text-[17px] font-semibold text-white transition-colors duration-150 hover:bg-white/10"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/30 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
             >
-              <FileText className="h-5 w-5" aria-hidden />
+              <FileText className="h-4 w-4" aria-hidden />
               My reports
             </Link>
           </div>
         </div>
-        <AccountDashboardHeroCard />
+
+        <div className="relative z-[2] mt-5 w-fit max-w-full md:absolute md:right-6 md:top-1/2 md:mt-0 md:-translate-y-1/2">
+          <AccountDashboardHeroCard flushRight />
+        </div>
       </section>
 
-      <div className="grid gap-7 lg:grid-cols-[1.25fr_1fr_0.85fr]">
-        <AccountDashboardFamilyPanel onAddMember={() => navigate('/account/profile')} />
+      <div className="grid gap-4 lg:grid-cols-[1.25fr_1fr_0.85fr]">
+        <AccountDashboardFamilyPanel onAddMember={() => scrollToCardHub(true)} />
         <AccountDashboardWalletPanel />
         <AccountDashboardNextVisitPanel />
       </div>
 
       <AccountDashboardPackagesPanel />
+
+      <AccountCardWalletSection onAddMember={() => scrollToCardHub(true)} />
     </div>
   )
 }

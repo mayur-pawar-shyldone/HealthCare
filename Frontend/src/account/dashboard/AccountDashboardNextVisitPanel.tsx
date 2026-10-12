@@ -11,10 +11,10 @@ export function AccountDashboardNextVisitPanel() {
 
   if (!next || !pkg) {
     return (
-      <section className="flex flex-col overflow-hidden rounded-[28px] bg-white">
-        <div className="flex flex-1 flex-col p-6 sm:p-8">
-          <h2 className="text-[22px] font-bold tracking-tight text-brick">Next home visit</h2>
-          <p className="mt-4 text-[15px] leading-relaxed text-muted">No visit scheduled. Book at member price anytime.</p>
+      <section className="flex flex-col overflow-hidden rounded-[20px] bg-white">
+        <div className="flex flex-1 flex-col p-3.5 sm:p-4">
+          <h2 className="text-lg font-bold tracking-tight text-brick">Next home visit</h2>
+          <p className="mt-2 text-[13px] leading-relaxed text-muted">No visit scheduled. Book at member price anytime.</p>
           <Link
             to="/account/catalogue"
             className="mt-auto inline-flex w-fit items-center gap-2 rounded-full bg-mp-teal px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-mp-teal-700"
@@ -27,12 +27,12 @@ export function AccountDashboardNextVisitPanel() {
   }
 
   return (
-    <section className="flex flex-col overflow-hidden rounded-[28px] bg-white">
-      <div className="p-6 sm:p-8">
-        <h2 className="text-[22px] font-bold tracking-tight text-brick">Next home visit</h2>
-        <ul className="mt-5 space-y-5">
-          <li className="flex items-center gap-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-mp-coral text-white">
+    <section className="flex flex-col overflow-hidden rounded-[20px] bg-white">
+      <div className="p-3.5 sm:p-4">
+        <h2 className="text-lg font-bold tracking-tight text-brick">Next home visit</h2>
+        <ul className="mt-3 space-y-3">
+          <li className="flex items-center gap-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-mp-coral text-white">
               <CalendarClock className="h-5 w-5" aria-hidden />
             </span>
             <div>
@@ -51,7 +51,7 @@ export function AccountDashboardNextVisitPanel() {
           </li>
         </ul>
       </div>
-      <div className="mt-auto bg-mp-teal px-6 py-6 text-white sm:px-8">
+      <div className="mt-auto bg-mp-teal px-4 py-4 text-white sm:px-5">
         <p className="text-lg font-bold">{pkg.name}</p>
         <p className="text-sm text-white/85">for {member?.name ?? 'Member'}</p>
         <Link

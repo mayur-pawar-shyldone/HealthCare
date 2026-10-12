@@ -29,10 +29,10 @@ export function AccountMpBookingsReportsPage() {
   const people = ['All', ...acc.family.map((f) => memberShortName(f.name))]
 
   return (
-    <div className="grid items-start gap-7 lg:grid-cols-[1.5fr_1fr]">
-      <section className="rounded-[28px] bg-white p-6 sm:p-8">
-        <h2 className="text-[30px] font-extrabold tracking-tight text-navy">My bookings</h2>
-        <p className="mt-1 text-[15px] text-muted">Current and past home collections.</p>
+    <div className="grid items-start gap-5 lg:grid-cols-[1.5fr_1fr]">
+      <section className="rounded-[24px] bg-white p-4 sm:p-5">
+        <h2 className="text-2xl font-extrabold tracking-tight text-navy">My bookings</h2>
+        <p className="mt-0.5 text-[13px] text-muted">Current and past home collections.</p>
 
         <div role="tablist" className="mt-6 flex flex-wrap gap-2">
           {bookingTabs.map((t) => (
@@ -105,9 +105,9 @@ export function AccountMpBookingsReportsPage() {
         </ul>
       </section>
 
-      <section className="rounded-[28px] bg-white p-6 sm:p-8">
-        <h2 className="text-[30px] font-extrabold tracking-tight text-navy">Reports</h2>
-        <p className="mt-1 text-[15px] text-muted">Lab reports for people on this card.</p>
+      <section className="rounded-[24px] bg-white p-4 sm:p-5">
+        <h2 className="text-2xl font-extrabold tracking-tight text-navy">Reports</h2>
+        <p className="mt-0.5 text-[13px] text-muted">Lab reports for people on this card.</p>
 
         <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label="Filter by person">
           {people.map((p) => (

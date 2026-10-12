@@ -16,13 +16,13 @@ export function AccountMpProfileCard() {
   const mobileDisplay = acc.mobile.startsWith('+') ? acc.mobile : `+91 ${acc.mobile}`
 
   return (
-    <section className="overflow-hidden rounded-[28px] bg-white">
-      <div className="bg-navy px-7 pb-16 pt-9 text-white">
+    <section className="overflow-hidden rounded-[24px] bg-white">
+      <div className="bg-navy px-5 pb-14 pt-6 text-white">
         <p className="text-[15px] text-white/75">My Account</p>
         <p className="mt-1 text-3xl font-extrabold tracking-tight">{acc.name}</p>
         <p className="mt-1 text-white/75">Member since Oct 2026</p>
       </div>
-      <div className="px-7 pb-7">
+      <div className="px-5 pb-5">
         <span className="-mt-11 grid h-[84px] w-[84px] place-items-center rounded-2xl bg-mp-coral text-2xl font-bold text-white ring-4 ring-white">
           {memberInitials(acc.name)}
         </span>

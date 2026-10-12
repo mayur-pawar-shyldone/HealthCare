@@ -8,10 +8,10 @@ export function AccountMpHelpSupportPage() {
   const [query, setQuery] = useState('')
 
   return (
-    <div className="space-y-7">
-      <section className="rounded-[28px] bg-mp-teal px-7 py-10 sm:px-12">
-        <h2 className="text-4xl font-extrabold tracking-tight text-white">How can we help?</h2>
-        <p className="mt-2 text-lg text-white/90">Search answers about bookings, reports, wallet and your card.</p>
+    <div className="space-y-5">
+      <section className="rounded-[24px] bg-mp-teal px-5 py-7 sm:px-6">
+        <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-[28px]">How can we help?</h2>
+        <p className="mt-1.5 text-sm text-white/90">Search answers about bookings, reports, wallet and your card.</p>
         <label className="relative mt-7 block max-w-[720px]">
           <span className="sr-only">Search help</span>
           <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" aria-hidden />
@@ -25,10 +25,10 @@ export function AccountMpHelpSupportPage() {
         </label>
       </section>
 
-      <div className="grid items-start gap-7 lg:grid-cols-[1.45fr_1fr]">
+      <div className="grid items-start gap-5 lg:grid-cols-[1.45fr_1fr]">
         <AccountMpFaqList query={query} />
 
-        <div className="space-y-7">
+        <div className="space-y-5">
           <AccountDashboardPanel title="Talk to us">
             <ul className="space-y-2">
               <li>
