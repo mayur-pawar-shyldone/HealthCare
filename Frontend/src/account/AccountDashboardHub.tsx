@@ -23,7 +23,7 @@ export function AccountDashboardPageContent() {
   }
 
   return (
-    <div className="account-dashboard-mp space-y-4 text-[14px]">
+    <div className="space-y-4">
       <section className="relative min-h-[260px] overflow-hidden rounded-[20px] bg-navy py-6 pb-7 pl-5 pr-5 sm:min-h-[280px] sm:py-8 sm:pb-8 sm:pl-6 sm:pr-6 md:py-8 md:pl-6 md:pr-6">
         <div className="relative z-[1] min-w-0 md:max-w-[calc(100%-384px)] md:pr-4">
           <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-[#8fe0d6]">

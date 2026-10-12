@@ -52,11 +52,11 @@ export function AccountMpPersonalDetails() {
           setDraft(details)
           setEditing(false)
         }}
-        className="rounded-full border border-line px-4 py-2 text-[15px] font-medium text-navy hover:bg-canvas"
+        className="rounded-full border border-line px-3.5 py-1.5 text-[13px] font-medium text-navy hover:bg-canvas"
       >
         Cancel
       </button>
-      <button type="button" onClick={save} className="rounded-full bg-navy px-4 py-2 text-[15px] font-semibold text-white hover:bg-navy-600">
+      <button type="button" onClick={save} className="rounded-full bg-navy px-3.5 py-1.5 text-[13px] font-semibold text-white hover:bg-navy-600">
         Save
       </button>
     </div>
@@ -67,7 +67,7 @@ export function AccountMpPersonalDetails() {
         setDraft({ ...details, fullName: acc.name, mobile: mobileDisplay })
         setEditing(true)
       }}
-      className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-[15px] font-medium text-navy transition-colors duration-150 hover:bg-canvas"
+      className="inline-flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 text-[13px] font-medium text-navy transition-colors duration-150 hover:bg-canvas"
     >
       {saved ? <Check className="h-4 w-4 text-mp-teal-700" /> : <Pencil className="h-4 w-4" />}
       {saved ? 'Saved' : 'Edit'}
@@ -76,7 +76,7 @@ export function AccountMpPersonalDetails() {
 
   return (
     <AccountDashboardPanel title="Personal details" action={action}>
-      <dl className="grid gap-x-10 gap-y-5 sm:grid-cols-2">
+      <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
         {fields.map((f) => (
           <div key={f.key}>
             <dt className="text-sm text-muted">
@@ -88,10 +88,10 @@ export function AccountMpPersonalDetails() {
                   id={`pd-${f.key}`}
                   value={draft[f.key]}
                   onChange={(e) => setDraft({ ...draft, [f.key]: e.target.value })}
-                  className="w-full rounded-xl border border-line px-3 py-2 text-[17px] text-navy focus:border-mp-teal focus:outline-none focus:ring-2 focus:ring-mp-teal-50"
+                  className="w-full rounded-xl border border-line px-3 py-2 text-sm text-navy focus:border-mp-teal focus:outline-none focus:ring-2 focus:ring-mp-teal-50"
                 />
               ) : (
-                <span className="text-lg font-medium text-navy">{f.key === 'fullName' ? acc.name : details[f.key]}</span>
+                <span className="text-sm font-medium text-navy">{f.key === 'fullName' ? acc.name : details[f.key]}</span>
               )}
             </dd>
           </div>

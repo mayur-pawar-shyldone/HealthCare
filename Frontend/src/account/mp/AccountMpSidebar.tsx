@@ -30,7 +30,7 @@ export function AccountMpSidebar({ onNavigate }: Props) {
                 isActive ||
                 (to === '/account/bookings' && pathname.startsWith('/account/bookings')) ||
                 (to === '/account/profile' && pathname.startsWith('/account/profile'))
-              return `flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mp-teal ${
+              return `flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mp-teal ${
                 active ? 'bg-navy font-semibold text-white' : 'text-navy hover:bg-canvas'
               }`
             }}

@@ -13,7 +13,7 @@ export function AccountMpTopbar({ onMenu }: Props) {
   const firstName = memberShortName(acc.name)
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-line bg-white px-4 lg:px-6">
+    <header className="flex h-14 items-center justify-between border-b border-line bg-white px-4 lg:px-5">
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -23,7 +23,7 @@ export function AccountMpTopbar({ onMenu }: Props) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <h1 className="text-[17px] font-medium text-muted">{title}</h1>
+        <h1 className="text-sm font-medium text-muted">{title}</h1>
       </div>
 
       <div className="flex items-center gap-3">

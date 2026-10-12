@@ -947,3 +947,35 @@ label.field {
   background: transparent;
   color: inherit;
 }
+
+/* Slim MP typography — matches account home (dashboard) */
+.account-dashboard-mp .page-head {
+  margin-bottom: 12px;
+  gap: 12px;
+}
+.account-dashboard-mp .page-head h1 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.account-dashboard-mp .page-head p {
+  margin-top: 4px;
+  font-size: 13px;
+}
+.account-dashboard-mp.shell .card,
+.account-dashboard-mp .hid-card {
+  padding: 14px 16px;
+  border-radius: 20px;
+}
+.account-dashboard-mp.shell .item {
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+.account-dashboard-mp.shell .tabs button {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+.account-dashboard-mp .hid-btn {
+  font-size: 14px;
+  padding: 10px 16px;
+}

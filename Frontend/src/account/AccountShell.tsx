@@ -51,8 +51,8 @@ export function AccountShell() {
           </div>
         ) : null}
         <AccountMpTopbar onMenu={() => setMenuOpen(true)} />
-        <main className="account-mp-main flex-1 overflow-y-auto px-4 py-5 lg:px-6 lg:py-5">
-          <div className="shell account-mp-legacy-wrap mx-auto w-full max-w-[1180px]">
+        <main className="account-mp-main flex-1 overflow-y-auto px-4 py-4 lg:px-5 lg:py-4">
+          <div className="shell account-mp-legacy-wrap account-dashboard-mp mx-auto w-full max-w-[1180px] text-[14px] leading-snug">
             <Outlet />
           </div>
         </main>

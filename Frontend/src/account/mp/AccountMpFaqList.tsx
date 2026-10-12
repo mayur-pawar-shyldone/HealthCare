@@ -26,7 +26,7 @@ export function AccountMpFaqList({ query }: Props) {
             type="button"
             aria-pressed={category === c}
             onClick={() => setCategory(c)}
-            className={`rounded-full px-4 py-2 text-[15px] font-medium transition-colors duration-150 ${
+            className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors duration-150 ${
               category === c ? 'bg-navy text-white' : 'bg-mp-teal-50 text-muted hover:text-navy'
             }`}
           >
@@ -44,11 +44,11 @@ export function AccountMpFaqList({ query }: Props) {
                 type="button"
                 aria-expanded={open}
                 onClick={() => setOpenId(open ? null : f.id)}
-                className="flex w-full items-center gap-4 py-5 text-left"
+                className="flex w-full items-center gap-3 py-3.5 text-left"
               >
                 <span className="flex-1">
-                  <span className="block text-sm text-mp-teal-700">{f.category}</span>
-                  <span className="block text-lg font-semibold text-navy">{f.q}</span>
+                  <span className="block text-xs text-mp-teal-700">{f.category}</span>
+                  <span className="block text-sm font-semibold text-navy">{f.q}</span>
                 </span>
                 <ChevronDown
                   className={`h-5 w-5 shrink-0 text-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
@@ -64,7 +64,7 @@ export function AccountMpFaqList({ query }: Props) {
                     transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
                     className="overflow-hidden"
                   >
-                    <p className="pb-5 pr-10 text-[15px] leading-relaxed text-muted">{f.a}</p>
+                    <p className="pb-3.5 pr-8 text-[13px] leading-relaxed text-muted">{f.a}</p>
                   </motion.div>
                 ) : null}
               </AnimatePresence>

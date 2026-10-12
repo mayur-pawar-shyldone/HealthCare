@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CalendarX, Download, FileText } from 'lucide-react'
 import { useAccount } from '@/account/AccountContext'
+import { AccountDashboardPanel } from '@/account/dashboard/AccountDashboardPanel'
 import { memberShortName } from '@/account/dashboard/mp-utils'
 import { formatMoney } from '@/lib/utils'
 
@@ -13,6 +14,11 @@ const statusStyle: Record<string, string> = {
   Completed: 'bg-navy-50 text-navy',
   Cancelled: 'bg-mp-coral-50 text-brick',
 }
+
+const tabClass = (active: boolean) =>
+  `rounded-full px-4 py-2 text-sm font-medium transition-colors duration-150 ${
+    active ? 'bg-navy text-white' : 'bg-mp-teal-50 text-muted hover:text-navy'
+  }`
 
 export function AccountMpBookingsReportsPage() {
   const acc = useAccount()
@@ -29,12 +35,9 @@ export function AccountMpBookingsReportsPage() {
   const people = ['All', ...acc.family.map((f) => memberShortName(f.name))]
 
   return (
-    <div className="grid items-start gap-5 lg:grid-cols-[1.5fr_1fr]">
-      <section className="rounded-[24px] bg-white p-4 sm:p-5">
-        <h2 className="text-2xl font-extrabold tracking-tight text-navy">My bookings</h2>
-        <p className="mt-0.5 text-[13px] text-muted">Current and past home collections.</p>
-
-        <div role="tablist" className="mt-6 flex flex-wrap gap-2">
+    <div className="grid items-start gap-4 lg:grid-cols-[1.5fr_1fr]">
+      <AccountDashboardPanel title="My bookings" subtitle="Current and past home collections.">
+        <div role="tablist" className="flex flex-wrap gap-2">
           {bookingTabs.map((t) => (
             <button
               key={t}
@@ -42,31 +45,29 @@ export function AccountMpBookingsReportsPage() {
               role="tab"
               aria-selected={tab === t}
               onClick={() => setTab(t)}
-              className={`rounded-full px-5 py-2.5 text-[17px] font-medium transition-colors duration-150 ${
-                tab === t ? 'bg-navy text-white' : 'bg-mp-teal-50 text-muted hover:text-navy'
-              }`}
+              className={tabClass(tab === t)}
             >
               {t}
             </button>
           ))}
         </div>
 
-        <ul className="mt-4 divide-y divide-line">
+        <ul className="mt-3 divide-y divide-line">
           {visibleBookings.map((b) => {
             const pkg = acc.pkg(b.packageId)
             const member = acc.member(b.memberId)
             return (
-              <li key={b.id} className="flex flex-col gap-4 py-6 md:flex-row md:items-center">
+              <li key={b.id} className="flex flex-col gap-3 py-4 md:flex-row md:items-center">
                 <div className="min-w-0 flex-1">
-                  <p className="text-lg font-bold text-navy">{pkg.name}</p>
-                  <p className="mt-1 text-[15px] text-muted">
+                  <p className="text-[15px] font-bold text-navy">{pkg.name}</p>
+                  <p className="mt-0.5 text-[13px] text-muted">
                     {member?.name} · {b.date} · {b.slot}
                   </p>
-                  <p className="text-sm text-mp-teal-700">{b.id}</p>
+                  <p className="text-xs text-mp-teal-700">{b.id}</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-lg font-bold text-navy">{formatMoney(b.amount)}</span>
-                  <span className={`rounded-full px-3 py-1 text-sm font-medium ${statusStyle[b.status] ?? ''}`}>{b.status}</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[15px] font-bold text-navy">{formatMoney(b.amount)}</span>
+                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle[b.status] ?? ''}`}>{b.status}</span>
                   {b.status === 'Upcoming' ? (
                     <button
                       type="button"
@@ -74,7 +75,7 @@ export function AccountMpBookingsReportsPage() {
                         acc.rescheduleBooking(b.id)
                         navigate('/account/bookings')
                       }}
-                      className="rounded-full border border-line px-5 py-2.5 text-[15px] font-semibold text-navy transition-colors duration-150 hover:bg-canvas"
+                      className="rounded-full border border-line px-4 py-2 text-[13px] font-semibold text-navy transition-colors duration-150 hover:bg-canvas"
                     >
                       Reschedule
                     </button>
@@ -86,7 +87,7 @@ export function AccountMpBookingsReportsPage() {
                         acc.choosePackage(b.packageId)
                         navigate('/account/book/member')
                       }}
-                      className="rounded-full border border-line px-5 py-2.5 text-[15px] font-semibold text-navy transition-colors duration-150 hover:bg-canvas"
+                      className="rounded-full border border-line px-4 py-2 text-[13px] font-semibold text-navy transition-colors duration-150 hover:bg-canvas"
                     >
                       Book again
                     </button>
@@ -96,27 +97,24 @@ export function AccountMpBookingsReportsPage() {
             )
           })}
           {visibleBookings.length === 0 ? (
-            <li className="flex flex-col items-center py-12 text-center">
-              <CalendarX className="h-8 w-8 text-muted" aria-hidden />
-              <p className="mt-3 font-semibold text-navy">No {tab.toLowerCase()} bookings</p>
-              <p className="text-sm text-muted">They&apos;ll show up here when you have any.</p>
+            <li className="flex flex-col items-center py-8 text-center">
+              <CalendarX className="h-7 w-7 text-muted" aria-hidden />
+              <p className="mt-2 text-sm font-semibold text-navy">No {tab.toLowerCase()} bookings</p>
+              <p className="text-[13px] text-muted">They&apos;ll show up here when you have any.</p>
             </li>
           ) : null}
         </ul>
-      </section>
+      </AccountDashboardPanel>
 
-      <section className="rounded-[24px] bg-white p-4 sm:p-5">
-        <h2 className="text-2xl font-extrabold tracking-tight text-navy">Reports</h2>
-        <p className="mt-0.5 text-[13px] text-muted">Lab reports for people on this card.</p>
-
-        <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label="Filter by person">
+      <AccountDashboardPanel title="Reports" subtitle="Lab reports for people on this card.">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by person">
           {people.map((p) => (
             <button
               key={p}
               type="button"
               aria-pressed={person === p}
               onClick={() => setPerson(p)}
-              className={`rounded-full px-4 py-2 text-[15px] font-medium transition-colors duration-150 ${
+              className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors duration-150 ${
                 person === p ? 'bg-mp-coral text-white' : 'bg-mp-teal-50 text-muted hover:text-navy'
               }`}
             >
@@ -125,18 +123,18 @@ export function AccountMpBookingsReportsPage() {
           ))}
         </div>
 
-        <ul className="mt-6 space-y-3">
+        <ul className="mt-3 space-y-2">
           {reportRows.map((b) => {
             const pkg = acc.pkg(b.packageId)
             const member = acc.member(b.memberId)
             return (
-              <li key={b.id} className="flex items-center gap-4 rounded-2xl bg-canvas p-4">
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white text-mp-teal-700">
-                  <FileText className="h-5 w-5" aria-hidden />
+              <li key={b.id} className="flex items-center gap-3 rounded-xl bg-canvas p-3">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white text-mp-teal-700">
+                  <FileText className="h-4 w-4" aria-hidden />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold text-navy">{pkg.name}</p>
-                  <p className="text-sm text-muted">
+                  <p className="text-sm font-bold text-navy">{pkg.name}</p>
+                  <p className="text-[13px] text-muted">
                     {memberShortName(member?.name ?? '')} · {b.date}
                   </p>
                 </div>
@@ -144,19 +142,19 @@ export function AccountMpBookingsReportsPage() {
                   type="button"
                   aria-label={`Download ${pkg.name} PDF`}
                   onClick={() => acc.showToast('Report download is locked until the lab file is linked.')}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-navy transition-colors duration-150 hover:bg-mp-teal-50"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[13px] font-semibold text-navy transition-colors duration-150 hover:bg-mp-teal-50"
                 >
-                  <Download className="h-4 w-4" aria-hidden />
+                  <Download className="h-3.5 w-3.5" aria-hidden />
                   PDF
                 </button>
               </li>
             )
           })}
           {reportRows.length === 0 ? (
-            <li className="rounded-2xl bg-canvas p-6 text-center text-sm text-muted">No reports for {person} yet.</li>
+            <li className="rounded-xl bg-canvas p-4 text-center text-[13px] text-muted">No reports for {person} yet.</li>
           ) : null}
         </ul>
-      </section>
+      </AccountDashboardPanel>
     </div>
   )
 }

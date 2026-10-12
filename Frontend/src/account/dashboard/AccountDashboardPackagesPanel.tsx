@@ -20,15 +20,15 @@ export function AccountDashboardPackagesPanel() {
       >
         <ul className="grid gap-x-10 md:grid-cols-2">
           {ACCOUNT_PACKAGES.map((p) => (
-            <li key={p.id} className="flex items-center gap-5 border-t border-line py-5">
+            <li key={p.id} className="flex items-center gap-4 border-t border-line py-4">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-mp-teal-700">{p.tests} tests</p>
-                <p className="text-[17px] font-semibold text-navy">{p.name}</p>
-                <p className="mt-0.5 truncate text-sm text-muted">{p.summary}</p>
+                <p className="text-xs font-medium text-mp-teal-700">{p.tests} tests</p>
+                <p className="text-[15px] font-semibold text-navy">{p.name}</p>
+                <p className="mt-0.5 truncate text-[13px] text-muted">{p.summary}</p>
               </div>
               <div className="text-right">
-                <p className="text-xl font-extrabold text-navy">{formatMoney(p.price)}</p>
-                <p className="text-sm text-muted line-through">{formatMoney(p.mrp)}</p>
+                <p className="text-lg font-extrabold text-navy">{formatMoney(p.price)}</p>
+                <p className="text-[13px] text-muted line-through">{formatMoney(p.mrp)}</p>
               </div>
               <button
                 type="button"
@@ -37,7 +37,7 @@ export function AccountDashboardPackagesPanel() {
                   acc.choosePackage(p.id)
                   navigate('/account/book/member')
                 }}
-                className={`w-[92px] rounded-full py-2.5 text-sm font-semibold transition-colors duration-150 ${
+                className={`w-[84px] rounded-full py-2 text-[13px] font-semibold transition-colors duration-150 ${
                   added === p.id ? 'bg-mp-teal-50 text-mp-teal-700' : 'bg-mp-coral text-white hover:bg-mp-coral-600'
                 }`}
               >
