@@ -19,6 +19,7 @@ import { ProfilePage } from '@/screens/ProfilePage'
 import { WalletPage } from '@/screens/WalletPage'
 import { RemindersPage } from '@/screens/RemindersPage'
 import { LandingPage } from '@/screens/LandingPage'
+import { ServiceBrowsePage } from '@/screens/ServiceBrowsePage'
 import { AdminDashboardPage } from '@/screens/admin/AdminDashboardPage'
 import { AdminCustomersPage } from '@/screens/admin/AdminCustomersPage'
 import { AdminCustomerDetailPage } from '@/screens/admin/AdminCustomerDetailPage'
@@ -42,6 +43,7 @@ export default function App() {
     <Routes>
       <Route path="/account/*" element={<AccountRoutes />} />
       <Route path="/" element={<LandingPage />} />
+      <Route path="/browse/:categoryId" element={<ServiceBrowsePage />} />
       <Route path="/splash" element={<SplashPage />} />
       <Route path="/onboarding" element={<OnboardingPage />} />
       <Route element={<GuestRoute />}>

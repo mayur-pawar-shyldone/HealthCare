@@ -5,15 +5,11 @@ import type { RootState } from '@/store'
 import { CardSignupModal } from '@/components/landing/CardSignupModal'
 import { LandingCardHkSection } from '@/components/landing/LandingCardHkSection'
 import { LandingFamilyCardSection } from '@/components/landing/LandingFamilyCardSection'
-import { LandingHealthJourneySection } from '@/components/landing/LandingHealthJourneySection'
 import { LandingHero } from '@/components/landing/LandingHero'
 import { LandingJourneyInteractive } from '@/components/landing/LandingJourneyInteractive'
 import { LandingFooter, LandingHeader } from '@/components/landing/LandingLayout'
-import { LandingHealthPackages } from '@/components/landing/LandingRateList'
-import { LandingLabVerticalSection } from '@/components/landing/LandingLabVerticalSection'
 import { LandingScansSection } from '@/components/landing/LandingScansSection'
-import { LandingPackagesMostBooked } from '@/components/landing/LandingPackagesMostBooked'
-import { LandingPopularCheckups } from '@/components/landing/LandingPopularCheckups'
+import { LandingShowcaseSection } from '@/components/landing/LandingShowcaseSection'
 import { LandingServicesCarousel } from '@/components/landing/LandingServicesCarousel'
 import { LandingTestimonialsSection } from '@/components/landing/LandingTestimonialsSection'
 
@@ -41,14 +37,10 @@ export function LandingPage() {
       <main>
         <LandingHero />
         <LandingServicesCarousel />
-        <LandingPackagesMostBooked />
-        <LandingPopularCheckups />
-        <LandingHealthPackages />
-        <LandingLabVerticalSection />
+        <LandingShowcaseSection />
         <LandingCardHkSection />
         <LandingScansSection />
         <LandingFamilyCardSection />
-        <LandingHealthJourneySection />
         <LandingJourneyInteractive />
         <LandingTestimonialsSection />
       </main>

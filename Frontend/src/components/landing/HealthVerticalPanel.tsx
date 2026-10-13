@@ -25,6 +25,8 @@ import {
   Users,
 } from 'lucide-react'
 import { HEALTH_VERTICALS, type HealthVertical } from '@/data/landing-nav-data'
+import { serviceBrowsePath, slugifyBrowseKey, type BrowseCategoryId } from '@/data/service-browse'
+import { Link } from 'react-router-dom'
 import { openHealthCard } from '@/lib/health-card-bus'
 import { LabBrowsePackageCard } from '@/components/landing/LabBrowsePackageCard'
 
@@ -64,6 +66,7 @@ type Props = {
   sidebarEyebrow?: string
   sidebarBadge?: string
   packageCountLabel?: string
+  browseCategoryId?: BrowseCategoryId
 }
 
 /** HealthID browse-by-need panel — sidebar + package cards (Blood Test, ECG, etc.). */
@@ -75,6 +78,7 @@ export function HealthVerticalPanel({
   sidebarEyebrow = 'Browse by health need',
   sidebarBadge = 'NABL labs • Home collection',
   packageCountLabel = 'packages',
+  browseCategoryId,
 }: Props) {
   const initialId = defaultActiveId ?? verticals[0]?.id ?? HEALTH_VERTICALS[0].id
   const [activeId, setActiveId] = useState(initialId)
@@ -100,6 +104,7 @@ export function HealthVerticalPanel({
         compact={compact}
         packageCountLabel={packageCountLabel}
         onNavigate={onNavigate}
+        browseCategoryId={browseCategoryId}
       />
     </div>
   )
@@ -230,11 +235,13 @@ function MainPanel({
   compact,
   packageCountLabel,
   onNavigate,
+  browseCategoryId,
 }: {
   active: HealthVertical
   compact?: boolean
   packageCountLabel: string
   onNavigate?: () => void
+  browseCategoryId?: BrowseCategoryId
 }) {
   return (
     <div className="bg-white p-6">
@@ -248,29 +255,63 @@ function MainPanel({
         </span>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        {active.quickLinks.map((link) => (
-          <span key={link} className="rounded-full border border-brand-200 bg-brand-50 px-3 py-1.5 text-[12.5px] font-medium text-ink-soft">
-            {link}
-          </span>
-        ))}
+        {active.quickLinks.map((link) =>
+          browseCategoryId ? (
+            <Link
+              key={link}
+              to={serviceBrowsePath(browseCategoryId, active.id, slugifyBrowseKey(link))}
+              onClick={onNavigate}
+              className="group/link relative inline-flex items-center rounded-full border border-brand-200 bg-brand-50 px-3 py-1.5 text-[12.5px] font-medium text-ink-soft transition hover:border-teal hover:bg-white hover:text-ink"
+            >
+              <span className="transition-opacity group-hover/link:opacity-0">{link}</span>
+              <span className="absolute inset-0 flex items-center justify-center gap-1 text-[12px] font-bold text-teal opacity-0 transition-opacity group-hover/link:opacity-100">
+                Book now
+                <ArrowRight className="h-3 w-3" aria-hidden />
+              </span>
+            </Link>
+          ) : (
+            <span
+              key={link}
+              className="rounded-full border border-brand-200 bg-brand-50 px-3 py-1.5 text-[12.5px] font-medium text-ink-soft"
+            >
+              {link}
+            </span>
+          ),
+        )}
       </div>
       <ul className="mt-4 grid gap-3 md:grid-cols-3">
         {active.packages.map((pkg) => (
           <li key={pkg.id} className="min-w-0">
-            <LabBrowsePackageCard pkg={pkg} onNavigate={onNavigate} />
+            <LabBrowsePackageCard
+              pkg={pkg}
+              onNavigate={onNavigate}
+              browseCategoryId={browseCategoryId}
+              browseTabId={active.id}
+            />
           </li>
         ))}
       </ul>
       {compact ? (
         <div className="mt-6 flex justify-center">
-          <a
-            href="#packages"
-            onClick={onNavigate}
-            className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 px-4 py-2 text-[13.5px] font-semibold text-ink-soft transition hover:border-brand-200 hover:text-ink"
-          >
-            View all
-            <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-          </a>
+          {browseCategoryId ? (
+            <Link
+              to={serviceBrowsePath(browseCategoryId, active.id)}
+              onClick={onNavigate}
+              className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 px-4 py-2 text-[13.5px] font-semibold text-ink-soft transition hover:border-brand-200 hover:text-ink"
+            >
+              View all
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+            </Link>
+          ) : (
+            <a
+              href="#showcase"
+              onClick={onNavigate}
+              className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 px-4 py-2 text-[13.5px] font-semibold text-ink-soft transition hover:border-brand-200 hover:text-ink"
+            >
+              View all
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+            </a>
+          )}
         </div>
       ) : null}
     </div>

@@ -119,14 +119,15 @@ export function LandingCategoryMenu() {
           >
             <div className="menu-drop mx-auto max-w-7xl">
               {active.id === 'radiology' ? (
-                <RadMenu />
+                <RadMenu onNavigate={closeMenu} />
               ) : active.id === 'blood-test' ? (
-                <HealthVerticalPanel compact onNavigate={closeMenu} />
+                <HealthVerticalPanel compact browseCategoryId="blood-test" onNavigate={closeMenu} />
               ) : active.id === 'ecg' ? (
-                <HealthVerticalPanel compact onNavigate={closeMenu} defaultActiveId="heart" />
+                <HealthVerticalPanel compact browseCategoryId="ecg" onNavigate={closeMenu} defaultActiveId="heart" />
               ) : active.id === 'doctor' ? (
                 <HealthVerticalPanel
                   compact
+                  browseCategoryId="doctor"
                   onNavigate={closeMenu}
                   verticals={DOCTOR_VERTICALS}
                   defaultActiveId="doc-gp-care"
@@ -137,6 +138,7 @@ export function LandingCategoryMenu() {
               ) : active.id === 'ayurveda' ? (
                 <HealthVerticalPanel
                   compact
+                  browseCategoryId="ayurveda"
                   onNavigate={closeMenu}
                   verticals={AYURVEDA_VERTICALS}
                   defaultActiveId="ayu-consult-root"
@@ -147,6 +149,7 @@ export function LandingCategoryMenu() {
               ) : active.id === 'pharmacy' ? (
                 <HealthVerticalPanel
                   compact
+                  browseCategoryId="pharmacy"
                   onNavigate={closeMenu}
                   verticals={PHARMACY_VERTICALS}
                   defaultActiveId="ph-rx"

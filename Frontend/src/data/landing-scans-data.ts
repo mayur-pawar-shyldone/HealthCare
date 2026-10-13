@@ -42,15 +42,3 @@ export const SCAN_TESTS: ScanTest[] = [
   },
 ]
 
-export const SCAN_LAYOUT_OPTIONS = [
-  {
-    label: 'Option 7',
-    title: 'Bottom Sheet',
-    note: 'A white sheet docked at the base of the photo — hover to slide up the full details and a booking button.',
-  },
-  {
-    label: 'Option 9',
-    title: '3D Flip',
-    note: 'Photo and price on the front — hover to flip the card over and reveal the full details on a brand-blue back.',
-  },
-] as const

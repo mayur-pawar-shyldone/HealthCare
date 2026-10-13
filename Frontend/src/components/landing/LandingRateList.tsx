@@ -133,7 +133,8 @@ export function LandingRateList() {
   )
 }
 
-export { LandingShowcaseSection as LandingHealthPackages } from '@/components/landing/LandingShowcaseSection'
+/** @deprecated Use `LandingRateList` — name kept for older imports */
+export { LandingRateList as LandingHealthPackages }
 
 export function LandingPopularTests() {
   const featured = POPULAR_TESTS.slice(0, 4)

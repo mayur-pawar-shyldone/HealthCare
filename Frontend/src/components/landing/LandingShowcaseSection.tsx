@@ -7,7 +7,7 @@ function categoryTabId(category: string) {
   return `showcase-tab-${category.replace(/\s+/g, '-').toLowerCase()}`
 }
 
-/** HealthID `ck` — Full body checkups showcase */
+/** Member-priced package grid with category tabs */
 export function LandingShowcaseSection() {
   const [category, setCategory] = useState<ShowcaseCategory>('Full body')
 
@@ -23,13 +23,13 @@ export function LandingShowcaseSection() {
           <div className="max-w-xl">
             <p className="inline-flex items-center gap-1.5 text-[13px] font-bold text-teal">
               <MapPin className="h-4 w-4" aria-hidden />
-              Mumbai · home collection
+              Nashik · home collection
             </p>
             <h2
               id="showcase-heading"
               className="mt-3 font-editorial text-[32px] font-bold leading-[1.12] text-ink sm:text-[40px]"
             >
-              Full body checkups, collected at home
+              Popular plans
             </h2>
             <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">
               Card holder rates below MRP, reports on WhatsApp, and one price per person for the whole family.

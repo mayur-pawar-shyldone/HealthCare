@@ -1,6 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { LANDING_SERVICE_TILES } from '@/data/landing-services-data'
+import { serviceBrowsePath, type BrowseCategoryId } from '@/data/service-browse'
+
+const TILE_BROWSE: Partial<Record<string, BrowseCategoryId>> = {
+  'blood-tests': 'blood-test',
+  'full-body': 'blood-test',
+  scans: 'radiology',
+  consult: 'doctor',
+  prescription: 'blood-test',
+}
 
 export function LandingServicesCarousel() {
   const scroller = useRef<HTMLUListElement>(null)
@@ -73,12 +83,12 @@ export function LandingServicesCarousel() {
           onScroll={measure}
           className="no-scrollbar mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2"
         >
-          {LANDING_SERVICE_TILES.map((item) => (
-            <li key={item.id} className="w-[184px] shrink-0 snap-start sm:w-[208px]">
-              <a
-                href="#checkups"
-                className="group block rounded-[24px] outline-none focus-visible:ring-4 focus-visible:ring-brand-100"
-              >
+          {LANDING_SERVICE_TILES.map((item) => {
+            const browseId = TILE_BROWSE[item.id]
+            const browseTab = item.id === 'full-body' ? 'full-body' : undefined
+            const tileClass = 'group block rounded-[24px] outline-none focus-visible:ring-4 focus-visible:ring-brand-100'
+            const inner = (
+              <>
                 <div className="relative overflow-hidden rounded-[24px] bg-mint">
                   <img
                     src={item.image}
@@ -99,9 +109,23 @@ export function LandingServicesCarousel() {
                     aria-hidden
                   />
                 </div>
-              </a>
-            </li>
-          ))}
+              </>
+            )
+
+            return (
+              <li key={item.id} className="w-[184px] shrink-0 snap-start sm:w-[208px]">
+                {browseId ? (
+                  <Link to={serviceBrowsePath(browseId, browseTab)} className={tileClass}>
+                    {inner}
+                  </Link>
+                ) : (
+                  <a href="#showcase" className={tileClass}>
+                    {inner}
+                  </a>
+                )}
+              </li>
+            )
+          })}
         </ul>
 
         {pages > 1 ? (

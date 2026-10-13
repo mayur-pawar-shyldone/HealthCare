@@ -92,7 +92,7 @@ export function LandingHero() {
         </ul>
         <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[12px] font-medium text-ink-muted">
           <MapPin className="h-3.5 w-3.5 text-brand-500" aria-hidden />
-          Home collection in Mumbai, Delhi NCR, Bangalore &amp; more
+          Home collection in Nashik
         </p>
       </div>
     </section>
