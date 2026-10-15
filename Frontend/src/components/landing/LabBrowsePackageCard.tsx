@@ -2,6 +2,9 @@ import { Activity, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { LandingPackagePreview } from '@/data/landing-nav-data'
 import { serviceBrowsePath, type BrowseCategoryId } from '@/data/service-browse'
+import { useCartActions } from '@/components/site/useCartActions'
+import { useBookingCart } from '@/cart/BookingCartContext'
+import { resolveCartPackageImage } from '@/lib/cart-package-image'
 
 type Props = {
   pkg: LandingPackagePreview
@@ -12,8 +15,18 @@ type Props = {
 
 /** Package tile — browse-by-need mega menu (Blood Test, ECG, etc.). */
 export function LabBrowsePackageCard({ pkg, onNavigate, browseCategoryId, browseTabId }: Props) {
+  const { addToCart, addAndBook } = useCartActions()
+  const cartUi = useBookingCart()
+  const cartItem = {
+    id: pkg.id,
+    name: pkg.name,
+    memberPrice: pkg.price,
+    mrp: pkg.mrp,
+    testCount: pkg.tests,
+    imageUrl: resolveCartPackageImage(pkg.id),
+  }
   const browseTo =
-    browseCategoryId && browseTabId ? serviceBrowsePath(browseCategoryId, browseTabId, pkg.id) : '/signup'
+    browseCategoryId && browseTabId ? serviceBrowsePath(browseCategoryId, browseTabId, pkg.id) : '/browse/health-checkups'
   const save = pkg.mrp > 0 ? Math.round(((pkg.mrp - pkg.price) / pkg.mrp) * 100) : 0
   const comingSoon = pkg.price <= 0
   const isInstant = /instant/i.test(pkg.reportIn)
@@ -81,14 +94,30 @@ export function LabBrowsePackageCard({ pkg, onNavigate, browseCategoryId, browse
           </span>
         ) : (
           <>
-            <Link
-              to={browseTo}
-              onClick={onNavigate}
-              className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition hover:bg-brand-600 group-hover/card:gap-2.5"
-            >
-              Book now
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-            </Link>
+            <div className="mt-4 flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  addToCart(cartItem)
+                  cartUi.openDrawer()
+                  onNavigate?.()
+                }}
+                className="inline-flex h-10 items-center justify-center rounded-full border border-line text-sm font-semibold text-ink hover:border-teal/40"
+              >
+                Add to cart
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  addAndBook(cartItem)
+                  onNavigate?.()
+                }}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition hover:bg-brand-600"
+              >
+                Book now
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+              </button>
+            </div>
             <Link
               to={browseTo}
               onClick={onNavigate}

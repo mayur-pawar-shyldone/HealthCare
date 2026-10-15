@@ -1,4 +1,4 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import { useAccount } from '@/account/AccountContext'
 import { AccountLoginPage } from '@/account/AccountLoginPage'
 import { AccountShell } from '@/account/AccountShell'
@@ -19,13 +19,14 @@ import {
 /** OTP login from pasted HealthID account portal — use at `/login`. */
 export function AccountLoginGate() {
   const acc = useAccount()
-  if (acc.authed) return <Navigate to="/account/dashboard" replace />
+  if (acc.authed) return <Navigate to="/" replace />
   return <AccountLoginPage />
 }
 
 function AccountProtected() {
   const acc = useAccount()
-  if (!acc.authed) return <Navigate to="/login" replace />
+  const location = useLocation()
+  if (!acc.authed) return <Navigate to="/login" replace state={{ from: location.pathname }} />
   return <Outlet />
 }
 

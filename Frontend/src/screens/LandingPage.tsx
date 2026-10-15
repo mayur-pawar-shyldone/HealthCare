@@ -1,9 +1,7 @@
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import type { RootState } from '@/store'
+import { useLocation } from 'react-router-dom'
+import { POPULAR_PLANS_SECTION_ID, scrollToPopularPlans } from '@/lib/landing-nav-scroll'
 import { CardSignupModal } from '@/components/landing/CardSignupModal'
-import { LandingCardHkSection } from '@/components/landing/LandingCardHkSection'
 import { LandingFamilyCardSection } from '@/components/landing/LandingFamilyCardSection'
 import { LandingHero } from '@/components/landing/LandingHero'
 import { LandingJourneyInteractive } from '@/components/landing/LandingJourneyInteractive'
@@ -15,17 +13,27 @@ import { LandingTestimonialsSection } from '@/components/landing/LandingTestimon
 
 /** Section order: hero → services → packages → … (LabVert removed per product request) */
 export function LandingPage() {
-  const navigate = useNavigate()
-  const { user, accessToken } = useSelector((s: RootState) => s.auth)
+  const { hash } = useLocation()
 
   useEffect(() => {
-    if (user?.id && accessToken) navigate('/home', { replace: true })
-  }, [user, accessToken, navigate])
+    if (!hash) return
+    const id = hash.replace('#', '')
+    if (id === POPULAR_PLANS_SECTION_ID) {
+      scrollToPopularPlans('smooth')
+      return
+    }
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [hash])
 
   useEffect(() => {
     document.body.style.overflow = 'auto'
+    document.documentElement.style.overflow = 'auto'
+    const root = document.getElementById('root')
+    if (root) root.style.overflow = 'auto'
     return () => {
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
+      if (root) root.style.overflow = ''
     }
   }, [])
 
@@ -38,7 +46,6 @@ export function LandingPage() {
         <LandingHero />
         <LandingServicesCarousel />
         <LandingShowcaseSection />
-        <LandingCardHkSection />
         <LandingScansSection />
         <LandingFamilyCardSection />
         <LandingJourneyInteractive />

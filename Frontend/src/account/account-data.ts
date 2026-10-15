@@ -31,6 +31,8 @@ export type Booking = {
   packageId: string
   memberId: string
   addressId: string
+  /** Full line when addressId is custom or saved label is not enough */
+  addressLine?: string
   date: string
   slot: string
   status: 'Upcoming' | 'Completed' | 'Cancelled' | 'Rescheduled'

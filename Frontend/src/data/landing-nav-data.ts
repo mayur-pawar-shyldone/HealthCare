@@ -634,3 +634,56 @@ export const RADIOLOGY_GROUPS: RadiologyGroup[] = [
     ],
   },
 ]
+
+function radiologyParseInr(price: string): number {
+  const match = price.match(/[\d,]+/)
+  return match ? Number(match[0].replace(/,/g, '')) : 0
+}
+
+function radiologySlug(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 48)
+}
+
+function radiologyItemToPackage(group: RadiologyGroup, item: RadiologyItem): LandingPackagePreview {
+  const price = radiologyParseInr(item.price)
+  const mrp = price > 0 ? Math.round(price * 2.15) : 1999
+  const name = item.detail ? `${item.name} — ${item.detail}` : item.name
+  return {
+    id: `rad-${group.id}-${radiologySlug(item.name)}`,
+    name,
+    tests: 1,
+    reportIn: '24 hrs',
+    price: price > 0 ? price : 0,
+    mrp,
+    ...(price <= 0 ? { tag: 'On request' } : {}),
+  }
+}
+
+function quickLinksForRadiologyGroup(group: RadiologyGroup): string[] {
+  const links: string[] = []
+  for (const item of group.items) {
+    const label = item.name.length > 30 ? `${item.name.slice(0, 28)}…` : item.name
+    if (links.length >= 4) break
+    links.push(label)
+  }
+  return links
+}
+
+/** Radiology mega-menu panels — same shape as blood-test / ECG verticals. */
+export const RADIOLOGY_VERTICALS: HealthVertical[] = RADIOLOGY_GROUPS.map((group) => ({
+  id: group.id,
+  label: group.label,
+  subtitle: `${group.items.length} studies`,
+  headline: group.note ?? `${group.label} at member rates in Nashik`,
+  points: [
+    'NRI-affiliated imaging centres in Nashik',
+    'Digital reports with radiologist review',
+    'HealthID Card member pricing on every study',
+  ],
+  quickLinks: quickLinksForRadiologyGroup(group),
+  packages: group.items.map((item) => radiologyItemToPackage(group, item)),
+}))

@@ -1,17 +1,22 @@
 import type { FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAccount } from '@/account/AccountContext'
 import { readForm } from '@/account/form-utils'
 
 export function AccountLoginPage() {
   const acc = useAccount()
   const navigate = useNavigate()
+  const location = useLocation()
   const creating = acc.loginMode === 'create'
+  const from = (location.state as { from?: string } | null)?.from
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const data = readForm(e.currentTarget) as { mobile: string; name?: string; otp?: string }
-    if (acc.submitLogin(data)) navigate('/account/dashboard')
+    if (acc.submitLogin(data)) {
+      const dest = from && from !== '/login' ? from : '/'
+      navigate(dest, { replace: true })
+    }
   }
 
   return (
@@ -84,11 +89,6 @@ export function AccountLoginPage() {
             <button type="button" className="linkish" onClick={() => acc.loginHelp()}>
               Help / support
             </button>
-          </p>
-          <p className="fine" style={{ fontSize: 12 }}>
-            <Link to="/login/password" className="linkish">
-              Email &amp; password login (demo app)
-            </Link>
           </p>
         </form>
       </section>

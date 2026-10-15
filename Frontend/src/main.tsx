@@ -6,6 +6,8 @@ import { BrowserRouter } from 'react-router-dom'
 import { store } from '@/store'
 import App from './App.tsx'
 import { AccountProvider } from '@/account/AccountContext'
+import { BookingCartProvider } from '@/cart/BookingCartContext'
+import { SiteCartUi } from '@/components/site/SiteCartUi'
 import './index.css'
 import './styles/healthid-tailwind.css'
 import './styles/healthid-account.css'
@@ -27,7 +29,10 @@ createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AccountProvider>
-            <App />
+            <BookingCartProvider>
+              <App />
+              <SiteCartUi />
+            </BookingCartProvider>
           </AccountProvider>
         </BrowserRouter>
       </QueryClientProvider>

@@ -2,7 +2,7 @@ import { Sparkles } from 'lucide-react'
 import { useMemo } from 'react'
 import { PLATFORM } from '@/data/platform-content'
 import { useAccount } from '@/account/AccountContext'
-import { CardMarketingFront, type HealthIdCardData } from '@/components/brand/HealthIdCard'
+import { CardMarketingFront, HEALTH_ID_CARD_IMAGES, type HealthIdCardData } from '@/components/brand/HealthIdCard'
 import { cn } from '@/lib/utils'
 
 type AccountMemberCardProps = {
@@ -37,9 +37,9 @@ export function AccountMemberCard({ className, showCaption = true }: AccountMemb
   )
 
   return (
-    <div className={cn('mx-auto w-full max-w-[420px]', className)}>
-      <div className="relative aspect-[1.586/1] w-full">
-        <CardMarketingFront data={data} />
+    <div className={cn('mx-auto w-full max-w-[420px] bg-transparent', className)}>
+      <div className="relative aspect-[1.586/1] w-full bg-transparent">
+        <CardMarketingFront data={data} imageSrc={HEALTH_ID_CARD_IMAGES.hero} />
       </div>
       {showCaption ? (
         <div className="mt-4 space-y-2 text-center">

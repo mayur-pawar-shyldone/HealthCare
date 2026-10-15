@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Check, ChevronDown, ScanLine } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { SCAN_TESTS } from '@/data/landing-scans-data'
-import { serviceBrowsePath } from '@/data/service-browse'
+import { bookStartUrl } from '@/booking/booking-url'
 
 function ScanBottomSheetCard({ test }: { test: (typeof SCAN_TESTS)[0] }) {
   const [open, setOpen] = useState(false)
@@ -13,12 +13,13 @@ function ScanBottomSheetCard({ test }: { test: (typeof SCAN_TESTS)[0] }) {
     if (pointerType !== 'mouse') setOpen((s) => !s)
   }
 
-  const bookTo =
-    test.id === 'ultrasound'
-      ? serviceBrowsePath('radiology', 'usg')
-      : test.id === 'digital-xray'
-        ? serviceBrowsePath('radiology', 'xray')
-        : serviceBrowsePath('ecg', 'heart')
+  const bookTo = bookStartUrl({
+    id: test.id,
+    name: test.name,
+    memberPrice: test.offerPrice,
+    mrp: test.originalPrice,
+    testCount: 1,
+  })
 
   return (
     <article

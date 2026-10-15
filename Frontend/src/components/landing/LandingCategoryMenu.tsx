@@ -14,6 +14,7 @@ export function LandingCategoryMenu() {
   const [openId, setOpenId] = useState<string | null>(null)
   const closeTimer = useRef<number | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
+  const dropRef = useRef<HTMLDivElement>(null)
   const reduceMotion = useReducedMotion()
   const active = LANDING_NAV_CATEGORIES.find((c) => c.id === openId) ?? null
 
@@ -51,11 +52,30 @@ export function LandingCategoryMenu() {
     backdrop.className = 'menu-backdrop'
     const close = () => setOpenId(null)
     backdrop.addEventListener('click', close)
+    backdrop.addEventListener('mouseenter', close)
     document.body.appendChild(backdrop)
     return () => {
       backdrop.removeEventListener('click', close)
+      backdrop.removeEventListener('mouseenter', close)
       backdrop.remove()
     }
+  }, [openId])
+
+  useEffect(() => {
+    if (!openId) return
+    const onMove = (e: MouseEvent) => {
+      const drop = dropRef.current
+      const nav = rootRef.current
+      if (!drop || !nav) return
+      const dropR = drop.getBoundingClientRect()
+      const navR = nav.getBoundingClientRect()
+      const { clientX: x, clientY: y } = e
+      const inDrop = x >= dropR.left && x <= dropR.right && y >= dropR.top && y <= dropR.bottom
+      const inNav = x >= navR.left && x <= navR.right && y >= navR.top && y <= navR.bottom
+      if (!inDrop && !inNav) scheduleClose()
+    }
+    document.addEventListener('mousemove', onMove)
+    return () => document.removeEventListener('mousemove', onMove)
   }, [openId])
 
   const closeMenu = () => setOpenId(null)
@@ -114,10 +134,10 @@ export function LandingCategoryMenu() {
             animate={{ opacity: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
-            className="absolute inset-x-0 top-full z-40 px-4 pb-6 md:px-6"
+            className="pointer-events-none absolute inset-x-0 top-full z-40 px-4 pb-6 md:px-6"
             onMouseEnter={clearCloseTimer}
           >
-            <div className="menu-drop mx-auto max-w-7xl">
+            <div ref={dropRef} className="menu-drop pointer-events-auto mx-auto max-w-7xl">
               {active.id === 'radiology' ? (
                 <RadMenu onNavigate={closeMenu} />
               ) : active.id === 'blood-test' ? (

@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Plus } from 'lucide-react'
-import { ACCOUNT_PACKAGES } from '@/account/account-data'
 import { useAccount } from '@/account/AccountContext'
+import { navigateToPopularPlans } from '@/lib/landing-nav-scroll'
 import { AccountDashboardPanel } from '@/account/dashboard/AccountDashboardPanel'
 import { ageFromDob, memberInitials, memberShortName } from '@/account/dashboard/mp-utils'
 
@@ -98,9 +98,8 @@ export function AccountDashboardFamilyPanel({ onAddMember }: Props) {
         <button
           type="button"
           onClick={() => {
-            acc.choosePackage(ACCOUNT_PACKAGES[0].id)
             acc.setDraftPartial({ memberId: selected.id })
-            navigate('/account/book/member')
+            navigateToPopularPlans(navigate)
           }}
           className="rounded-full bg-navy py-2.5 text-center text-[13px] font-semibold text-white transition-colors hover:bg-navy-600"
         >

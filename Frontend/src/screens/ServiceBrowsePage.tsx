@@ -120,7 +120,7 @@ function BrowseContent({ categoryId }: { categoryId: BrowseCategoryId }) {
                 highlight ? 'rounded-[28px] ring-2 ring-teal ring-offset-2 ring-offset-[#f4f9fb]' : ''
               }`}
             >
-              <LandingShowcaseCard pkg={pkg} bookTo="/signup" />
+                <LandingShowcaseCard pkg={pkg} />
             </li>
           )
         })}
@@ -134,8 +134,13 @@ export function ServiceBrowsePage() {
 
   useEffect(() => {
     document.body.style.overflow = 'auto'
+    document.documentElement.style.overflow = 'auto'
+    const root = document.getElementById('root')
+    if (root) root.style.overflow = 'auto'
     return () => {
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
+      if (root) root.style.overflow = ''
     }
   }, [])
 

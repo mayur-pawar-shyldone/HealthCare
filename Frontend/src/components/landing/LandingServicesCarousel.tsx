@@ -119,7 +119,7 @@ export function LandingServicesCarousel() {
                     {inner}
                   </Link>
                 ) : (
-                  <a href="#showcase" className={tileClass}>
+                  <a href="#popular-plans" className={tileClass}>
                     {inner}
                   </a>
                 )}

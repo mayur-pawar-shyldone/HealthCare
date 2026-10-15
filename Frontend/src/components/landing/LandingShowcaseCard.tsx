@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { ArrowRight, Clock, FileText, Users } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { useCartActions } from '@/components/site/useCartActions'
+import { useBookingCart } from '@/cart/BookingCartContext'
+import { resolveCartPackageImage } from '@/lib/cart-package-image'
 import {
   SHOWCASE_VISIBLE_INCLUDES,
   showcaseMetaLines,
@@ -14,8 +16,19 @@ function formatInr(amount: number) {
 const META_ICONS = [Clock, Users, FileText] as const
 
 /** HealthID `uk` — showcase package card */
-export function LandingShowcaseCard({ pkg, bookTo = '/signup' }: { pkg: ShowcasePackage; bookTo?: string }) {
+export function LandingShowcaseCard({ pkg, bookTo }: { pkg: ShowcasePackage; bookTo?: string }) {
+  const { addToCart, addAndBook } = useCartActions()
+  const cartUi = useBookingCart()
+  const cartItem = {
+    id: pkg.id,
+    name: pkg.name,
+    memberPrice: pkg.memberPrice,
+    mrp: pkg.mrp,
+    testCount: pkg.testCount,
+    imageUrl: resolveCartPackageImage(pkg.id),
+  }
   const [expandedIncludes, setExpandedIncludes] = useState(false)
+  void bookTo // optional deep-link override from parent browse cards
 
   const savePct = Math.round(((pkg.mrp - pkg.memberPrice) / pkg.mrp) * 100)
   const extraIncludes = Math.max(0, pkg.includes.length - SHOWCASE_VISIBLE_INCLUDES)
@@ -85,13 +98,26 @@ export function LandingShowcaseCard({ pkg, bookTo = '/signup' }: { pkg: Showcase
               <span className="ml-1.5">MRP</span>
             </p>
           </div>
-          <Link
-            to={bookTo}
-            className="inline-flex h-12 shrink-0 items-center gap-2 rounded-xl bg-teal px-5 text-[14.5px] font-bold text-white transition-[transform,background-color] duration-150 ease-out hover:bg-teal-dark active:scale-[0.98]"
-          >
-            Book now
-            <ArrowRight className="h-4 w-4" aria-hidden />
-          </Link>
+          <div className="grid w-full min-w-[240px] grid-cols-2 gap-2 sm:w-[280px]">
+            <button
+              type="button"
+              onClick={() => {
+                addToCart(cartItem)
+                cartUi.openDrawer()
+              }}
+              className="inline-flex h-12 w-full min-w-0 items-center justify-center rounded-xl border border-line px-3 text-[13px] font-bold leading-tight text-ink transition hover:border-teal/40 sm:text-[13.5px]"
+            >
+              Add to cart
+            </button>
+            <button
+              type="button"
+              onClick={() => addAndBook(cartItem)}
+              className="inline-flex h-12 w-full min-w-0 items-center justify-center gap-1.5 rounded-xl bg-teal px-3 text-[13px] font-bold text-white transition-[transform,background-color] duration-150 ease-out hover:bg-teal-dark active:scale-[0.98] sm:text-[13.5px]"
+            >
+              Book now
+              <ArrowRight className="h-4 w-4 shrink-0" aria-hidden />
+            </button>
+          </div>
         </div>
       </div>
     </article>

@@ -17,7 +17,7 @@ export function LandingShowcaseSection() {
   )
 
   return (
-    <section id="showcase" className="bg-cream py-20" aria-labelledby="showcase-heading">
+    <section id="popular-plans" className="scroll-mt-28 bg-cream py-20" aria-labelledby="showcase-heading">
       <div className="mx-auto max-w-7xl px-6">
         <header className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-xl">

@@ -83,6 +83,13 @@ type AccountContextValue = AccountState & {
   submitMemberStep: (memberId: string, addressId: string) => boolean
   submitSlotStep: () => boolean
   confirmBooking: () => void
+  confirmCartBookings: (items: { id: string; name: string; memberPrice: number }[], visit: {
+    memberId: string
+    addressId: string
+    addressLine?: string
+    dateLabel: string
+    slot: string
+  }) => void
   rescheduleBooking: (id: string) => void
   cancelBooking: (id: string) => boolean
   setDraftPartial: (patch: Partial<BookDraft>) => void
@@ -332,6 +339,26 @@ export function AccountProvider({ children }: { children: ReactNode }) {
               ...s.bookings,
             ],
           }
+        })
+      },
+      confirmCartBookings: (items, visit) => {
+        setState((s) => {
+          const base = Date.now()
+          const created = items.map((item, i) => {
+            const p = ACCOUNT_PACKAGES.find((x) => x.id === item.id)
+            return {
+              id: `HID-${String(base + i).slice(-5)}`,
+              packageId: p?.id ?? item.id,
+              memberId: visit.memberId,
+              addressId: visit.addressId,
+              addressLine: visit.addressLine,
+              date: visit.dateLabel,
+              slot: visit.slot,
+              status: 'Upcoming' as const,
+              amount: p?.price ?? item.memberPrice,
+            }
+          })
+          return { ...s, bookings: [...created, ...s.bookings] }
         })
       },
       rescheduleBooking: (id) => {
