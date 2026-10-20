@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom'
-import { CalendarDays, FileText, FlaskConical, UserRound, Wallet } from 'lucide-react'
+import { CalendarDays, FileText, FlaskConical, UserRound } from 'lucide-react'
 
 const items = [
   { to: '/tests', label: 'Tests', icon: FlaskConical, bg: 'bg-teal-light', color: 'text-teal' },
-  { to: '/wallet', label: 'Wallet', icon: Wallet, bg: 'bg-amber-50', color: 'text-amber-700' },
   { to: '/appointments', label: 'Bookings', icon: CalendarDays, bg: 'bg-red-50', color: 'text-[#e03a28]' },
   { to: '/history', label: 'Reports', icon: FileText, bg: 'bg-indigo-50', color: 'text-indigo-600' },
   { to: '/profile', label: 'Profile', icon: UserRound, bg: 'bg-emerald-50', color: 'text-emerald-600' },
@@ -11,7 +10,7 @@ const items = [
 
 export function HomeQuickNav() {
   return (
-    <nav aria-label="Quick navigation" className="grid grid-cols-5 gap-2 sm:gap-3">
+    <nav aria-label="Quick navigation" className="grid grid-cols-4 gap-2 sm:gap-3">
       {items.map((item) => {
         const Icon = item.icon
         return (

@@ -1,14 +1,12 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronRight, CreditCard, Sparkles, Users } from 'lucide-react'
+import { CreditCard, Sparkles, Users } from 'lucide-react'
 import api, { unwrap } from '@/services/api'
 import type { MembershipPlan } from '@/types'
 import { PLATFORM } from '@/data/platform-content'
 import { HealthIdCard, type HealthIdCardData } from '@/components/brand/HealthIdCard'
 import { Loading } from '@/components/ui/Loading'
 import { MembershipEditPanel } from './MembershipEditPanel'
-import { HomeWalletPanel } from './HomeWalletPanel'
 import { HomeCardActions } from './HomeCardActions'
 import { HomeActivatePanel } from './HomeActivatePanel'
 import { CardBenefitsList, FamilyOnCardPanel, hubSectionClassName } from './CardFamilyHubPanels'
@@ -46,7 +44,6 @@ export function HomeHealthIdCard({ hasMembership, editOpen, onEditOpen, hasAddre
       qc.invalidateQueries({ queryKey: ['membership'] })
       qc.invalidateQueries({ queryKey: ['dashboard'] })
       qc.invalidateQueries({ queryKey: ['card'] })
-      qc.invalidateQueries({ queryKey: ['wallet'] })
     },
   })
 
@@ -78,7 +75,7 @@ export function HomeHealthIdCard({ hasMembership, editOpen, onEditOpen, hasAddre
             <p className="mt-0.5 text-sm text-ink-soft">
               {hasMembership
                 ? 'Your digital card, member benefits, and family you can book for'
-                : 'Activate once for member rates, family coverage & wallet bonus'}
+                : 'Activate once for member rates and family coverage'}
             </p>
           </div>
         </div>
@@ -133,7 +130,7 @@ export function HomeHealthIdCard({ hasMembership, editOpen, onEditOpen, hasAddre
                     </div>
                     <p className="mt-4 font-display text-lg text-ink">Your card appears here</p>
                     <p className="mt-1 max-w-[240px] text-sm text-ink-soft">
-                      One tap activation · Family included · Wallet bonus unlocked instantly
+                      One tap activation · Family included · Member pricing unlocked instantly
                     </p>
                   </div>
                 </div>
@@ -161,16 +158,6 @@ export function HomeHealthIdCard({ hasMembership, editOpen, onEditOpen, hasAddre
         </div>
       </div>
 
-      <div className="border-t border-line/60 bg-white p-5 md:p-6">
-        <div className="mb-4 flex items-center justify-between gap-2">
-          <p className="text-xs font-bold uppercase tracking-wider text-ink-soft">Wallet credits</p>
-          <Link to="/wallet" className="flex items-center gap-0.5 text-xs font-semibold text-teal transition hover:underline">
-            Manage wallet
-            <ChevronRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-        <HomeWalletPanel hasMembership={hasMembership} />
-      </div>
     </section>
   )
 }

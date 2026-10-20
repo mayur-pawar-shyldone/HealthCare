@@ -5,8 +5,6 @@ import { AdminRoute, GuestRoute, ProtectedRoute } from '@/components/layout/Guar
 import { SplashPage } from '@/screens/SplashPage'
 import { OnboardingPage } from '@/screens/OnboardingPage'
 import { LoginPage } from '@/screens/LoginPage'
-import { SignupPage } from '@/screens/SignupPage'
-import { ForgotPasswordPage, ResetPasswordPage } from '@/screens/PasswordPages'
 import { HomePage } from '@/screens/HomePage'
 import { TestsPage } from '@/screens/TestsPage'
 import { TestDetailsPage } from '@/screens/TestDetailsPage'
@@ -16,9 +14,10 @@ import { HistoryPage } from '@/screens/HistoryPage'
 import { NotificationsPage } from '@/screens/NotificationsPage'
 import { SearchPage } from '@/screens/SearchPage'
 import { ProfilePage } from '@/screens/ProfilePage'
-import { WalletPage } from '@/screens/WalletPage'
 import { RemindersPage } from '@/screens/RemindersPage'
 import { LandingPage } from '@/screens/LandingPage'
+import { ServiceBrowsePage } from '@/screens/ServiceBrowsePage'
+import { PublicBookingRoutes } from '@/booking/PublicBookingRoutes'
 import { AdminDashboardPage } from '@/screens/admin/AdminDashboardPage'
 import { AdminCustomersPage } from '@/screens/admin/AdminCustomersPage'
 import { AdminCustomerDetailPage } from '@/screens/admin/AdminCustomerDetailPage'
@@ -42,14 +41,17 @@ export default function App() {
     <Routes>
       <Route path="/account/*" element={<AccountRoutes />} />
       <Route path="/" element={<LandingPage />} />
+      <Route path="/browse/:categoryId" element={<ServiceBrowsePage />} />
+      <Route path="/book/*" element={<PublicBookingRoutes />} />
       <Route path="/splash" element={<SplashPage />} />
       <Route path="/onboarding" element={<OnboardingPage />} />
+      <Route path="/login" element={<AccountLoginGate />} />
+      <Route path="/login/password" element={<Navigate to="/login" replace />} />
+      <Route path="/signup" element={<Navigate to="/login" replace />} />
+      <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
+      <Route path="/reset-password" element={<Navigate to="/login" replace />} />
       <Route element={<GuestRoute />}>
-        <Route path="/login" element={<AccountLoginGate />} />
-        <Route path="/login/password" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/login-legacy" element={<LoginPage />} />
       </Route>
       <Route element={<ProtectedRoute />}>
         <Route element={<AdminRoute />}>
@@ -85,7 +87,7 @@ export default function App() {
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/wallet" element={<Navigate to="/home" replace />} />
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/transactions/:id/invoice" element={<InvoicePage mode="user" />} />
           <Route path="/transactions/:id" element={<TransactionDetailPage />} />

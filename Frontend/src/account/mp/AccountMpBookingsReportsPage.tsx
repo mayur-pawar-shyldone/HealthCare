@@ -35,8 +35,8 @@ export function AccountMpBookingsReportsPage() {
   const people = ['All', ...acc.family.map((f) => memberShortName(f.name))]
 
   return (
-    <div className="grid items-start gap-4 lg:grid-cols-[1.5fr_1fr]">
-      <AccountDashboardPanel title="My bookings" subtitle="Current and past home collections.">
+    <div className="grid items-stretch gap-4 lg:grid-cols-[1.5fr_1fr]">
+      <AccountDashboardPanel title="My bookings" subtitle="Current and past home collections." className="flex h-full flex-col">
         <div role="tablist" className="flex flex-wrap gap-2">
           {bookingTabs.map((t) => (
             <button
@@ -52,7 +52,7 @@ export function AccountMpBookingsReportsPage() {
           ))}
         </div>
 
-        <ul className="mt-3 divide-y divide-line">
+        <ul className="mt-3 flex min-h-[280px] flex-1 flex-col divide-y divide-line">
           {visibleBookings.map((b) => {
             const pkg = acc.pkg(b.packageId)
             const member = acc.member(b.memberId)
@@ -106,7 +106,7 @@ export function AccountMpBookingsReportsPage() {
         </ul>
       </AccountDashboardPanel>
 
-      <AccountDashboardPanel title="Reports" subtitle="Lab reports for people on this card.">
+      <AccountDashboardPanel title="Reports" subtitle="Lab reports for people on this card." className="flex h-full flex-col">
         <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by person">
           {people.map((p) => (
             <button
@@ -123,7 +123,7 @@ export function AccountMpBookingsReportsPage() {
           ))}
         </div>
 
-        <ul className="mt-3 space-y-2">
+        <ul className="mt-3 flex min-h-[280px] flex-1 flex-col space-y-2">
           {reportRows.map((b) => {
             const pkg = acc.pkg(b.packageId)
             const member = acc.member(b.memberId)

@@ -1,5 +1,6 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { LogOut } from 'lucide-react'
+import { ArrowUpRight, LogOut, TestTube2 } from 'lucide-react'
+import { navigateToPopularPlans } from '@/lib/landing-nav-scroll'
 import { useAccount } from '@/account/AccountContext'
 import { AccountMpLogo } from '@/account/mp/AccountMpLogo'
 import { ACCOUNT_MP_NAV } from '@/account/mp/account-mp-nav'
@@ -18,7 +19,26 @@ export function AccountMpSidebar({ onNavigate }: Props) {
         <AccountMpLogo />
       </div>
 
-      <nav aria-label="Main" className="mt-8 flex flex-col gap-1.5">
+      <nav aria-label="Main" className="mt-6 flex flex-col gap-1.5">
+        <button
+          type="button"
+          onClick={() => {
+            navigateToPopularPlans(navigate, onNavigate)
+          }}
+          className="group mx-1 mb-2 flex w-[calc(100%-0.5rem)] flex-col overflow-hidden rounded-2xl border border-mp-teal/25 bg-gradient-to-br from-mp-teal-50 via-white to-mp-coral-50 p-4 text-left shadow-sm transition hover:border-mp-teal hover:shadow-md"
+        >
+          <span className="flex items-start justify-between gap-2">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-navy text-white shadow-sm">
+              <TestTube2 className="h-5 w-5" aria-hidden />
+            </span>
+            <ArrowUpRight
+              className="h-4 w-4 shrink-0 text-mp-teal-700 opacity-60 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
+              aria-hidden
+            />
+          </span>
+          <span className="mt-3 font-display text-[15px] font-bold leading-snug text-navy">Continue browsing tests</span>
+          <span className="mt-1 text-[12.5px] leading-snug text-muted">Popular packages on the home page · member rates</span>
+        </button>
         {ACCOUNT_MP_NAV.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}

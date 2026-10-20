@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, CreditCard, Receipt } from 'lucide-react'
+import { CreditCard, Receipt } from 'lucide-react'
 import api, { unwrap } from '@/services/api'
 import type { PaymentTransactionList } from '@/types'
 import { formatMoney } from '@/lib/utils'
 import { Loading } from '@/components/ui/Loading'
-import { Button } from '@/components/ui/Button'
 import {
   UserBadge,
   UserEmptyRow,
@@ -47,14 +46,6 @@ export function TransactionsPage() {
       <UserPageHeader
         title="Payment history"
         subtitle="Lab booking payments, discounts applied, and settlement status"
-        actions={
-          <Link to="/wallet">
-            <Button variant="secondary" className="rounded-xl">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Wallet
-            </Button>
-          </Link>
-        }
       />
 
       <div className="grid gap-4 sm:grid-cols-3">

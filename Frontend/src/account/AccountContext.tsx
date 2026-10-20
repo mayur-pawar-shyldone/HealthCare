@@ -13,6 +13,8 @@ import {
   BOOKING_DATES,
   INITIAL_ADDRESSES,
   INITIAL_BOOKINGS,
+  MAX_FAMILY_MEMBERS,
+  PRIMARY_MEMBER_ID,
   createInitialFamily,
   type AccountPackage,
   type Address,
@@ -49,6 +51,7 @@ type AccountState = {
   toast: string
   family: FamilyMember[]
   addresses: Address[]
+  defaultAddressId: string
   bookings: Booking[]
   tickets: Ticket[]
   draft: BookDraft
@@ -73,7 +76,13 @@ type AccountContextValue = AccountState & {
   loginHelp: () => void
   submitLogin: (data: { mobile: string; name?: string; otp?: string }) => boolean
   saveFamilyMember: (data: { name: string; relation: string; dob: string; phone: string }) => boolean
-  removeMember: (id: string) => void
+  updateFamilyMember: (
+    id: string,
+    data: { name: string; relation: string; dob: string; phone: string },
+  ) => boolean
+  removeMember: (id: string) => boolean
+  addAddress: (data: { label: string; line: string; note: string }) => boolean
+  setDefaultAddress: (id: string) => void
   toggleShowAdd: () => void
   saveProfile: (name: string) => void
   submitTicket: (issue: string) => void
@@ -83,6 +92,13 @@ type AccountContextValue = AccountState & {
   submitMemberStep: (memberId: string, addressId: string) => boolean
   submitSlotStep: () => boolean
   confirmBooking: () => void
+  confirmCartBookings: (items: { id: string; name: string; memberPrice: number }[], visit: {
+    memberId: string
+    addressId: string
+    addressLine?: string
+    dateLabel: string
+    slot: string
+  }) => void
   rescheduleBooking: (id: string) => void
   cancelBooking: (id: string) => boolean
   setDraftPartial: (patch: Partial<BookDraft>) => void
@@ -91,6 +107,12 @@ type AccountContextValue = AccountState & {
 }
 
 const AccountContext = createContext<AccountContextValue | null>(null)
+
+function isValidMemberDob(dob: string) {
+  if (/^\d{2}-\d{2}-\d{4}$/.test(dob)) return true
+  if (/^\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}$/.test(dob.trim())) return true
+  return false
+}
 
 function loadAuthed() {
   return sessionStorage.getItem('hid_auth') === '1'
@@ -118,6 +140,7 @@ function initialState(): AccountState {
     toast: '',
     family: createInitialFamily(name, mobile),
     addresses: INITIAL_ADDRESSES,
+    defaultAddressId: 'home',
     bookings: INITIAL_BOOKINGS,
     tickets: [],
     draft: { packageId: 'full-body', memberId: 'self', addressId: 'home', date: '', slot: '', newAddress: false },
@@ -243,12 +266,19 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         return true
       },
       saveFamilyMember: (data) => {
-        if (state.family.length >= 6) {
-          setState((s) => ({ ...s, error: 'This card already has 6 members.' }))
+        if (state.family.length >= MAX_FAMILY_MEMBERS) {
+          setState((s) => ({
+            ...s,
+            error: `This card already has ${MAX_FAMILY_MEMBERS} members (1 primary + ${MAX_FAMILY_MEMBERS - 1} others).`,
+          }))
           return false
         }
-        if (!/^\d{2}-\d{2}-\d{4}$/.test(data.dob)) {
+        if (!isValidMemberDob(data.dob)) {
           setState((s) => ({ ...s, familyDraft: data, error: 'Use dd-mm-yyyy for date of birth.' }))
+          return false
+        }
+        if (!data.name.trim()) {
+          setState((s) => ({ ...s, familyDraft: data, error: 'Enter the member’s full name.' }))
           return false
         }
         setState((s) => ({
@@ -257,7 +287,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
             ...s.family,
             {
               id: `m${Date.now()}`,
-              name: data.name,
+              name: data.name.trim(),
               relation: data.relation,
               dob: data.dob,
               phone: data.phone,
@@ -271,9 +301,68 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         showToast('Member added')
         return true
       },
+      updateFamilyMember: (id, data) => {
+        if (!data.name.trim()) {
+          setState((s) => ({ ...s, error: 'Enter the member’s full name.' }))
+          return false
+        }
+        if (!isValidMemberDob(data.dob)) {
+          setState((s) => ({ ...s, error: 'Use dd-mm-yyyy for date of birth.' }))
+          return false
+        }
+        setState((s) => ({
+          ...s,
+          family: s.family.map((m) =>
+            m.id === id
+              ? {
+                  ...m,
+                  name: data.name.trim(),
+                  relation: id === PRIMARY_MEMBER_ID ? 'Self' : data.relation,
+                  dob: data.dob,
+                  phone: data.phone,
+                }
+              : m,
+          ),
+          error: '',
+        }))
+        showToast('Member updated')
+        return true
+      },
       removeMember: (id) => {
+        if (id === PRIMARY_MEMBER_ID) {
+          showToast('The primary card holder cannot be removed.')
+          return false
+        }
         setState((s) => ({ ...s, family: s.family.filter((m) => m.id !== id) }))
         showToast('Member removed')
+        return true
+      },
+      addAddress: (data) => {
+        if (!data.label.trim() || !data.line.trim()) {
+          setState((s) => ({ ...s, error: 'Label and address line are required.' }))
+          return false
+        }
+        const id = `addr-${Date.now()}`
+        setState((s) => ({
+          ...s,
+          addresses: [
+            ...s.addresses,
+            {
+              id,
+              label: data.label.trim(),
+              line: data.line.trim(),
+              note: data.note.trim() || 'Home collection',
+            },
+          ],
+          error: '',
+        }))
+        showToast('Address added')
+        return true
+      },
+      setDefaultAddress: (id) => {
+        if (!stateRef.current.addresses.some((a) => a.id === id)) return
+        setState((s) => ({ ...s, defaultAddressId: id, draft: { ...s.draft, addressId: id } }))
+        showToast('Default address updated')
       },
       toggleShowAdd: () => setState((s) => ({ ...s, showAdd: !s.showAdd, error: '' })),
       saveProfile: (name) => {
@@ -332,6 +421,26 @@ export function AccountProvider({ children }: { children: ReactNode }) {
               ...s.bookings,
             ],
           }
+        })
+      },
+      confirmCartBookings: (items, visit) => {
+        setState((s) => {
+          const base = Date.now()
+          const created = items.map((item, i) => {
+            const p = ACCOUNT_PACKAGES.find((x) => x.id === item.id)
+            return {
+              id: `HID-${String(base + i).slice(-5)}`,
+              packageId: p?.id ?? item.id,
+              memberId: visit.memberId,
+              addressId: visit.addressId,
+              addressLine: visit.addressLine,
+              date: visit.dateLabel,
+              slot: visit.slot,
+              status: 'Upcoming' as const,
+              amount: p?.price ?? item.memberPrice,
+            }
+          })
+          return { ...s, bookings: [...created, ...s.bookings] }
         })
       },
       rescheduleBooking: (id) => {

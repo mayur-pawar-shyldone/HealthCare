@@ -318,25 +318,10 @@ export function AccountBookReviewPage() {
               <strong style={{ textAlign: 'right' }}>{acc.address(acc.draft.addressId)?.line}</strong>
             </div>
           </div>
-          <h3>Payment</h3>
-          <div className="choice">
-            <label>
-              <input type="radio" name="pay" value="cash" defaultChecked />
-              <span>
-                <strong>Cash at collection</strong>
-                <br />
-                <small className="muted">Pay the phlebotomist. No online charge in this preview.</small>
-              </span>
-            </label>
-            <label>
-              <input type="radio" disabled />
-              <span>
-                <strong>Online payment</strong>
-                <br />
-                <small className="muted">Not enabled yet.</small>
-              </span>
-            </label>
-          </div>
+          <p className="rounded-xl bg-mint/50 px-4 py-3 text-[14px] leading-relaxed text-ink-soft">
+            <strong className="text-ink">Pay at sample collection</strong> — cash or UPI to the phlebotomist when they
+            visit. No online payment is taken during booking.
+          </p>
         </article>
         <aside className="card">
           <div className="kvs">

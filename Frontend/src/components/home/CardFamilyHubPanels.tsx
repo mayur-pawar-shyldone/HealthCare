@@ -46,7 +46,7 @@ export function CardBenefitsList({
     : [
         { title: 'Activate once', desc: 'Free 1-year card · member rates on every test.' },
         { title: 'Family coverage', desc: `Add up to ${maxFamily} people and book for anyone on the card.` },
-        { title: 'Wallet bonus', desc: 'Credits unlock when you activate — use at checkout.' },
+        { title: 'Member pricing', desc: 'Flat discount on eligible tests once your card is active.' },
       ]
 
   return (

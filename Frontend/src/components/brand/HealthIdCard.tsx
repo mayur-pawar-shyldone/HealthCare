@@ -4,6 +4,11 @@ import { QRCodeSVG } from 'qrcode.react'
 import { RotateCcw } from 'lucide-react'
 import { cn, formatDate } from '@/lib/utils'
 
+export const HEALTH_ID_CARD_IMAGES = {
+  hero: '/brand/health-id-card-hero.png',
+  walletFront: '/brand/health-id-card-wallet-front.png',
+} as const
+
 export type HealthIdCardData = {
   memberName: string
   dateOfBirth?: string | null
@@ -57,7 +62,11 @@ export function HealthIdCard({
           transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
           onClick={disableTapFlip ? undefined : toggleFlip}
         >
-          <CardMarketingFront data={data} />
+          <CardMarketingFront
+            data={data}
+            imageSrc={HEALTH_ID_CARD_IMAGES.walletFront}
+            className="shadow-[0_24px_60px_rgba(43,90,121,0.28)]"
+          />
           <CardQrBack data={data} />
         </motion.div>
       </div>
@@ -75,38 +84,28 @@ export function HealthIdCard({
   )
 }
 
-/** Branded card face — official HealthID Card artwork with live member fields. */
-export function CardMarketingFront({ data, className }: { data: HealthIdCardData; className?: string }) {
+/** Branded card face — hero or wallet artwork (full bleed, no CSS crop). */
+export function CardMarketingFront({
+  className,
+  imageSrc = HEALTH_ID_CARD_IMAGES.hero,
+}: {
+  data: HealthIdCardData
+  className?: string
+  imageSrc?: string
+}) {
   return (
     <div
       className={cn(
-        'absolute inset-0 overflow-hidden rounded-[24px] shadow-[0_24px_60px_rgba(43,90,121,0.28)] [backface-visibility:hidden]',
+        'absolute inset-0 overflow-hidden rounded-[18px] border border-white bg-transparent [backface-visibility:hidden]',
         className,
       )}
     >
       <img
-        src="/brand/health-id-card-marketing.png"
-        alt=""
+        src={imageSrc}
+        alt="HealthID Card membership"
         className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
         draggable={false}
       />
-      <div className="absolute inset-x-0 bottom-0 h-[21.5%] bg-[#003b73] px-[8%] pb-[4%] pt-[2.5%] text-white">
-        <div className="flex h-full items-center gap-3 sm:gap-5">
-          <div className="min-w-0 flex-1 text-left">
-            <p className="text-[8px] font-medium uppercase tracking-[0.14em] text-white/70">Member ID</p>
-            <p className="mt-0.5 truncate font-display text-[clamp(11px,3vw,15px)] font-bold leading-tight tracking-wide">
-              {data.membershipId}
-            </p>
-          </div>
-          <div className="h-8 w-px shrink-0 bg-white/30" aria-hidden />
-          <div className="min-w-0 flex-1 text-left">
-            <p className="text-[8px] font-medium uppercase tracking-[0.14em] text-white/70">Valid till</p>
-            <p className="mt-0.5 font-display text-[clamp(12px,3.4vw,16px)] font-bold leading-tight">
-              {formatDate(data.validUntil)}
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

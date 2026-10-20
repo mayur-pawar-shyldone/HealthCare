@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowRight,
   Baby,
@@ -18,13 +18,19 @@ import {
   Pill,
   Ribbon,
   Scale,
+  Scan,
+  ScanLine,
   ShoppingBag,
   Sparkles,
   Stethoscope,
+  Syringe,
   UserRound,
   Users,
 } from 'lucide-react'
 import { HEALTH_VERTICALS, type HealthVertical } from '@/data/landing-nav-data'
+import { serviceBrowsePath, type BrowseCategoryId } from '@/data/service-browse'
+import { browseTabForQuickLink, packagesForQuickLink } from '@/lib/landing-quick-link-packages'
+import { Link } from 'react-router-dom'
 import { openHealthCard } from '@/lib/health-card-bus'
 import { LabBrowsePackageCard } from '@/components/landing/LabBrowsePackageCard'
 
@@ -53,6 +59,15 @@ const ICONS: Record<string, typeof FlaskConical> = {
   'ph-essentials': ShoppingBag,
   'ph-chronic': HeartPulse,
   'ph-family': Users,
+  usg: Scan,
+  obs: Baby,
+  vasc: HeartPulse,
+  xray: ScanLine,
+  proc: FlaskConical,
+  ir: Syringe,
+  mri: Brain,
+  ct: Scan,
+  other: FileText,
 }
 
 type Props = {
@@ -64,6 +79,7 @@ type Props = {
   sidebarEyebrow?: string
   sidebarBadge?: string
   packageCountLabel?: string
+  browseCategoryId?: BrowseCategoryId
 }
 
 /** HealthID browse-by-need panel — sidebar + package cards (Blood Test, ECG, etc.). */
@@ -75,6 +91,7 @@ export function HealthVerticalPanel({
   sidebarEyebrow = 'Browse by health need',
   sidebarBadge = 'NABL labs • Home collection',
   packageCountLabel = 'packages',
+  browseCategoryId,
 }: Props) {
   const initialId = defaultActiveId ?? verticals[0]?.id ?? HEALTH_VERTICALS[0].id
   const [activeId, setActiveId] = useState(initialId)
@@ -97,9 +114,11 @@ export function HealthVerticalPanel({
       />
       <MainPanel
         active={active}
+        verticals={verticals}
         compact={compact}
         packageCountLabel={packageCountLabel}
         onNavigate={onNavigate}
+        browseCategoryId={browseCategoryId}
       />
     </div>
   )
@@ -227,15 +246,35 @@ function Sidebar({
 
 function MainPanel({
   active,
+  verticals,
   compact,
   packageCountLabel,
   onNavigate,
+  browseCategoryId,
 }: {
   active: HealthVertical
+  verticals: HealthVertical[]
   compact?: boolean
   packageCountLabel: string
   onNavigate?: () => void
+  browseCategoryId?: BrowseCategoryId
 }) {
+  const [hoveredQuickLink, setHoveredQuickLink] = useState<string | null>(null)
+
+  useEffect(() => {
+    setHoveredQuickLink(null)
+  }, [active.id])
+
+  const displayPackages = useMemo(() => {
+    if (!hoveredQuickLink) return active.packages
+    return packagesForQuickLink(active, hoveredQuickLink, verticals)
+  }, [active, hoveredQuickLink, verticals])
+
+  const browseTabId = useMemo(() => {
+    if (!hoveredQuickLink) return active.id
+    return browseTabForQuickLink(active, hoveredQuickLink, verticals)
+  }, [active, hoveredQuickLink, verticals])
+
   return (
     <div className="bg-white p-6">
       <div className="flex items-start justify-between gap-4">
@@ -244,33 +283,64 @@ function MainPanel({
           <p className="mt-1 max-w-xl text-[13.5px] leading-snug text-ink-muted">{active.headline}</p>
         </div>
         <span className="hidden shrink-0 rounded-full bg-mint px-3 py-1.5 text-[11.5px] font-semibold text-ink-soft sm:inline-flex">
-          {active.packages.length} {packageCountLabel}
+          {displayPackages.length} {packageCountLabel}
         </span>
       </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {active.quickLinks.map((link) => (
-          <span key={link} className="rounded-full border border-brand-200 bg-brand-50 px-3 py-1.5 text-[12.5px] font-medium text-ink-soft">
-            {link}
-          </span>
-        ))}
+      <div onMouseLeave={() => setHoveredQuickLink(null)}>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {active.quickLinks.map((link) => {
+            const on = hoveredQuickLink === link
+            return (
+              <button
+                key={link}
+                type="button"
+                onMouseEnter={() => setHoveredQuickLink(link)}
+                onFocus={() => setHoveredQuickLink(link)}
+                className={`rounded-full border px-3 py-1.5 text-[12.5px] font-semibold transition-colors duration-150 ease-out ${
+                  on
+                    ? 'border-ink bg-ink text-white shadow-sm'
+                    : 'border-brand-200 bg-brand-50 text-ink-soft hover:border-brand-300 hover:text-ink'
+                }`}
+              >
+                {link}
+              </button>
+            )
+          })}
+        </div>
+        <ul className="mt-4 grid gap-3 md:grid-cols-3">
+          {displayPackages.map((pkg) => (
+            <li key={pkg.id} className="min-w-0">
+              <LabBrowsePackageCard
+                pkg={pkg}
+                onNavigate={onNavigate}
+                browseCategoryId={browseCategoryId}
+                browseTabId={browseTabId}
+              />
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="mt-4 grid gap-3 md:grid-cols-3">
-        {active.packages.map((pkg) => (
-          <li key={pkg.id} className="min-w-0">
-            <LabBrowsePackageCard pkg={pkg} onNavigate={onNavigate} />
-          </li>
-        ))}
-      </ul>
       {compact ? (
         <div className="mt-6 flex justify-center">
-          <a
-            href="#packages"
-            onClick={onNavigate}
-            className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 px-4 py-2 text-[13.5px] font-semibold text-ink-soft transition hover:border-brand-200 hover:text-ink"
-          >
-            View all
-            <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-          </a>
+          {browseCategoryId ? (
+            <Link
+              to={serviceBrowsePath(browseCategoryId, active.id)}
+              onClick={onNavigate}
+              className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 px-4 py-2 text-[13.5px] font-semibold text-ink-soft transition hover:border-brand-200 hover:text-ink"
+            >
+              View all
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+            </Link>
+          ) : (
+            <a
+              href="#popular-plans"
+              onClick={onNavigate}
+              className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 px-4 py-2 text-[13.5px] font-semibold text-ink-soft transition hover:border-brand-200 hover:text-ink"
+            >
+              View all
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+            </a>
+          )}
         </div>
       ) : null}
     </div>

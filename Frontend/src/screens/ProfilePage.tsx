@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { MessageCircle, Wallet } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 import api, { unwrap } from '@/services/api'
 import { clearSession, updateUser } from '@/store/authSlice'
 import type { RootState } from '@/store'
-import type { FamilyMember, UserProfile, WalletSummary } from '@/types'
-import { formatMoney } from '@/lib/utils'
+import type { FamilyMember, UserProfile } from '@/types'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Loading } from '@/components/ui/Loading'
@@ -41,10 +40,6 @@ export function ProfilePage() {
   const family = useQuery({
     queryKey: ['family'],
     queryFn: async () => unwrap<FamilyMember[]>((await api.get('/family')).data),
-  })
-  const wallet = useQuery({
-    queryKey: ['wallet'],
-    queryFn: async () => unwrap<WalletSummary>((await api.get('/wallet')).data),
   })
   const [form, setForm] = useState<ProfileForm>({})
   const [locationMsg, setLocationMsg] = useState('')
@@ -108,33 +103,7 @@ export function ProfilePage() {
 
   return (
     <UserPage className="max-w-3xl">
-      <UserPageHeader
-        title="Profile"
-        subtitle="Personal details, address, and preferences"
-        actions={
-          <Link to="/wallet">
-            <Button variant="secondary" className="rounded-xl">
-              <Wallet className="mr-2 h-4 w-4" />
-              Wallet {wallet.data ? formatMoney(wallet.data.totalSpendable) : ''}
-            </Button>
-          </Link>
-        }
-      />
-
-      {wallet.data ? (
-        <Link to="/wallet" className="block rounded-2xl border border-teal/20 bg-gradient-to-r from-teal-light/50 to-white p-4 transition hover:border-teal/40">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-teal">HealthID Wallet</p>
-              <p className="mt-1 font-display text-2xl text-ink">{formatMoney(wallet.data.totalSpendable)}</p>
-              <p className="mt-0.5 text-xs text-ink-soft">
-                {formatMoney(wallet.data.balance)} balance · {formatMoney(wallet.data.referralBalance)} referral
-              </p>
-            </div>
-            <p className="font-mono text-sm font-bold text-teal">{wallet.data.referralCode}</p>
-          </div>
-        </Link>
-      ) : null}
+      <UserPageHeader title="Profile" subtitle="Personal details, address, and preferences" />
 
       <UserPanel title="Personal information">
         <div className="flex items-center gap-4">

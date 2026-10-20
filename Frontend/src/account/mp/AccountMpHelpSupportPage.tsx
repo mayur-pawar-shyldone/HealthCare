@@ -11,7 +11,7 @@ export function AccountMpHelpSupportPage() {
     <div className="space-y-4">
       <section className="rounded-[20px] bg-mp-teal px-5 py-5 sm:px-6 sm:py-6">
         <h2 className="font-display text-2xl font-extrabold tracking-tight text-white sm:text-[26px]">How can we help?</h2>
-        <p className="mt-1 text-[13px] text-white/90">Search answers about bookings, reports, wallet and your card.</p>
+        <p className="mt-1 text-[13px] text-white/90">Search answers about bookings, reports, and your card.</p>
         <label className="relative mt-4 block max-w-[640px]">
           <span className="sr-only">Search help</span>
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />

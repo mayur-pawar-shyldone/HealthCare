@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { ArrowRight, ChevronDown, Clock, FileText, Users } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { ArrowRight, Clock, FileText, Users } from 'lucide-react'
+import { useCartActions } from '@/components/site/useCartActions'
+import { useBookingCart } from '@/cart/BookingCartContext'
+import { resolveCartPackageImage } from '@/lib/cart-package-image'
 import {
   SHOWCASE_VISIBLE_INCLUDES,
-  showcaseMemberPrice,
   showcaseMetaLines,
   type ShowcasePackage,
 } from '@/data/landing-showcase'
@@ -15,24 +16,27 @@ function formatInr(amount: number) {
 const META_ICONS = [Clock, Users, FileText] as const
 
 /** HealthID `uk` — showcase package card */
-export function LandingShowcaseCard({ pkg }: { pkg: ShowcasePackage }) {
-  const [members, setMembers] = useState(1)
+export function LandingShowcaseCard({ pkg, bookTo }: { pkg: ShowcasePackage; bookTo?: string }) {
+  const { addToCart, addAndBook } = useCartActions()
+  const cartUi = useBookingCart()
+  const cartItem = {
+    id: pkg.id,
+    name: pkg.name,
+    memberPrice: pkg.memberPrice,
+    mrp: pkg.mrp,
+    testCount: pkg.testCount,
+    imageUrl: resolveCartPackageImage(pkg.id),
+  }
   const [expandedIncludes, setExpandedIncludes] = useState(false)
+  void bookTo // optional deep-link override from parent browse cards
 
-  const perPerson = showcaseMemberPrice(pkg.memberPrice, members)
-  const total = perPerson * members
-  const totalMrp = pkg.mrp * members
-  const savePct = Math.round(((totalMrp - total) / totalMrp) * 100)
+  const savePct = Math.round(((pkg.mrp - pkg.memberPrice) / pkg.mrp) * 100)
   const extraIncludes = Math.max(0, pkg.includes.length - SHOWCASE_VISIBLE_INCLUDES)
   const visibleIncludes = expandedIncludes ? pkg.includes : pkg.includes.slice(0, SHOWCASE_VISIBLE_INCLUDES)
   const metaLines = showcaseMetaLines(pkg)
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-[26px] border border-line bg-white">
-      <div className="flex h-1 w-full" aria-hidden>
-        <span className="w-[31%] bg-teal" />
-        <span className="flex-1 bg-coral-red" />
-      </div>
       <div className="flex flex-1 flex-col p-5 pb-4">
         <div className="flex items-start justify-between gap-3">
           <h3 className="font-editorial text-[19px] font-bold uppercase leading-tight tracking-[0.01em] text-ink">
@@ -61,37 +65,12 @@ export function LandingShowcaseCard({ pkg }: { pkg: ShowcasePackage }) {
         </p>
 
         <div className="mt-5 border-t border-line pt-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <button
-              type="button"
-              className="text-[14px] font-bold text-ink transition-colors duration-150 ease-out hover:text-teal"
-            >
-              + Know more
-            </button>
-            <label className="relative inline-flex items-center">
-              <span className="sr-only">Number of members</span>
-              <select
-                value={members}
-                onChange={(e) => setMembers(Number(e.target.value))}
-                className="h-11 appearance-none rounded-xl border border-line bg-white pl-4 pr-10 text-[14px] font-bold text-ink outline-none transition-colors duration-150 ease-out hover:border-teal focus-visible:border-teal focus-visible:ring-2 focus-visible:ring-teal/20"
-              >
-                {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <option key={n} value={n}>
-                    {n} {n === 1 ? 'Member' : 'Members'}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-3.5 h-4 w-4 text-ink-soft" aria-hidden />
-            </label>
-          </div>
-          {members > 1 ? (
-            <p className="mt-2.5 text-[13.5px] font-semibold text-ink-soft">
-              Family booking ·{' '}
-              <span className="font-bold text-ink">{formatInr(perPerson)} per person locked</span>
-            </p>
-          ) : (
-            <p className="mt-2.5 text-[13.5px] font-semibold text-ink-soft">Add members to unlock the family rate</p>
-          )}
+          <button
+            type="button"
+            className="text-[14px] font-bold text-ink transition-colors duration-150 ease-out hover:text-teal"
+          >
+            + Know more
+          </button>
         </div>
 
         <ul className="mt-5 space-y-2.5">
@@ -111,26 +90,34 @@ export function LandingShowcaseCard({ pkg }: { pkg: ShowcasePackage }) {
         <div className="mt-auto flex items-end justify-between gap-4 border-t border-line pt-5">
           <div>
             <p className="text-[22px] font-extrabold leading-none text-ink">
-              {formatInr(perPerson)}
+              {formatInr(pkg.memberPrice)}
               <span className="ml-1 text-[13px] font-semibold text-ink-soft">per person</span>
             </p>
             <p className="mt-2 text-[13px] font-semibold text-ink-soft">
-              <span className="line-through">{formatInr(totalMrp)}</span>
+              <span className="line-through">{formatInr(pkg.mrp)}</span>
               <span className="ml-1.5">MRP</span>
             </p>
-            {members > 1 ? (
-              <p className="mt-1.5 text-[13px] font-bold text-ink">
-                Total {formatInr(total)} for {members} members
-              </p>
-            ) : null}
           </div>
-          <Link
-            to="/signup"
-            className="inline-flex h-12 shrink-0 items-center gap-2 rounded-xl bg-teal px-5 text-[14.5px] font-bold text-white transition-[transform,background-color] duration-150 ease-out hover:bg-teal-dark active:scale-[0.98]"
-          >
-            Book now
-            <ArrowRight className="h-4 w-4" aria-hidden />
-          </Link>
+          <div className="grid w-full min-w-[240px] grid-cols-2 gap-2 sm:w-[280px]">
+            <button
+              type="button"
+              onClick={() => {
+                addToCart(cartItem)
+                cartUi.openDrawer()
+              }}
+              className="inline-flex h-12 w-full min-w-0 items-center justify-center rounded-xl border border-line px-3 text-[13px] font-bold leading-tight text-ink transition hover:border-teal/40 sm:text-[13.5px]"
+            >
+              Add to cart
+            </button>
+            <button
+              type="button"
+              onClick={() => addAndBook(cartItem)}
+              className="inline-flex h-12 w-full min-w-0 items-center justify-center gap-1.5 rounded-xl bg-teal px-3 text-[13px] font-bold text-white transition-[transform,background-color] duration-150 ease-out hover:bg-teal-dark active:scale-[0.98] sm:text-[13.5px]"
+            >
+              Book now
+              <ArrowRight className="h-4 w-4 shrink-0" aria-hidden />
+            </button>
+          </div>
         </div>
       </div>
     </article>

@@ -1,19 +1,17 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Plus } from 'lucide-react'
-import { ACCOUNT_PACKAGES } from '@/account/account-data'
+import { Pencil, Plus } from 'lucide-react'
 import { useAccount } from '@/account/AccountContext'
+import { navigateToPopularPlans } from '@/lib/landing-nav-scroll'
 import { AccountDashboardPanel } from '@/account/dashboard/AccountDashboardPanel'
 import { ageFromDob, memberInitials, memberShortName } from '@/account/dashboard/mp-utils'
 
-const MAX_FAMILY = 6
-
 type Props = {
+  onManageFamily?: () => void
   onAddMember?: () => void
 }
 
-
-export function AccountDashboardFamilyPanel({ onAddMember }: Props) {
+export function AccountDashboardFamilyPanel({ onManageFamily, onAddMember }: Props) {
   const acc = useAccount()
   const navigate = useNavigate()
   const [selectedId, setSelectedId] = useState(acc.family[0]?.id ?? 'self')
@@ -41,15 +39,22 @@ export function AccountDashboardFamilyPanel({ onAddMember }: Props) {
   ]
 
   return (
+    <div id="card-family" className="h-full min-h-0">
     <AccountDashboardPanel
       title="Family on this card"
+      className="flex h-full flex-col"
       action={
-        <span className="whitespace-nowrap pt-1 text-xs text-muted">
-          {acc.family.length} of {MAX_FAMILY} added
-        </span>
+        <button
+          type="button"
+          onClick={onManageFamily}
+          className="inline-flex shrink-0 items-center gap-1.5 pt-0.5 text-[13px] font-semibold text-mp-teal-700 transition hover:text-mp-teal-800 hover:underline"
+        >
+          <Pencil className="h-3.5 w-3.5" aria-hidden />
+          Manage family
+        </button>
       }
-      className="flex flex-col"
     >
+
       <div role="tablist" aria-label="Family members" className="flex gap-3">
         {acc.family.map((f) => {
           const active = f.id === selectedId
@@ -75,7 +80,7 @@ export function AccountDashboardFamilyPanel({ onAddMember }: Props) {
         })}
         <button
           type="button"
-          onClick={onAddMember}
+          onClick={onAddMember ?? onManageFamily}
           className="flex w-14 flex-col items-center gap-1.5 text-xs text-muted"
         >
           <span className="grid h-12 w-12 place-items-center rounded-full border-2 border-dashed border-line transition-colors duration-150 hover:border-mp-teal hover:text-mp-teal-700">
@@ -98,9 +103,8 @@ export function AccountDashboardFamilyPanel({ onAddMember }: Props) {
         <button
           type="button"
           onClick={() => {
-            acc.choosePackage(ACCOUNT_PACKAGES[0].id)
             acc.setDraftPartial({ memberId: selected.id })
-            navigate('/account/book/member')
+            navigateToPopularPlans(navigate)
           }}
           className="rounded-full bg-navy py-2.5 text-center text-[13px] font-semibold text-white transition-colors hover:bg-navy-600"
         >
@@ -114,5 +118,6 @@ export function AccountDashboardFamilyPanel({ onAddMember }: Props) {
         </Link>
       </div>
     </AccountDashboardPanel>
+    </div>
   )
 }

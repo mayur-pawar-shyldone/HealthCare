@@ -1,13 +1,13 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FileText, FlaskConical, Sparkles } from 'lucide-react'
 import { ACCOUNT_PACKAGES } from '@/account/account-data'
 import { useAccount } from '@/account/AccountContext'
 import { AccountCardWalletSection } from '@/account/AccountCardWalletSection'
 import { AccountDashboardFamilyPanel } from '@/account/dashboard/AccountDashboardFamilyPanel'
+import { AccountFamilyManageModal } from '@/account/dashboard/AccountFamilyManageModal'
 import { AccountDashboardHeroCard } from '@/account/dashboard/AccountDashboardHeroCard'
 import { AccountDashboardNextVisitPanel } from '@/account/dashboard/AccountDashboardNextVisitPanel'
-import { AccountDashboardPackagesPanel } from '@/account/dashboard/AccountDashboardPackagesPanel'
-import { AccountDashboardWalletPanel } from '@/account/dashboard/AccountDashboardWalletPanel'
 import { dashboardGreeting } from '@/account/dashboard/mp-utils'
 import { PLATFORM } from '@/data/platform-content'
 
@@ -17,15 +17,19 @@ export function AccountDashboardPageContent() {
   const navigate = useNavigate()
   const firstName = acc.name.split(' ')[0]
 
-  function scrollToCardHub(openAdd?: boolean) {
-    if (openAdd && !acc.showAdd) acc.toggleShowAdd()
-    document.getElementById(openAdd ? 'card-family' : 'card-wallet')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const [familyManage, setFamilyManage] = useState<{ open: boolean; mode: 'list' | 'add' }>({
+    open: false,
+    mode: 'list',
+  })
+
+  function openFamilyManage(mode: 'list' | 'add' = 'list') {
+    setFamilyManage({ open: true, mode })
   }
 
   return (
     <div className="space-y-4">
-      <section className="relative min-h-[260px] overflow-hidden rounded-[20px] bg-navy py-6 pb-7 pl-5 pr-5 sm:min-h-[280px] sm:py-8 sm:pb-8 sm:pl-6 sm:pr-6 md:py-8 md:pl-6 md:pr-6">
-        <div className="relative z-[1] min-w-0 md:max-w-[calc(100%-384px)] md:pr-4">
+      <section className="relative overflow-hidden rounded-[20px] bg-navy py-4 pl-5 pr-5 sm:py-5 sm:pl-6 sm:pr-6 md:py-4 md:pl-6 md:pr-6">
+        <div className="relative z-[1] min-w-0 md:max-w-[calc(100%-304px)] md:pr-4">
           <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-[#8fe0d6]">
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
             Active · {PLATFORM.membership.flatDiscount}% member pricing
@@ -36,7 +40,7 @@ export function AccountDashboardPageContent() {
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80">
             Your family card covers {acc.family.length} people. Book any test at member price with free home collection.
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => {
@@ -58,20 +62,25 @@ export function AccountDashboardPageContent() {
           </div>
         </div>
 
-        <div className="relative z-[2] mt-5 w-fit max-w-full md:absolute md:right-6 md:top-1/2 md:mt-0 md:-translate-y-1/2">
+        <div className="relative z-[2] mt-3 w-fit max-w-full md:absolute md:right-5 md:top-3 md:mt-0 md:translate-y-0">
           <AccountDashboardHeroCard flushRight />
         </div>
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-[1.25fr_1fr_0.85fr]">
-        <AccountDashboardFamilyPanel onAddMember={() => scrollToCardHub(true)} />
-        <AccountDashboardWalletPanel />
+      <div className="grid gap-4 lg:grid-cols-[1.25fr_1fr]">
+        <AccountDashboardFamilyPanel
+          onManageFamily={() => openFamilyManage('list')}
+          onAddMember={() => openFamilyManage('add')}
+        />
         <AccountDashboardNextVisitPanel />
       </div>
 
-      <AccountDashboardPackagesPanel />
-
-      <AccountCardWalletSection onAddMember={() => scrollToCardHub(true)} />
+      <AccountCardWalletSection />
+      <AccountFamilyManageModal
+        open={familyManage.open}
+        initialMode={familyManage.mode}
+        onClose={() => setFamilyManage((s) => ({ ...s, open: false }))}
+      />
     </div>
   )
 }
