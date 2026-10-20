@@ -1,8 +1,20 @@
 import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { ForgotPasswordDto, LoginDto, RefreshDto, ResetPasswordDto, SignupDto } from './dto/auth.dto';
+import {
+  AliasSendOtpDto,
+  AliasVerifyOtpDto,
+  FirebaseOtpDto,
+  ForgotPasswordDto,
+  LoginDto,
+  RefreshDto,
+  ResetPasswordDto,
+  SendOtpDto,
+  SignupDto,
+  VerifyOtpDto,
+} from './dto/auth.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
@@ -39,6 +51,41 @@ export class AuthController {
   @Post('reset-password')
   reset(@Body() dto: ResetPasswordDto) {
     return this.auth.resetPassword(dto);
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Post('otp/send')
+  sendOtp(@Body() dto: SendOtpDto) {
+    return this.auth.sendOtp(dto);
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Post('otp/verify')
+  verifyOtp(@Body() dto: VerifyOtpDto, @Req() req: Request) {
+    return this.auth.verifyOtp(dto, req.headers['user-agent']);
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Post('otp/firebase')
+  verifyFirebaseOtp(@Body() dto: FirebaseOtpDto, @Req() req: Request) {
+    return this.auth.verifyFirebaseOtp(dto, req.headers['user-agent']);
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Post('send-otp')
+  sendOtpAlias(@Body() dto: AliasSendOtpDto) {
+    return this.auth.sendOtpAlias(dto);
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Post('verify-otp')
+  verifyOtpAlias(@Body() dto: AliasVerifyOtpDto, @Req() req: Request) {
+    return this.auth.verifyOtpAlias(dto, req.headers['user-agent']);
   }
 
   @ApiBearerAuth()

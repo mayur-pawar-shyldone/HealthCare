@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestj
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AppointmentsService } from './appointments.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 import { CreateAppointmentDto, RescheduleDto } from './dto/appointments.dto';
 
 @ApiTags('appointments')
@@ -10,11 +11,13 @@ import { CreateAppointmentDto, RescheduleDto } from './dto/appointments.dto';
 export class AppointmentsController {
   constructor(private appointments: AppointmentsService) {}
 
+  @Public()
   @Get('slots')
   slots(@Query('date') date: string) {
     return this.appointments.slots(date);
   }
 
+  @Public()
   @Get('serviceability')
   serviceability(@Query('pincode') pincode: string) {
     return this.appointments.checkServiceability(pincode);

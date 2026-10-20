@@ -75,3 +75,105 @@ export class ResetPasswordDto {
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/)
   password: string;
 }
+
+export enum OtpPurpose {
+  login = 'login',
+  signup = 'signup',
+  guest = 'guest',
+  lookup = 'lookup',
+}
+
+export class SendOtpDto {
+  @ApiProperty()
+  @Matches(/^[6-9]\d{9}$/, { message: 'Enter a valid 10-digit Indian mobile number' })
+  mobile: string;
+
+  @ApiProperty({ enum: OtpPurpose })
+  @IsEnum(OtpPurpose)
+  purpose: OtpPurpose;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  fullName?: string;
+}
+
+export class VerifyOtpDto {
+  @ApiProperty()
+  @Matches(/^[6-9]\d{9}$/, { message: 'Enter a valid 10-digit Indian mobile number' })
+  mobile: string;
+
+  @ApiProperty()
+  @Matches(/^\d{6}$/, { message: 'Enter the 6-digit OTP' })
+  otp: string;
+
+  @ApiProperty({ enum: OtpPurpose })
+  @IsEnum(OtpPurpose)
+  purpose: OtpPurpose;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  fullName?: string;
+}
+
+export class FirebaseOtpDto {
+  @ApiProperty()
+  @IsString()
+  @MinLength(20)
+  idToken: string;
+
+  @ApiProperty()
+  @Matches(/^[6-9]\d{9}$/, { message: 'Enter a valid 10-digit Indian mobile number' })
+  mobile: string;
+
+  @ApiProperty({ enum: OtpPurpose })
+  @IsEnum(OtpPurpose)
+  purpose: OtpPurpose;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  fullName?: string;
+}
+
+export class AliasSendOtpDto {
+  @ApiProperty()
+  @Matches(/^[6-9]\d{9}$/, { message: 'Enter a valid 10-digit Indian mobile number' })
+  mobile: string;
+
+  @ApiPropertyOptional({ enum: OtpPurpose })
+  @IsOptional()
+  @IsEnum(OtpPurpose)
+  purpose?: OtpPurpose;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  fullName?: string;
+}
+
+export class AliasVerifyOtpDto {
+  @ApiProperty()
+  @Matches(/^[6-9]\d{9}$/, { message: 'Enter a valid 10-digit Indian mobile number' })
+  mobile: string;
+
+  @ApiProperty()
+  @Matches(/^\d{6}$/, { message: 'Enter the 6-digit OTP' })
+  otp: string;
+
+  @ApiPropertyOptional({ enum: OtpPurpose })
+  @IsOptional()
+  @IsEnum(OtpPurpose)
+  purpose?: OtpPurpose;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  fullName?: string;
+}

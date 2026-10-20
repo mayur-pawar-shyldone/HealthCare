@@ -60,6 +60,14 @@ export class UpdateProfileDto {
   @IsOptional()
   @Matches(/^\d{6}$/)
   pincode?: string;
+
+  @IsOptional()
+  @IsString()
+  label?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  newAddress?: boolean;
 }
 
 export class ChangePasswordDto {

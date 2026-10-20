@@ -49,8 +49,23 @@ export class UsersService {
     });
 
     if (dto.line1 && dto.city && dto.state && dto.pincode) {
+      const count = await this.prisma.address.count({ where: { userId } });
       const existing = await this.prisma.address.findFirst({ where: { userId, isPrimary: true } });
-      if (existing) {
+      if (dto.newAddress && count > 0) {
+        await this.prisma.address.create({
+          data: {
+            userId,
+            line1: dto.line1,
+            city: dto.city,
+            state: dto.state,
+            pincode: dto.pincode,
+            label: dto.label,
+            isPrimary: false,
+            latitude: dto.locationLat,
+            longitude: dto.locationLng,
+          },
+        });
+      } else if (existing) {
         await this.prisma.address.update({
           where: { id: existing.id },
           data: {
@@ -58,6 +73,7 @@ export class UsersService {
             city: dto.city,
             state: dto.state,
             pincode: dto.pincode,
+            label: dto.label,
             latitude: dto.locationLat,
             longitude: dto.locationLng,
           },
@@ -70,6 +86,7 @@ export class UsersService {
             city: dto.city,
             state: dto.state,
             pincode: dto.pincode,
+            label: dto.label,
             latitude: dto.locationLat,
             longitude: dto.locationLng,
           },

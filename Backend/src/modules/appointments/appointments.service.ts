@@ -29,7 +29,7 @@ const SLOTS = [
   '07:00 PM',
 ];
 
-const METRO_PIN_PREFIXES = ['11', '12', '20', '30', '38', '40', '41', '50', '56', '60', '70'];
+const METRO_PIN_PREFIXES = ['11', '12', '20', '30', '38', '40', '41', '42', '50', '56', '60', '70'];
 
 function isServiceablePincode(pincode: string) {
   return /^\d{6}$/.test(pincode) && METRO_PIN_PREFIXES.some((p) => pincode.startsWith(p));
@@ -62,7 +62,7 @@ export class AppointmentsService {
         deletedAt: null,
         ...(status && status !== 'ALL' ? { status: status as AppointmentStatus } : {}),
       },
-      include: { test: { include: { category: true } }, address: true, familyMember: true },
+      include: { test: { include: { category: true } }, address: true, familyMember: true, reports: true },
       orderBy: { date: 'desc' },
     });
   }

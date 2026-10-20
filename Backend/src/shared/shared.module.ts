@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { PricingService } from './pricing.service';
 import { WhatsAppService } from './whatsapp.service';
+import { OtpDeliveryService } from './otp-delivery.service';
 import { WalletService } from './wallet.service';
 import { CheckoutService } from './checkout.service';
 import { PlatformSettingsService } from './platform-settings.service';
@@ -13,6 +14,7 @@ import { InvoiceService } from './invoice.service';
   providers: [
     PricingService,
     WhatsAppService,
+    OtpDeliveryService,
     WalletService,
     CheckoutService,
     PlatformSettingsService,
@@ -23,6 +25,7 @@ import { InvoiceService } from './invoice.service';
   exports: [
     PricingService,
     WhatsAppService,
+    OtpDeliveryService,
     WalletService,
     CheckoutService,
     PlatformSettingsService,
