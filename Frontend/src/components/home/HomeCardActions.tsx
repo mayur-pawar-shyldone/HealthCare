@@ -9,6 +9,7 @@ type HomeCardActionsProps = {
   onFlip: () => void
   onEdit: () => void
   hasAddress: boolean
+  profilePath?: string
 }
 
 function ToolbarBtn({
@@ -38,9 +39,9 @@ function ToolbarBtn({
   )
 }
 
-export function HomeCardActions({ cardData, flipped, onFlip, onEdit, hasAddress }: HomeCardActionsProps) {
+export function HomeCardActions({ cardData, flipped, onFlip, onEdit, hasAddress, profilePath = '/profile' }: HomeCardActionsProps) {
   return (
-    <div className="mx-auto w-full max-w-[400px] space-y-4">
+    <div className="mx-auto w-full max-w-[420px] space-y-4">
       {/* Quick actions toolbar */}
       <div className="flex gap-2">
         <ToolbarBtn label={flipped ? 'Front' : 'Flip card'} icon={RotateCcw} onClick={onFlip} />
@@ -73,7 +74,7 @@ export function HomeCardActions({ cardData, flipped, onFlip, onEdit, hasAddress 
 
       {!hasAddress ? (
         <Link
-          to="/profile"
+          to={profilePath}
           className="flex items-center gap-2.5 rounded-xl border border-amber-200/80 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900 transition hover:bg-amber-100/70"
         >
           <MapPin className="h-4 w-4 shrink-0 text-amber-700" />

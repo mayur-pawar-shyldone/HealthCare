@@ -35,15 +35,18 @@ import { AdminPricingSettingsPage } from '@/screens/admin/AdminPricingSettingsPa
 import { TransactionsPage } from '@/screens/TransactionsPage'
 import { TransactionDetailPage } from '@/screens/TransactionDetailPage'
 import { InvoicePage } from '@/screens/InvoicePage'
+import { AccountLoginGate, AccountRoutes } from '@/account/AccountRoutes'
 
 export default function App() {
   return (
     <Routes>
+      <Route path="/account/*" element={<AccountRoutes />} />
       <Route path="/" element={<LandingPage />} />
       <Route path="/splash" element={<SplashPage />} />
       <Route path="/onboarding" element={<OnboardingPage />} />
       <Route element={<GuestRoute />}>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<AccountLoginGate />} />
+        <Route path="/login/password" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />

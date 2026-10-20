@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { RATE_LIST, RATE_LIST_CATEGORIES, POPULAR_TESTS, savingsPercent } from '@/data/rate-list'
-import { HEALTH_PACKAGES } from '@/data/packages-data'
 import { PLATFORM } from '@/data/platform-content'
 import { formatMoney } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
@@ -22,179 +21,119 @@ export function LandingRateList() {
   }, [query, category])
 
   return (
-    <section id="pricing" className="mx-auto max-w-6xl px-4 py-20 md:px-6">
-      <div className="text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-red">Transparent pricing</p>
-        <h2 className="mt-3 font-display text-3xl md:text-4xl">Blood test rate list</h2>
-        <p className="mx-auto mt-3 max-w-2xl text-ink-soft">
-          Official partner rates with an extra <strong className="text-ink">{PLATFORM.membership.flatDiscount}% off applied at payment</strong>. MRP shown for reference — special price includes free home collection.
-        </p>
-        <div className="mt-4 flex justify-center">
-          <PaymentDiscountBadge size="lg" />
-        </div>
-      </div>
-
-      <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 sm:max-w-md">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-soft" />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search tests…"
-            className="w-full rounded-xl border border-line bg-white py-2.5 pl-10 pr-4 text-sm outline-none ring-teal/30 focus:ring-2"
-          />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {RATE_LIST_CATEGORIES.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setCategory(c)}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                category === c
-                  ? 'bg-teal text-white'
-                  : 'border border-line bg-white text-ink-soft hover:border-teal/40 hover:text-teal'
-              }`}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-6 overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-line bg-gradient-to-r from-teal to-teal-dark text-white">
-                <th className="px-4 py-3.5 font-medium w-12">#</th>
-                <th className="px-4 py-3.5 font-medium">Test name</th>
-                <th className="px-4 py-3.5 font-medium hidden md:table-cell">Category</th>
-                <th className="px-4 py-3.5 font-medium text-right bg-white/10">MRP</th>
-                <th className="px-4 py-3.5 font-medium text-right bg-brand-red/90">Special price</th>
-                <th className="px-4 py-3.5 font-medium text-right hidden sm:table-cell">You save</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-ink-soft">
-                    No tests match your search. Try another keyword or category.
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((t, i) => {
-                  const save = savingsPercent(t.mrp, t.specialPrice)
-                  return (
-                    <tr
-                      key={t.sr}
-                      className={`border-b border-line/70 transition hover:bg-teal-light/30 ${i % 2 === 0 ? 'bg-white' : 'bg-cream/40'}`}
-                    >
-                      <td className="px-4 py-3 text-ink-soft">{t.sr}</td>
-                      <td className="px-4 py-3 font-medium leading-snug">{t.name}</td>
-                      <td className="px-4 py-3 text-ink-soft hidden md:table-cell">{t.category}</td>
-                      <td className="px-4 py-3 text-right text-ink-soft line-through">{formatMoney(t.mrp)}</td>
-                      <td className="px-4 py-3 text-right font-bold text-brand-red">{formatMoney(t.specialPrice)}</td>
-                      <td className="px-4 py-3 text-right hidden sm:table-cell">
-                        <span className="rounded-full bg-success/10 px-2 py-0.5 text-xs font-semibold text-success">
-                          {save}%
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-cream/60 px-4 py-4">
-          <p className="text-xs text-ink-soft">
-            Showing {filtered.length} of {RATE_LIST.length} tests · Prices inclusive of home collection for members
+    <section id="pricing" className="bg-white py-20">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="max-w-2xl">
+          <p className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-brand-600">
+            <span className="h-0.5 w-5 rounded-full bg-coral" aria-hidden />
+            Transparent pricing
           </p>
-          <Link to="/signup">
-            <Button variant="accent" size="sm" className="rounded-lg">Get free card to book</Button>
-          </Link>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-export function LandingHealthPackages() {
-  const [expanded, setExpanded] = useState<string | null>(null)
-
-  return (
-    <section id="packages" className="border-y border-line bg-gradient-to-b from-teal-light/30 to-white py-16">
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-red">Official brochure rates</p>
-            <h2 className="mt-3 font-display text-3xl">Diagnostic health packages</h2>
-            <p className="mt-2 max-w-xl text-sm text-ink-soft">
-              {PLATFORM.packageCount} packages from the HealthID Card partner brochure — special rates plus extra {PLATFORM.membership.flatDiscount}% off at payment. Free home collection on every booking.
-            </p>
+          <h2 className="mt-3 font-display text-[32px] font-extrabold leading-tight tracking-tight text-ink sm:text-[38px]">
+            Blood test rate list
+          </h2>
+          <p className="mt-3 text-[16px] leading-relaxed text-ink-soft">
+            Official partner rates with an extra{' '}
+            <strong className="text-ink">{PLATFORM.membership.flatDiscount}% off applied at payment</strong>. MRP shown
+            for reference — special price includes free home collection.
+          </p>
+          <div className="mt-4">
+            <PaymentDiscountBadge size="lg" />
           </div>
-          <Link to="/signup" className="text-sm font-semibold text-teal hover:underline">
-            Get free card to book →
-          </Link>
         </div>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {HEALTH_PACKAGES.map((pkg) => {
-            const open = expanded === pkg.name
-            const preview = pkg.includedTests.slice(0, 4)
-            const rest = pkg.includedTests.length - preview.length
-            return (
-              <div key={pkg.name} className="overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                <div className="h-1.5 bg-gradient-to-r from-teal to-[#e03a28]" />
-                <div className="p-5">
-                  <p className="text-xs font-bold uppercase tracking-wide text-teal">
-                    {pkg.includedTests.length} parameters · Home collection
-                  </p>
-                  <h3 className="mt-2 font-display text-lg leading-snug">{pkg.name}</h3>
-                  <div className="mt-4 flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-brand-red">{formatMoney(pkg.specialPrice)}</span>
-                    <span className="text-sm text-ink-soft line-through">{formatMoney(pkg.mrp)}</span>
-                  </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <p className="text-xs font-medium text-success">Save {savingsPercent(pkg.mrp, pkg.specialPrice)}% vs MRP</p>
-                    <PaymentDiscountBadge size="sm" />
-                  </div>
 
-                  <div className="mt-4 rounded-xl border border-line/80 bg-cream/40 p-3">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-ink-soft">Included tests</p>
-                    <ul className="mt-2 space-y-1 text-xs leading-relaxed text-ink-soft">
-                      {(open ? pkg.includedTests : preview).map((t) => (
-                        <li key={t} className="flex gap-1.5">
-                          <span className="text-teal">•</span>
-                          <span>{t}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    {rest > 0 ? (
-                      <button
-                        type="button"
-                        onClick={() => setExpanded(open ? null : pkg.name)}
-                        className="mt-2 flex items-center gap-1 text-xs font-semibold text-teal hover:underline"
+        <div className="mt-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="relative flex-1 lg:max-w-md">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search tests…"
+              className="h-12 w-full rounded-full border border-ink/10 bg-mint pl-11 pr-4 text-[14px] outline-none focus:border-brand-300 focus:bg-white"
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {RATE_LIST_CATEGORIES.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCategory(c)}
+                className={`rounded-full border px-4 py-2 text-[13px] font-semibold transition ${
+                  category === c
+                    ? 'border-ink bg-ink text-white'
+                    : 'border-ink/15 bg-white text-ink-soft hover:border-brand-300 hover:text-brand-600'
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6 overflow-hidden rounded-[22px] border border-ink/10 bg-white shadow-lift">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-left text-[13.5px]">
+              <thead>
+                <tr className="border-b border-ink/10 bg-brand-700 text-white">
+                  <th className="w-12 px-4 py-3.5 font-semibold">#</th>
+                  <th className="px-4 py-3.5 font-semibold">Test name</th>
+                  <th className="hidden px-4 py-3.5 font-semibold md:table-cell">Category</th>
+                  <th className="bg-white/10 px-4 py-3.5 text-right font-semibold">MRP</th>
+                  <th className="bg-coral/90 px-4 py-3.5 text-right font-semibold">Special price</th>
+                  <th className="hidden px-4 py-3.5 text-right font-semibold sm:table-cell">You save</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-12 text-center text-ink-soft">
+                      No tests match your search. Try another keyword or category.
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((t, i) => {
+                    const save = savingsPercent(t.mrp, t.specialPrice)
+                    return (
+                      <tr
+                        key={t.sr}
+                        className={`border-b border-ink/10 transition hover:bg-brand-50/50 ${
+                          i % 2 === 0 ? 'bg-white' : 'bg-mint/40'
+                        }`}
                       >
-                        {open ? 'Show less' : `+ ${rest} more tests`}
-                        <ChevronDown className={`h-3.5 w-3.5 transition ${open ? 'rotate-180' : ''}`} />
-                      </button>
-                    ) : null}
-                  </div>
-
-                  <Link to="/signup" className="mt-4 block">
-                    <Button className="w-full rounded-lg text-xs">Book with free card</Button>
-                  </Link>
-                </div>
-              </div>
-            )
-          })}
+                        <td className="px-4 py-3 text-ink-muted">{t.sr}</td>
+                        <td className="px-4 py-3 font-medium leading-snug text-ink">{t.name}</td>
+                        <td className="hidden px-4 py-3 text-ink-soft md:table-cell">{t.category}</td>
+                        <td className="px-4 py-3 text-right text-ink-muted line-through">{formatMoney(t.mrp)}</td>
+                        <td className="px-4 py-3 text-right font-bold text-coral">{formatMoney(t.specialPrice)}</td>
+                        <td className="hidden px-4 py-3 text-right sm:table-cell">
+                          <span className="rounded-full bg-success/10 px-2 py-0.5 text-xs font-semibold text-success">
+                            {save}%
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 bg-mint/60 px-4 py-4">
+            <p className="text-[12px] text-ink-soft">
+              Showing {filtered.length} of {RATE_LIST.length} tests · Prices inclusive of home collection for members
+            </p>
+            <Link to="/signup">
+              <Button variant="accent" size="sm" className="rounded-full px-5">
+                Get free card to book
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </section>
   )
 }
+
+export { LandingShowcaseSection as LandingHealthPackages } from '@/components/landing/LandingShowcaseSection'
 
 export function LandingPopularTests() {
   const featured = POPULAR_TESTS.slice(0, 4)

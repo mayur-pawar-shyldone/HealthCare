@@ -184,7 +184,9 @@ export function ProfilePage() {
           ))}
           {!family.data?.length ? <p className="text-sm text-ink-soft">No family members yet. Add them from your HealthID Card.</p> : null}
         </div>
-        <Link to="/home?edit=card" className="text-sm font-semibold text-teal hover:underline">Manage family on HealthID Card →</Link>
+        <Link to="/home#healthid-card-section" className="text-sm font-semibold text-teal hover:underline">
+          Manage card &amp; family on Home →
+        </Link>
       </UserPanel>
 
       <UserPanel title="Notifications">
