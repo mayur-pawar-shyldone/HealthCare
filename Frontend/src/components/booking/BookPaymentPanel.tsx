@@ -23,10 +23,6 @@ type BookPaymentPanelProps = {
   patientName: string
   addressLine?: string
   paymentMethod: 'UPI' | 'CARD' | 'COD'
-  useWallet: boolean
-  useReferral: boolean
-  onUseWallet: (v: boolean) => void
-  onUseReferral: (v: boolean) => void
   onPaymentMethod: (m: 'UPI' | 'CARD' | 'COD') => void
   onConfirm: () => void
   isPending: boolean
@@ -71,10 +67,6 @@ export function BookPaymentPanel({
   patientName,
   addressLine,
   paymentMethod,
-  useWallet,
-  useReferral,
-  onUseWallet,
-  onUseReferral,
   onPaymentMethod,
   onConfirm,
   isPending,
@@ -194,14 +186,6 @@ export function BookPaymentPanel({
             />
           ) : null}
 
-          {pricing.walletCreditApplied > 0 ? (
-            <PriceLine
-              label="Wallet balance applied"
-              value={`−${formatMoney(pricing.walletCreditApplied)}`}
-              tone="wallet"
-            />
-          ) : null}
-
           <div className="flex justify-between border-t border-teal/15 pt-3">
             <span className="font-display text-xl text-ink">Final price you pay</span>
             <span className="font-display text-2xl text-teal">
@@ -224,56 +208,17 @@ export function BookPaymentPanel({
         </div>
       </div>
 
-      {!quote.isFreeForMember && (quote.walletBalance > 0 || quote.referralBalance > 0) ? (
-        <div className="rounded-2xl border border-line/80 bg-white p-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-ink-soft">HealthID Wallet</p>
-          <p className="mt-1 text-xs text-ink-soft">Credits apply after the {pct}% payment discount</p>
-          <div className="mt-3 space-y-3">
-            {quote.referralBalance > 0 ? (
-              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-line/60 p-3 has-[:checked]:border-teal has-[:checked]:bg-teal-light/30">
-                <input
-                  type="checkbox"
-                  checked={useReferral}
-                  onChange={(e) => onUseReferral(e.target.checked)}
-                  className="mt-1 accent-teal"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-ink">Use referral credit</p>
-                  <p className="text-xs text-ink-soft">
-                    {formatMoney(quote.referralBalance)} available · up to {formatMoney(quote.referralPerTest)} this booking
-                  </p>
-                </div>
-              </label>
-            ) : null}
-            {quote.walletBalance > 0 ? (
-              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-line/60 p-3 has-[:checked]:border-teal has-[:checked]:bg-teal-light/30">
-                <input
-                  type="checkbox"
-                  checked={useWallet}
-                  onChange={(e) => onUseWallet(e.target.checked)}
-                  className="mt-1 accent-teal"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-ink">Use wallet balance</p>
-                  <p className="text-xs text-ink-soft">{formatMoney(quote.walletBalance)} available (joining bonus & credits)</p>
-                </div>
-              </label>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-
       {amountDue === 0 ? (
         <div className="flex items-start gap-3 rounded-2xl border border-teal/20 bg-teal-light/30 p-4">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-teal" />
           <div className="flex-1">
             <p className="font-semibold">
-              {quote.isFreeForMember ? 'No payment required' : 'Fully covered by wallet'}
+              No payment required
             </p>
             <p className="text-sm text-ink-soft">
               {quote.isFreeForMember
                 ? 'This test is included free with your HealthID Card.'
-                : `After ${pct}% discount, your wallet credits cover the remaining amount.`}
+                : 'Your member benefits cover the full amount for this booking.'}
             </p>
             <Button className="mt-4 w-full" size="lg" disabled={isPending} onClick={onConfirm}>
               {isPending ? 'Confirming…' : 'Confirm booking'}
@@ -347,8 +292,7 @@ export function BookPaymentPanel({
 
           {paymentMethod === 'COD' ? (
             <div className="rounded-2xl border border-teal/20 bg-teal-light/30 p-4 text-sm">
-              Pay {formatMoney(amountDue)} to the phlebotomist at home collection (after {pct}% discount
-              {pricing.walletCreditApplied + pricing.referralCreditApplied > 0 ? ' & wallet credits' : ''}).
+              Pay {formatMoney(amountDue)} to the phlebotomist at home collection (after {pct}% member discount).
             </div>
           ) : null}
 

@@ -9,13 +9,11 @@ import {
   Plus,
   Search,
   UserRound,
-  Wallet,
 } from 'lucide-react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { cn, formatMoney } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import type { RootState } from '@/store'
-import type { WalletSummary } from '@/types'
 import { clearSession } from '@/store/authSlice'
 import api, { unwrap } from '@/services/api'
 import { NotifyBell } from '@/components/ui/SearchBar'
@@ -32,7 +30,6 @@ const navItems: NavItem[] = [
   { to: '/tests', label: 'Tests & packages', icon: FlaskConical },
   { to: '/appointments', label: 'My bookings', icon: CalendarDays },
   { to: '/history', label: 'Reports & records', icon: History },
-  { to: '/wallet', label: 'Wallet', icon: Wallet },
   { to: '/profile', label: 'Profile & settings', icon: UserRound },
 ]
 
@@ -61,12 +58,6 @@ export function AppShell() {
   const qc = useQueryClient()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchQ, setSearchQ] = useState('')
-
-  const wallet = useQuery({
-    queryKey: ['wallet'],
-    queryFn: async () => unwrap<WalletSummary>((await api.get('/wallet')).data),
-    staleTime: 60_000,
-  })
 
   const unread = useQuery({
     queryKey: ['notifications-unread'],
@@ -159,12 +150,6 @@ export function AppShell() {
             />
           </form>
           <div className="top-actions">
-            {wallet.data ? (
-              <NavLink to="/wallet" className="icon-btn">
-                <Wallet width={16} height={16} />
-                {formatMoney(wallet.data.totalSpendable)}
-              </NavLink>
-            ) : null}
             <NotifyBell count={unread.data?.count ?? 0} compact />
             <NavLink to="/profile" className="icon-btn">
               <UserRound width={16} height={16} />

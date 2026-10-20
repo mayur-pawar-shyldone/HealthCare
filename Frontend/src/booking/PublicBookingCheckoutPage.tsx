@@ -10,7 +10,7 @@ import {
   MapPin,
   Trash2,
   UserRound,
-  Wallet,
+  Banknote,
   type LucideIcon,
 } from 'lucide-react'
 import type { Address } from '@/account/account-data'
@@ -125,6 +125,7 @@ export function PublicBookingCheckoutPage() {
     patientName: string
     scheduleLabel: string
     testCount: number
+    whatsappMobile: string
   } | null>(null)
 
   useEffect(() => {
@@ -210,6 +211,7 @@ export function PublicBookingCheckoutPage() {
       patientName: draft.patientName || acc.member(draft.memberId || '')?.name || 'Guest',
       scheduleLabel: `${dateLabel} · ${draft.slot}`,
       testCount: draft.cart.length,
+      whatsappMobile: draft.bookerMobile || draft.mobile || acc.mobile,
     })
   }
 
@@ -493,7 +495,7 @@ export function PublicBookingCheckoutPage() {
             </dl>
 
             <div className="flex gap-3 rounded-xl bg-mp-teal-50 p-4">
-              <Wallet className="h-6 w-6 shrink-0 text-mp-teal-700" aria-hidden />
+              <Banknote className="h-6 w-6 shrink-0 text-mp-teal-700" aria-hidden />
               <div>
                 <p className="text-base font-semibold text-navy">Pay at sample collection</p>
                 <p className="mt-1.5 text-[15px] leading-relaxed text-muted">
@@ -531,6 +533,7 @@ export function PublicBookingCheckoutPage() {
         scheduleLabel={successModal?.scheduleLabel ?? ''}
         total={successModal?.total ?? 0}
         testCount={successModal?.testCount ?? 0}
+        whatsappMobile={successModal?.whatsappMobile}
         onDashboard={() => finishAfterSuccess(true)}
         onExplore={() => finishAfterSuccess(false)}
       />

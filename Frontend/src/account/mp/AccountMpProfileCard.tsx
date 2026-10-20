@@ -1,9 +1,8 @@
 import { ShieldCheck } from 'lucide-react'
+import { MAX_FAMILY_MEMBERS } from '@/account/account-data'
 import { PLATFORM } from '@/data/platform-content'
 import { useAccount } from '@/account/AccountContext'
 import { formatValidTill, memberInitials } from '@/account/dashboard/mp-utils'
-
-const MAX_FAMILY = 6
 
 export function AccountMpProfileCard() {
   const acc = useAccount()
@@ -12,7 +11,7 @@ export function AccountMpProfileCard() {
     { label: 'Valid till', value: formatValidTill(), accent: false },
     { label: 'Plan', value: `Family · ${PLATFORM.membership.flatDiscount}% off`, accent: true },
   ]
-  const pct = (acc.family.length / MAX_FAMILY) * 100
+  const pct = (acc.family.length / MAX_FAMILY_MEMBERS) * 100
   const mobileDisplay = acc.mobile.startsWith('+') ? acc.mobile : `+91 ${acc.mobile}`
 
   return (
@@ -38,15 +37,16 @@ export function AccountMpProfileCard() {
           <div className="flex justify-between">
             <span className="font-semibold text-navy">Family slots</span>
             <span className="text-muted">
-              {acc.family.length} of {MAX_FAMILY}
+              {acc.family.length} of {MAX_FAMILY_MEMBERS}
             </span>
           </div>
+          <p className="mt-1 text-[12px] text-muted">1 primary + up to 4 additional members</p>
           <div
             className="mt-3 h-2 rounded-full bg-mp-teal-50"
             role="progressbar"
             aria-valuenow={acc.family.length}
             aria-valuemin={0}
-            aria-valuemax={MAX_FAMILY}
+            aria-valuemax={MAX_FAMILY_MEMBERS}
           >
             <div className="h-2 rounded-full bg-mp-teal" style={{ width: `${pct}%` }} />
           </div>

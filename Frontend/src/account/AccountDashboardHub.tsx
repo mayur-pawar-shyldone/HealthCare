@@ -1,12 +1,13 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FileText, FlaskConical, Sparkles } from 'lucide-react'
 import { ACCOUNT_PACKAGES } from '@/account/account-data'
 import { useAccount } from '@/account/AccountContext'
 import { AccountCardWalletSection } from '@/account/AccountCardWalletSection'
 import { AccountDashboardFamilyPanel } from '@/account/dashboard/AccountDashboardFamilyPanel'
+import { AccountFamilyManageModal } from '@/account/dashboard/AccountFamilyManageModal'
 import { AccountDashboardHeroCard } from '@/account/dashboard/AccountDashboardHeroCard'
 import { AccountDashboardNextVisitPanel } from '@/account/dashboard/AccountDashboardNextVisitPanel'
-import { AccountDashboardWalletPanel } from '@/account/dashboard/AccountDashboardWalletPanel'
 import { dashboardGreeting } from '@/account/dashboard/mp-utils'
 import { PLATFORM } from '@/data/platform-content'
 
@@ -16,9 +17,13 @@ export function AccountDashboardPageContent() {
   const navigate = useNavigate()
   const firstName = acc.name.split(' ')[0]
 
-  function scrollToCardHub(openAdd?: boolean) {
-    if (openAdd && !acc.showAdd) acc.toggleShowAdd()
-    document.getElementById(openAdd ? 'card-family' : 'card-wallet')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const [familyManage, setFamilyManage] = useState<{ open: boolean; mode: 'list' | 'add' }>({
+    open: false,
+    mode: 'list',
+  })
+
+  function openFamilyManage(mode: 'list' | 'add' = 'list') {
+    setFamilyManage({ open: true, mode })
   }
 
   return (
@@ -62,13 +67,20 @@ export function AccountDashboardPageContent() {
         </div>
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-[1.25fr_1fr_0.85fr]">
-        <AccountDashboardFamilyPanel onAddMember={() => scrollToCardHub(true)} />
-        <AccountDashboardWalletPanel />
+      <div className="grid gap-4 lg:grid-cols-[1.25fr_1fr]">
+        <AccountDashboardFamilyPanel
+          onManageFamily={() => openFamilyManage('list')}
+          onAddMember={() => openFamilyManage('add')}
+        />
         <AccountDashboardNextVisitPanel />
       </div>
 
-      <AccountCardWalletSection onAddMember={() => scrollToCardHub(true)} />
+      <AccountCardWalletSection />
+      <AccountFamilyManageModal
+        open={familyManage.open}
+        initialMode={familyManage.mode}
+        onClose={() => setFamilyManage((s) => ({ ...s, open: false }))}
+      />
     </div>
   )
 }

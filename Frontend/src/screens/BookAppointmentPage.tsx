@@ -33,8 +33,8 @@ export function BookAppointmentPage() {
   const [familyMemberId, setFamilyMemberId] = useState('')
   const [collectionType] = useState<'HOME' | 'LAB'>('HOME')
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'CARD' | 'COD'>('UPI')
-  const [useWallet, setUseWallet] = useState(true)
-  const [useReferral, setUseReferral] = useState(true)
+  const useWallet = false
+  const useReferral = false
   const [locationStatus, setLocationStatus] = useState('')
   const [serviceable, setServiceable] = useState<boolean | null>(null)
   const [done, setDone] = useState<{ code: string; id: string } | null>(null)
@@ -167,7 +167,6 @@ export function BookAppointmentPage() {
       qc.invalidateQueries({ queryKey: ['dashboard'] })
       qc.invalidateQueries({ queryKey: ['appointments'] })
       qc.invalidateQueries({ queryKey: ['reminders'] })
-      qc.invalidateQueries({ queryKey: ['wallet'] })
       qc.invalidateQueries({ queryKey: ['quote'] })
       setDone(data)
     },
@@ -340,7 +339,7 @@ export function BookAppointmentPage() {
             <p className="text-xs font-bold uppercase tracking-wider text-ink-soft">Selected test</p>
             <p className="mt-1 font-display text-lg">{selected.name}</p>
             <p className="mt-1 text-sm text-ink-soft">
-              MRP {formatMoney(Number(selected.price))} · Member rate & wallet on next step
+              MRP {formatMoney(Number(selected.price))} · Member rate on next step
             </p>
           </div>
 
@@ -384,10 +383,6 @@ export function BookAppointmentPage() {
             patientName={patientName}
             addressLine={addr ? `${addr.line1}, ${addr.city} — ${addr.pincode}` : undefined}
             paymentMethod={paymentMethod}
-            useWallet={useWallet}
-            useReferral={useReferral}
-            onUseWallet={setUseWallet}
-            onUseReferral={setUseReferral}
             onPaymentMethod={setPaymentMethod}
             onConfirm={() => book.mutate()}
             isPending={book.isPending}

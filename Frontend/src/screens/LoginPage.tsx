@@ -4,29 +4,24 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { Input } from '@/components/ui/Input'
+import { useState, type ReactNode } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import api, { unwrap } from '@/services/api'
 import { setSession } from '@/store/authSlice'
 import type { AuthUser } from '@/types'
-import { type ReactNode } from 'react'
-import { Logo } from '@/components/brand/Logo'
+import { AuthSplitLayout, authSplitInputClass, authSplitPrimaryBtnClass } from '@/components/auth/AuthSplitLayout'
 
 const schema = z.object({
   identifier: z.string().min(3, 'Enter email or mobile'),
   password: z.string().min(1, 'Password is required'),
 })
 
-const BRAND_POINTS = [
-  'Book tests for up to six family members',
-  'Free home collection in partner cities',
-  'Reports and history in one timeline',
-]
-
 export function LoginPage() {
   const dispatch = useDispatch()
   const qc = useQueryClient()
   const navigate = useNavigate()
   const location = useLocation()
+  const [showPassword, setShowPassword] = useState(false)
   const registered = Boolean((location.state as { registered?: boolean } | null)?.registered)
   const prefill = (location.state as { email?: string } | null)?.email ?? ''
   const form = useForm({
@@ -61,71 +56,85 @@ export function LoginPage() {
   }
 
   const rootError = form.formState.errors.root?.message
+  const idError = form.formState.errors.identifier?.message
+  const passError = form.formState.errors.password?.message
 
   return (
-    <AuthFrame title="Welcome back" subtitle="Log in to manage bookings and health records.">
-      {registered ? <div className="ok">Account created. Please log in to enter HealthIDCard.</div> : null}
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Input label="Email or mobile" {...form.register('identifier')} error={form.formState.errors.identifier?.message} />
-        <Input label="Password" type="password" {...form.register('password')} error={form.formState.errors.password?.message} />
-        {rootError ? <p className="error">{rootError}</p> : null}
-        <button className="hid-btn hid-btn-primary hid-btn-block" type="submit">
-          Log in securely
+    <AuthSplitLayout
+      title="Welcome Back"
+      subtitle="Please login to your account"
+      footer={
+        <>
+          <div className="flex items-center justify-between text-[13px]">
+            <Link to="/forgot-password" className="font-medium text-[#9ca3af] hover:text-[#5e5df0]">
+              Forgot password?
+            </Link>
+            <Link to="/signup" className="font-semibold text-[#5e5df0] hover:underline">
+              Create an account
+            </Link>
+          </div>
+          <p className="mt-4 text-center text-[13px]">
+            <Link to="/login" className="font-semibold text-[#5e5df0] hover:underline">
+              Log in with mobile OTP
+            </Link>
+          </p>
+          <p className="mt-2 text-center text-[12px] text-[#9ca3af]">Demo: mayur@healthcart.com / Demo@1234</p>
+        </>
+      }
+    >
+      {registered ? (
+        <div className="mb-4 rounded-xl bg-emerald-50 px-3 py-2.5 text-[13px] font-medium text-emerald-800">
+          Account created. Please log in to enter HealthIDCard.
+        </div>
+      ) : null}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label className="block">
+            <span className="sr-only">Email or mobile</span>
+            <input
+              className={authSplitInputClass}
+              placeholder="Email or mobile"
+              {...form.register('identifier')}
+            />
+          </label>
+          {idError ? <p className="mt-1.5 text-[12px] font-semibold text-[#dc2626]">{idError}</p> : null}
+        </div>
+        <div>
+          <label className="relative block">
+            <span className="sr-only">Password</span>
+            <input
+              className={cnInputWithIcon}
+              placeholder="Password"
+              type={showPassword ? 'text' : 'password'}
+              {...form.register('password')}
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9ca3af] hover:text-[#6b7280]"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
+          </label>
+          {passError ? <p className="mt-1.5 text-[12px] font-semibold text-[#dc2626]">{passError}</p> : null}
+        </div>
+        {rootError ? <p className="text-[13px] font-semibold text-[#dc2626]">{rootError}</p> : null}
+        <button className={authSplitPrimaryBtnClass} type="submit">
+          Login
         </button>
       </form>
-      <div className="row-between fine" style={{ marginTop: 8 }}>
-        <Link to="/forgot-password" className="linkish">
-          Forgot password?
-        </Link>
-        <Link to="/signup" className="linkish">
-          Create an account
-        </Link>
-      </div>
-      <p className="fine">
-        <Link to="/login" className="linkish">
-          Log in with mobile OTP
-        </Link>
-      </p>
-      <p className="fine" style={{ fontSize: 12 }}>
-        Demo: mayur@healthcart.com / Demo@1234
-      </p>
-    </AuthFrame>
+    </AuthSplitLayout>
   )
 }
 
+const cnInputWithIcon = `${authSplitInputClass} pr-12`
+
+/** @deprecated Use AuthSplitLayout directly */
 export function AuthFrame({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
   return (
-    <div className="login">
-      <section className="login-brand">
-        <div>
-          <Logo variant="compact" onDark />
-          <h1>Your family&apos;s health, all in one place</h1>
-          <p className="lead">Member pricing, home collection and reports for everyone on your HealthID Card.</p>
-          <ul className="brand-points">
-            {BRAND_POINTS.map((point) => (
-              <li key={point}>
-                <span className="dot" />
-                {point}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p style={{ color: 'rgba(255,255,255,.65)', fontSize: 13 }}>Sehat bhi, bachat bhi.</p>
-      </section>
-      <section className="login-panel">
-        <div className="login-card">
-          <div className="mb-6 flex items-center justify-between lg:hidden">
-            <Logo variant="compact" />
-            <Link to="/" className="linkish">
-              ← Home
-            </Link>
-          </div>
-          <p className="eyebrow">HealthIDCard</p>
-          <h2>{title}</h2>
-          <p className="sub">{subtitle}</p>
-          {children}
-        </div>
-      </section>
-    </div>
+    <AuthSplitLayout title={title} subtitle={subtitle}>
+      {children}
+    </AuthSplitLayout>
   )
 }

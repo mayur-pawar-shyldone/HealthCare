@@ -14,7 +14,6 @@ import { HistoryPage } from '@/screens/HistoryPage'
 import { NotificationsPage } from '@/screens/NotificationsPage'
 import { SearchPage } from '@/screens/SearchPage'
 import { ProfilePage } from '@/screens/ProfilePage'
-import { WalletPage } from '@/screens/WalletPage'
 import { RemindersPage } from '@/screens/RemindersPage'
 import { LandingPage } from '@/screens/LandingPage'
 import { ServiceBrowsePage } from '@/screens/ServiceBrowsePage'
@@ -88,7 +87,7 @@ export default function App() {
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/wallet" element={<Navigate to="/home" replace />} />
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/transactions/:id/invoice" element={<InvoicePage mode="user" />} />
           <Route path="/transactions/:id" element={<TransactionDetailPage />} />

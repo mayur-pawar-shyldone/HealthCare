@@ -11,12 +11,17 @@ import { LandingShowcaseSection } from '@/components/landing/LandingShowcaseSect
 import { LandingServicesCarousel } from '@/components/landing/LandingServicesCarousel'
 import { LandingTestimonialsSection } from '@/components/landing/LandingTestimonialsSection'
 
+type LandingPageProps = {
+  /** Non-interactive layer behind login modal */
+  backdrop?: boolean
+}
+
 /** Section order: hero → services → packages → … (LabVert removed per product request) */
-export function LandingPage() {
+export function LandingPage({ backdrop = false }: LandingPageProps) {
   const { hash } = useLocation()
 
   useEffect(() => {
-    if (!hash) return
+    if (backdrop || !hash) return
     const id = hash.replace('#', '')
     if (id === POPULAR_PLANS_SECTION_ID) {
       scrollToPopularPlans('smooth')
@@ -26,6 +31,7 @@ export function LandingPage() {
   }, [hash])
 
   useEffect(() => {
+    if (backdrop) return
     document.body.style.overflow = 'auto'
     document.documentElement.style.overflow = 'auto'
     const root = document.getElementById('root')
@@ -35,11 +41,13 @@ export function LandingPage() {
       document.documentElement.style.overflow = ''
       if (root) root.style.overflow = ''
     }
-  }, [])
+  }, [backdrop])
 
   return (
-    <div className="landing-page min-h-screen bg-white font-sans text-ink">
-      <CardSignupModal />
+    <div
+      className={`landing-page bg-white font-sans text-ink ${backdrop ? 'min-h-[120vh] pointer-events-none select-none' : 'min-h-screen'}`}
+    >
+      {backdrop ? null : <CardSignupModal />}
       <LandingHeader />
 
       <main>

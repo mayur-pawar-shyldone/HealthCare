@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, CalendarCheck, FileText, Gift, Wallet } from 'lucide-react'
+import { Bell, CalendarCheck, FileText, Gift } from 'lucide-react'
 import {
   accountMpNotifications,
   unreadNotificationCount,
@@ -10,7 +10,6 @@ import {
 const KIND_ICON: Record<AccountMpNotification['kind'], typeof Bell> = {
   report: FileText,
   visit: CalendarCheck,
-  wallet: Wallet,
   offer: Gift,
 }
 

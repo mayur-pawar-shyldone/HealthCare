@@ -19,6 +19,10 @@ export type FamilyMember = {
   status: string
 }
 
+/** One primary holder + up to 4 additional members on a single card. */
+export const MAX_FAMILY_MEMBERS = 5
+export const PRIMARY_MEMBER_ID = 'self'
+
 export type Address = {
   id: string
   label: string
@@ -184,23 +188,11 @@ export const ACCOUNT_FAQS: AccountFaq[] = [
     a: 'Yes. Full Body Advanced includes a physician review call. For other tests, you can book one from your report.',
   },
   {
-    id: 'f5',
-    category: 'Wallet',
-    q: 'How do wallet credits work?',
-    a: 'Credits are applied automatically at checkout and can cover up to 20% of any booking.',
-  },
-  {
-    id: 'f6',
-    category: 'Wallet',
-    q: 'How do I earn referral credits?',
-    a: 'Share your code. When a friend books their first test, you earn ₹200 in wallet credits.',
-  },
-  {
     id: 'f7',
     category: 'Membership',
     q: 'Can I add a parent?',
-    a: 'Yes, up to six people can be on one card. Add them from My Account → Family members.',
+    a: 'Yes — one primary member plus up to four others (5 people total). Manage family from Home → Family on this card.',
   },
 ]
 
-export const ACCOUNT_FAQ_CATEGORIES = ['All', 'Bookings', 'Reports', 'Wallet', 'Membership'] as const
+export const ACCOUNT_FAQ_CATEGORIES = ['All', 'Bookings', 'Reports', 'Membership'] as const

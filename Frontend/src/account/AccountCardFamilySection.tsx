@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { cn } from '@/lib/utils'
 
-const MAX_FAMILY = 6
+import { MAX_FAMILY_MEMBERS } from '@/account/account-data'
 
 function BenefitRow({ title, desc, badge }: { title: string; desc: string; badge?: string }) {
   return (
@@ -35,7 +35,7 @@ function memberInitials(name: string) {
 export function AccountCardFamilySection({ onAddMember }: { onAddMember?: () => void }) {
   const acc = useAccount()
   const pct = PLATFORM.membership.flatDiscount
-  const seatsLeft = MAX_FAMILY - acc.family.length
+  const seatsLeft = MAX_FAMILY_MEMBERS - acc.family.length
 
   function openAddForm() {
     if (!acc.showAdd) acc.toggleShowAdd()
@@ -80,13 +80,13 @@ export function AccountCardFamilySection({ onAddMember }: { onAddMember?: () => 
             <BenefitRow title="Status" desc="Active membership · free to keep" badge="Active" />
             <BenefitRow title="Member pricing" desc={`Flat ${pct}% off on eligible tests and packages at checkout.`} />
             <BenefitRow title="Home collection" desc="Free home sample collection on eligible panels in partner cities." />
-            <BenefitRow title="Family on this card" desc={`${acc.family.length} of ${MAX_FAMILY} seats used${seatsLeft > 0 ? ` · ${seatsLeft} available` : ''}.`} />
+            <BenefitRow title="Family on this card" desc={`${acc.family.length} of ${MAX_FAMILY_MEMBERS} seats used${seatsLeft > 0 ? ` · ${seatsLeft} available` : ''}.`} />
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col">
             <div className="mb-3 flex items-baseline justify-between gap-2">
               <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-ink-soft">
-                Family ({acc.family.length}/{MAX_FAMILY})
+                Family ({acc.family.length}/{MAX_FAMILY_MEMBERS})
               </p>
               {seatsLeft > 0 && !acc.showAdd ? (
                 <button type="button" className="text-xs font-semibold text-teal hover:underline" onClick={openAddForm}>

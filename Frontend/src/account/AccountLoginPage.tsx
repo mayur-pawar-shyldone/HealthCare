@@ -2,6 +2,7 @@ import type { FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAccount } from '@/account/AccountContext'
 import { readForm } from '@/account/form-utils'
+import { AuthSplitLayout, authSplitInputClass, authSplitPrimaryBtnClass } from '@/components/auth/AuthSplitLayout'
 
 export function AccountLoginPage() {
   const acc = useAccount()
@@ -20,79 +21,96 @@ export function AccountLoginPage() {
   }
 
   return (
-    <div className="login">
-      <section className="login-brand">
-        <div>
-          <img className="logo" src="/logo.webp" alt="HealthIDCard" style={{ height: 46, background: '#fff', borderRadius: 12, padding: 6 }} />
-          <h1>Your family&apos;s health, all in one place</h1>
-          <p className="lead">Member pricing, home collection and reports for everyone on your HealthID Card.</p>
-          <ul className="brand-points">
-            <li>
-              <span className="dot" /> Book tests for up to six family members
-            </li>
-            <li>
-              <span className="dot" /> Free home collection in Mumbai
-            </li>
-            <li>
-              <span className="dot" /> Reports and trends in one timeline
-            </li>
-          </ul>
-        </div>
-        <p style={{ color: 'rgba(255,255,255,.65)', fontSize: 13 }}>Sehat bhi, bachat bhi.</p>
-      </section>
-      <section className="login-panel">
-        <form className="login-card" onSubmit={onSubmit}>
-          <p className="eyebrow">HealthIDCard</p>
-          <h2>{creating ? 'Create your account' : 'Welcome back'}</h2>
-          <p className="sub">
-            {creating
-              ? 'Tell us who the card is for. We’ll verify the mobile number next.'
-              : 'Log in to manage bookings and health records.'}
-          </p>
-          {acc.notice ? <div className="ok">{acc.notice}</div> : null}
+    <>
+      <AuthSplitLayout
+        title={creating ? 'Create your account' : 'Welcome Back'}
+        subtitle={
+          creating
+            ? 'Tell us who the card is for. We’ll verify your mobile next.'
+            : 'Please login to your account'
+        }
+        footer={
+          <>
+            <p className="text-center text-[14px] text-[#6b7280]">
+              {creating ? 'Already a member?' : 'New to HealthIDCard?'}{' '}
+              <button type="button" className="font-semibold text-[#5e5df0] hover:underline" onClick={() => acc.toggleAuthMode()}>
+                {creating ? 'Log in' : 'Create an account'}
+              </button>
+            </p>
+            <p className="mt-3 text-center text-[13px]">
+              <button type="button" className="font-semibold text-[#9ca3af] hover:text-[#5e5df0]" onClick={() => acc.loginHelp()}>
+                Help / support
+              </button>
+            </p>
+          </>
+        }
+      >
+        <form onSubmit={onSubmit} className="space-y-4">
+          {acc.notice ? (
+            <div className="rounded-xl bg-emerald-50 px-3 py-2.5 text-[13px] font-medium text-emerald-800">{acc.notice}</div>
+          ) : null}
           {creating ? (
-            <label className="field">
-              Full name
-              <input name="name" placeholder="As you’d like it on the card" defaultValue={acc.nameInput} required />
+            <label className="block">
+              <span className="sr-only">Full name</span>
+              <input
+                name="name"
+                className={authSplitInputClass}
+                placeholder="Full name (as on card)"
+                defaultValue={acc.nameInput}
+                required
+              />
             </label>
           ) : null}
-          <label className="field">
-            Mobile number
-            <input name="mobile" inputMode="numeric" maxLength={10} placeholder="Enter registered mobile number" defaultValue={acc.mobileInput} required />
+          <label className="block">
+            <span className="sr-only">Mobile number</span>
+            <input
+              name="mobile"
+              className={authSplitInputClass}
+              inputMode="numeric"
+              maxLength={10}
+              placeholder="Mobile number"
+              defaultValue={acc.mobileInput}
+              required
+            />
           </label>
           {acc.otpSent ? (
             <>
-              <label className="field">
-                OTP
-                <input name="otp" inputMode="numeric" maxLength={6} placeholder="Enter one-time password" defaultValue={acc.otp} />
-                <span className="hint">Preview: any 6-digit code continues.</span>
+              <label className="block">
+                <span className="sr-only">OTP</span>
+                <input
+                  name="otp"
+                  className={authSplitInputClass}
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="One-time password (OTP)"
+                  defaultValue={acc.otp}
+                />
               </label>
-              <div className="row-between" style={{ marginBottom: 12 }}>
-                <span className="hint">OTP sent to your mobile</span>
-                <button type="button" className="linkish" onClick={() => acc.resendOtp()} disabled={acc.cooldown > 0}>
-                  {acc.cooldown ? `Resend OTP in ${acc.cooldown}s` : 'Resend OTP'}
+              <div className="flex items-center justify-between gap-2 text-[13px]">
+                <span className="text-[#9ca3af]">OTP sent to your mobile</span>
+                <button
+                  type="button"
+                  className="font-semibold text-[#5e5df0] hover:underline disabled:text-[#9ca3af]"
+                  onClick={() => acc.resendOtp()}
+                  disabled={acc.cooldown > 0}
+                >
+                  {acc.cooldown ? `Resend in ${acc.cooldown}s` : 'Resend OTP'}
                 </button>
               </div>
+              <p className="text-[12px] text-[#9ca3af]">Preview: any 6-digit code continues.</p>
             </>
           ) : null}
-          {acc.error ? <p className="error">{acc.error}</p> : null}
-          <button className="hid-btn hid-btn-primary hid-btn-block" type="submit">
+          {acc.error ? <p className="text-[13px] font-semibold text-[#dc2626]">{acc.error}</p> : null}
+          <button className={authSplitPrimaryBtnClass} type="submit">
             {acc.otpSent ? 'Continue securely' : 'Send OTP'}
           </button>
-          <p className="fine">
-            {creating ? 'Already a member?' : 'New to HealthIDCard?'}{' '}
-            <button type="button" className="linkish" onClick={() => acc.toggleAuthMode()}>
-              {creating ? 'Log in' : 'Create an account'}
-            </button>
-          </p>
-          <p className="fine">
-            <button type="button" className="linkish" onClick={() => acc.loginHelp()}>
-              Help / support
-            </button>
-          </p>
         </form>
-      </section>
-      {acc.toast ? <div className="toast">{acc.toast}</div> : null}
-    </div>
+      </AuthSplitLayout>
+      {acc.toast ? (
+        <div className="fixed bottom-6 left-1/2 z-[110] -translate-x-1/2 rounded-full bg-[#111827] px-5 py-2.5 text-sm font-semibold text-white shadow-lg">
+          {acc.toast}
+        </div>
+      ) : null}
+    </>
   )
 }

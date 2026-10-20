@@ -1,12 +1,14 @@
+import { useState } from 'react'
 import { CheckCircle2, Home, MapPin, Plus } from 'lucide-react'
 import { useAccount } from '@/account/AccountContext'
 import { AccountDashboardPanel } from '@/account/dashboard/AccountDashboardPanel'
-import { ageFromDob, memberInitials } from '@/account/dashboard/mp-utils'
+import { AccountAddAddressModal } from '@/account/mp/AccountAddAddressModal'
 import { AccountMpPersonalDetails } from '@/account/mp/AccountMpPersonalDetails'
 import { AccountMpProfileCard } from '@/account/mp/AccountMpProfileCard'
 
 export function AccountMpMyAccountPage() {
   const acc = useAccount()
+  const [addressModalOpen, setAddressModalOpen] = useState(false)
 
   return (
     <div className="grid items-start gap-4 lg:grid-cols-[min(320px,100%)_1fr]">
@@ -18,52 +20,24 @@ export function AccountMpMyAccountPage() {
         <AccountMpPersonalDetails />
 
         <AccountDashboardPanel
-          title="Family members"
-          subtitle="Everyone here gets member pricing."
+          title="Collection addresses"
           action={
             <button
               type="button"
               onClick={() => {
-                if (!acc.showAdd) acc.toggleShowAdd()
+                acc.setError('')
+                setAddressModalOpen(true)
               }}
-              className="inline-flex items-center gap-1.5 rounded-full bg-mp-coral px-4 py-2 text-[13px] font-semibold text-white transition-colors duration-150 hover:bg-mp-coral-600"
+              className="inline-flex items-center gap-1 pt-1 text-[13px] font-medium text-mp-teal-700 hover:underline"
             >
-              <Plus className="h-4 w-4" aria-hidden />
-              Add
-            </button>
-          }
-        >
-          <ul className="divide-y divide-line">
-            {acc.family.map((f) => (
-              <li key={f.id} className="flex items-center gap-3 py-3">
-                <span className="grid h-10 w-10 place-items-center rounded-full bg-mp-teal-50 text-[13px] font-bold text-navy">
-                  {memberInitials(f.name)}
-                </span>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-navy">{f.name}</p>
-                  <p className="text-[13px] text-muted">
-                    {f.relation} · {ageFromDob(f.dob) != null ? `${ageFromDob(f.dob)} yrs` : '—'}
-                  </p>
-                </div>
-                <button type="button" className="text-[13px] font-medium text-mp-teal-700 hover:underline">
-                  Edit
-                </button>
-              </li>
-            ))}
-          </ul>
-        </AccountDashboardPanel>
-
-        <AccountDashboardPanel
-          title="Collection addresses"
-          action={
-            <button type="button" className="pt-1 text-[13px] font-medium text-mp-teal-700 hover:underline">
+              <Plus className="h-3.5 w-3.5" aria-hidden />
               Add new
             </button>
           }
         >
           <div className="grid gap-4 md:grid-cols-2">
-            {acc.addresses.map((a, i) => {
-              const isDefault = a.id === 'home' || i === 0
+            {acc.addresses.map((a) => {
+              const isDefault = a.id === acc.defaultAddressId
               const Icon = isDefault ? Home : MapPin
               return (
                 <div
@@ -81,7 +55,11 @@ export function AccountMpMyAccountPage() {
                         Default
                       </span>
                     ) : (
-                      <button type="button" className="text-sm font-medium text-muted hover:text-mp-teal-700">
+                      <button
+                        type="button"
+                        onClick={() => acc.setDefaultAddress(a.id)}
+                        className="text-sm font-medium text-muted hover:text-mp-teal-700"
+                      >
                         Set default
                       </button>
                     )}
@@ -94,6 +72,8 @@ export function AccountMpMyAccountPage() {
           </div>
         </AccountDashboardPanel>
       </div>
+
+      <AccountAddAddressModal open={addressModalOpen} onClose={() => setAddressModalOpen(false)} />
     </div>
   )
 }

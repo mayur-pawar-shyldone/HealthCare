@@ -3,7 +3,7 @@ import { CheckCircle2 } from 'lucide-react'
 import { useAccount } from '@/account/AccountContext'
 import { AccountDashboardPanel } from '@/account/dashboard/AccountDashboardPanel'
 
-const issues = ['Reschedule a visit', 'Report not received', 'Payment or refund', 'Wallet credits', 'Something else']
+const issues = ['Reschedule a visit', 'Report not received', 'Payment or refund', 'Something else']
 
 export function AccountMpRequestForm() {
   const acc = useAccount()

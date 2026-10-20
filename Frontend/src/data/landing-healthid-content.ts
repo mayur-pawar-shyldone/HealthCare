@@ -86,7 +86,7 @@ export const CARD_BENEFITS = [
 
 export const FAMILY_CARD_PERKS = [
   'Member rates on every test, for every member',
-  'Up to 6 family members on one free card',
+  'Up to 5 family members on one free card (1 primary + 4 others)',
   'Free home collection in Mumbai, every time',
   'All reports and trends in one shared timeline',
   'Book for parents in another city from your account',

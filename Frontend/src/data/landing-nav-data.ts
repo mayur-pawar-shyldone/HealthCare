@@ -483,13 +483,12 @@ export const PHARMACY_VERTICALS: HealthVertical[] = [
   {
     id: 'ph-family',
     label: 'Family on card',
-    subtitle: '6 members',
+    subtitle: '5 members',
     headline: 'Order for anyone on your card',
-    points: ['Family profiles on HealthID Card', 'Single checkout upcoming', 'Wallet credits at launch'],
-    quickLinks: ['Family', 'Wallet', 'HealthID Card'],
+    points: ['Family profiles on HealthID Card', 'Single checkout upcoming', 'Member pricing on every test'],
+    quickLinks: ['Family', 'HealthID Card'],
     packages: [
       { id: 'ph-family', name: 'Family pharmacy profile', tests: 0, reportIn: 'Soon', price: 0, mrp: 0 },
-      { id: 'ph-wallet', name: 'Pay with wallet', tests: 0, reportIn: 'Soon', price: 0, mrp: 0, tag: 'Coming Soon' },
       { id: 'ph-notify', name: 'Notify me at launch', tests: 0, reportIn: 'Soon', price: 0, mrp: 0 },
     ],
   },

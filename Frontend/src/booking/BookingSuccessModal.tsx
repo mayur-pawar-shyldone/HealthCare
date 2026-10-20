@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowRight, CheckCircle2, Sparkles } from 'lucide-react'
+import { ArrowRight, CheckCircle2, MessageCircle, Sparkles } from 'lucide-react'
 
 type Props = {
   open: boolean
@@ -8,8 +8,15 @@ type Props = {
   scheduleLabel: string
   total: number
   testCount: number
+  whatsappMobile?: string
   onDashboard: () => void
   onExplore: () => void
+}
+
+function formatWhatsAppMobile(mobile: string) {
+  const digits = mobile.replace(/\D/g, '').slice(-10)
+  if (digits.length !== 10) return mobile
+  return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`
 }
 
 export function BookingSuccessModal({
@@ -19,6 +26,7 @@ export function BookingSuccessModal({
   scheduleLabel,
   total,
   testCount,
+  whatsappMobile,
   onDashboard,
   onExplore,
 }: Props) {
@@ -69,6 +77,26 @@ export function BookingSuccessModal({
             <p className="mt-2 text-[15px] font-bold text-navy">
               Pay ₹{total.toLocaleString('en-IN')} at sample collection (cash or UPI)
             </p>
+          </div>
+
+          <div className="flex gap-3 rounded-2xl border border-mp-teal/25 bg-mp-teal-50/80 px-4 py-3 text-left">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-mp-teal text-white">
+              <MessageCircle className="h-5 w-5" aria-hidden />
+            </span>
+            <div className="min-w-0 text-[13px] leading-snug text-navy">
+              <p className="font-bold text-[14px]">Report on WhatsApp</p>
+              <p className="mt-1 text-muted">
+                {whatsappMobile ? (
+                  <>
+                    We&apos;ll share your report on your registered WhatsApp{' '}
+                    <span className="font-semibold text-navy">{formatWhatsAppMobile(whatsappMobile)}</span>.
+                  </>
+                ) : (
+                  <>We&apos;ll share your report on your registered WhatsApp number.</>
+                )}
+              </p>
+              <p className="mt-1.5 font-semibold text-mp-teal-700">You will typically receive the report within 6 hours.</p>
+            </div>
           </div>
 
           <button

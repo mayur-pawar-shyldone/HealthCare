@@ -13,14 +13,12 @@ export const PLATFORM = {
     duration: '1 year',
     flatDiscount: 30,
     description:
-      'One-time free family health card for 1 year. Exclusive lab rates on 63+ tests, 29 diagnostic packages, free home collection, wallet credits, WhatsApp updates & digital reports.',
+      'One-time free family health card for 1 year. Exclusive lab rates on 63+ tests, 29 diagnostic packages, free home collection, WhatsApp updates & digital reports.',
     benefits: [
       'Extra 30% off special price at every payment (not on MRP)',
       'Free 1-year family membership (launch offer)',
       'Exclusive special rates on 63+ individual blood tests',
       '29 official diagnostic packages at bundled member prices',
-      '₹250 joining bonus wallet on card activation',
-      '₹1000 referral bonus — redeem ₹200 per test booking',
       'Add up to 5 family members on one card',
       'Free home sample collection across major cities',
       'WhatsApp booking updates, reminders & reports',

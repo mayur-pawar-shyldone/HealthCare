@@ -4,7 +4,7 @@ export type AccountMpNotification = {
   body: string
   time: string
   unread: boolean
-  kind: 'report' | 'visit' | 'offer' | 'wallet'
+  kind: 'report' | 'visit' | 'offer'
 }
 
 /** Sample notifications for dashboard UI (replace with API when wired). */
@@ -25,14 +25,6 @@ export function accountMpNotifications(): AccountMpNotification[] {
       time: '5h ago',
       unread: true,
       kind: 'visit',
-    },
-    {
-      id: 'n3',
-      title: 'Wallet credit applied',
-      body: '₹50 referral bonus added — auto-applies on your next booking.',
-      time: 'Yesterday',
-      unread: false,
-      kind: 'wallet',
     },
     {
       id: 'n4',

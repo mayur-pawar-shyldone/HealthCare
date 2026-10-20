@@ -6,7 +6,6 @@ import {
   FlaskConical,
   HelpCircle,
   UserPlus,
-  Wallet,
 } from 'lucide-react'
 import { PLATFORM } from '@/data/platform-content'
 import { cn } from '@/lib/utils'
@@ -71,8 +70,7 @@ export function AccountQuickActions({ onAddFamily }: AccountQuickActionsProps) {
     },
     { label: 'My bookings', sub: 'Track collections', icon: CalendarDays, to: '/account/bookings' },
     { label: 'Reports & records', sub: 'Download PDFs', icon: FileText, to: '/account/reports' },
-    { label: 'Add family member', sub: 'Up to 6 on one card', icon: UserPlus, onClick: onAddFamily },
-    { label: 'Wallet & full app', sub: '₹250 bonus · referrals', icon: Wallet, to: '/login/password' },
+    { label: 'Add family member', sub: 'Up to 5 on one card', icon: UserPlus, onClick: onAddFamily },
     { label: 'Help & support', sub: '1800-123-4567', icon: HelpCircle, to: '/account/support' },
   ]
 
