@@ -35,6 +35,24 @@ function isServiceablePincode(pincode: string) {
   return /^\d{6}$/.test(pincode) && METRO_PIN_PREFIXES.some((p) => pincode.startsWith(p));
 }
 
+function parseAppointmentDate(value: string) {
+  const iso = /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : '';
+  if (!iso) {
+    throw new BadRequestException({ message: 'Choose a valid collection date', error: 'INVALID_DATE' });
+  }
+  const [year, month, day] = iso.split('-').map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (
+    Number.isNaN(parsed.getTime()) ||
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
+    throw new BadRequestException({ message: 'Choose a valid collection date', error: 'INVALID_DATE' });
+  }
+  return parsed;
+}
+
 @Injectable()
 export class AppointmentsService {
   constructor(
@@ -92,6 +110,7 @@ export class AppointmentsService {
     if (!SLOTS.includes(dto.timeSlot)) {
       throw new BadRequestException({ message: 'Invalid time slot', error: 'INVALID_SLOT' });
     }
+    const appointmentDate = parseAppointmentDate(dto.date);
 
     const collectionType = dto.collectionType ?? CollectionType.HOME;
     let deliveryAddress = dto.deliveryAddress;
@@ -100,6 +119,9 @@ export class AppointmentsService {
     let longitude = dto.longitude;
 
     if (collectionType === CollectionType.HOME) {
+      if (addressId && ['custom', 'home', 'lab'].includes(addressId)) {
+        addressId = undefined;
+      }
       if (addressId) {
         const addr = await this.prisma.address.findFirst({ where: { id: addressId, userId } });
         if (!addr) throw new BadRequestException({ message: 'Invalid address', error: 'INVALID_ADDRESS' });
@@ -151,7 +173,7 @@ export class AppointmentsService {
         code,
         userId,
         testId: test.id,
-        date: new Date(dto.date),
+        date: appointmentDate,
         timeSlot: dto.timeSlot,
         patientName: dto.patientName,
         patientAge: dto.patientAge,
@@ -225,7 +247,7 @@ export class AppointmentsService {
       data: { userId, appointmentId: appointment.id, status: 'PENDING' },
     });
 
-    const remindAt = new Date(dto.date);
+    const remindAt = new Date(appointmentDate);
     remindAt.setDate(remindAt.getDate() - 1);
     remindAt.setHours(9, 0, 0, 0);
     if (remindAt > new Date()) {
@@ -270,10 +292,11 @@ export class AppointmentsService {
     if (['COMPLETED', 'CANCELLED'].includes(appointment.status)) {
       throw new BadRequestException({ message: 'This appointment cannot be rescheduled', error: 'RESCHEDULE_FAILED' });
     }
+    const nextDate = parseAppointmentDate(dto.date);
     const updated = await this.prisma.appointment.update({
       where: { id },
       data: {
-        date: new Date(dto.date),
+        date: nextDate,
         timeSlot: dto.timeSlot,
         status: AppointmentStatus.RESCHEDULED,
         reminderSentAt: null,
