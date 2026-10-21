@@ -1,28 +1,22 @@
 import type { FormEvent } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { useAccount } from '@/account/AccountContext'
 import { readForm } from '@/account/form-utils'
 import { AuthSplitLayout, authSplitInputClass, authSplitPrimaryBtnClass } from '@/components/auth/AuthSplitLayout'
 
-export function AccountLoginPage() {
+export function AccountLoginPage({ onClose }: { onClose?: () => void }) {
   const acc = useAccount()
-  const navigate = useNavigate()
-  const location = useLocation()
   const creating = acc.loginMode === 'create'
-  const from = (location.state as { from?: string } | null)?.from
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const data = readForm(e.currentTarget) as { mobile: string; name?: string; otp?: string }
-    if (acc.submitLogin(data)) {
-      const dest = from && from !== '/login' ? from : '/'
-      navigate(dest, { replace: true })
-    }
+    await acc.submitLogin(data)
   }
 
   return (
     <>
       <AuthSplitLayout
+        onClose={onClose}
         title={creating ? 'Create your account' : 'Welcome Back'}
         subtitle={
           creating
@@ -91,18 +85,17 @@ export function AccountLoginPage() {
                 <button
                   type="button"
                   className="font-semibold text-[#5e5df0] hover:underline disabled:text-[#9ca3af]"
-                  onClick={() => acc.resendOtp()}
-                  disabled={acc.cooldown > 0}
+                  onClick={() => void acc.resendOtp()}
+                  disabled={acc.cooldown > 0 || acc.busy}
                 >
                   {acc.cooldown ? `Resend in ${acc.cooldown}s` : 'Resend OTP'}
                 </button>
               </div>
-              <p className="text-[12px] text-[#9ca3af]">Preview: any 6-digit code continues.</p>
             </>
           ) : null}
           {acc.error ? <p className="text-[13px] font-semibold text-[#dc2626]">{acc.error}</p> : null}
-          <button className={authSplitPrimaryBtnClass} type="submit">
-            {acc.otpSent ? 'Continue securely' : 'Send OTP'}
+          <button className={authSplitPrimaryBtnClass} type="submit" disabled={acc.busy}>
+            {acc.busy ? 'Please wait…' : acc.otpSent ? 'Continue securely' : 'Send OTP'}
           </button>
         </form>
       </AuthSplitLayout>

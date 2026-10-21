@@ -8,14 +8,9 @@ export function AccountDashboardWalletPanel() {
   const acc = useAccount()
   const [copied, setCopied] = useState(false)
 
-  const walletBalance = 180
-  const referralCredits = 0
-  const base = acc.name
-    .split(/\s+/)[0]
-    .toUpperCase()
-    .replace(/[^A-Z]/g, '')
-    .slice(0, 5)
-  const referralCode = `${base}${acc.mobile.slice(-1)}K2`
+  const walletBalance = acc.wallet?.balance ?? 0
+  const referralCredits = acc.wallet?.referralBalance ?? 0
+  const referralCode = acc.wallet?.referralCode || ''
 
   function copy() {
     navigator.clipboard?.writeText(referralCode).catch(() => undefined)

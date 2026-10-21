@@ -57,18 +57,7 @@ export function PublicBookingShell({
   const acc = useAccount()
 
   useEffect(() => {
-    const prevBody = document.body.style.overflow
-    const prevHtml = document.documentElement.style.overflow
-    const prevRoot = document.getElementById('root')?.style.overflow ?? ''
-    document.body.style.overflow = 'auto'
-    document.documentElement.style.overflow = 'auto'
-    const root = document.getElementById('root')
-    if (root) root.style.overflow = 'auto'
-    return () => {
-      document.body.style.overflow = prevBody
-      document.documentElement.style.overflow = prevHtml
-      if (root) root.style.overflow = prevRoot
-    }
+    window.scrollTo(0, 0)
   }, [])
 
   return (

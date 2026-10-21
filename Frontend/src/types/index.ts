@@ -11,6 +11,7 @@ export type AuthUser = {
   email: string
   role: Role
   fullName: string
+  mobile?: string
 }
 
 export type Category = {
@@ -168,6 +169,7 @@ export type FamilyMember = {
   age?: number | null
   gender?: Gender | null
   mobile?: string | null
+  dateOfBirth?: string | null
 }
 
 export type TestReminder = {

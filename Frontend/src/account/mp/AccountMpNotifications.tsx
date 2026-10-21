@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Bell, CalendarCheck, FileText, Gift } from 'lucide-react'
+import api, { unwrap } from '@/services/api'
+import type { NotificationItem } from '@/types'
 import {
-  accountMpNotifications,
+  mapAccountNotifications,
   unreadNotificationCount,
   type AccountMpNotification,
 } from '@/account/mp/account-mp-notifications'
@@ -15,8 +18,13 @@ const KIND_ICON: Record<AccountMpNotification['kind'], typeof Bell> = {
 
 export function AccountMpNotifications() {
   const [open, setOpen] = useState(false)
-  const [items, setItems] = useState(accountMpNotifications)
   const rootRef = useRef<HTMLDivElement>(null)
+  const qc = useQueryClient()
+  const query = useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => unwrap<NotificationItem[]>((await api.get('/notifications')).data),
+  })
+  const items = mapAccountNotifications(query.data ?? [])
   const unread = unreadNotificationCount(items)
 
   useEffect(() => {
@@ -36,11 +44,11 @@ export function AccountMpNotifications() {
   }, [open])
 
   function markAllRead() {
-    setItems((prev) => prev.map((n) => ({ ...n, unread: false })))
+    void api.patch('/notifications/read-all').then(() => qc.invalidateQueries({ queryKey: ['notifications'] }))
   }
 
-  function openPanel() {
-    setOpen((v) => !v)
+  function markRead(id: string) {
+    void api.patch(`/notifications/${id}/read`).then(() => qc.invalidateQueries({ queryKey: ['notifications'] }))
   }
 
   return (
@@ -50,7 +58,7 @@ export function AccountMpNotifications() {
         aria-expanded={open}
         aria-haspopup="true"
         aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'}
-        onClick={openPanel}
+        onClick={() => setOpen((v) => !v)}
         className={`relative grid h-11 w-11 place-items-center rounded-full transition-colors duration-150 ${
           open ? 'bg-navy text-white' : 'bg-mp-teal-50 text-mp-teal-700 hover:bg-[#d3ecea]'
         }`}
@@ -84,38 +92,44 @@ export function AccountMpNotifications() {
           </div>
 
           <ul className="max-h-[min(60vh,320px)] overflow-y-auto py-1">
-            {items.map((n) => {
-              const Icon = KIND_ICON[n.kind]
-              return (
-                <li key={n.id}>
-                  <button
-                    type="button"
-                    onClick={() => setItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, unread: false } : x)))}
-                    className={`flex w-full gap-3 px-4 py-3 text-left transition hover:bg-canvas ${
-                      n.unread ? 'bg-mp-teal-50/40' : ''
-                    }`}
-                  >
-                    <span
-                      className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl ${
-                        n.unread ? 'bg-mp-teal text-white' : 'bg-mp-teal-50 text-mp-teal-700'
+            {query.isLoading ? (
+              <li className="px-4 py-6 text-center text-[13px] text-muted">Loading…</li>
+            ) : items.length ? (
+              items.map((n) => {
+                const Icon = KIND_ICON[n.kind]
+                return (
+                  <li key={n.id}>
+                    <button
+                      type="button"
+                      onClick={() => markRead(n.id)}
+                      className={`flex w-full gap-3 px-4 py-3 text-left transition hover:bg-canvas ${
+                        n.unread ? 'bg-mp-teal-50/40' : ''
                       }`}
                     >
-                      <Icon className="h-4 w-4" aria-hidden />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-center gap-2">
-                        <span className="text-[13.5px] font-semibold text-navy">{n.title}</span>
-                        {n.unread ? (
-                          <span className="h-2 w-2 shrink-0 rounded-full bg-mp-coral" aria-label="Unread" />
-                        ) : null}
+                      <span
+                        className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl ${
+                          n.unread ? 'bg-mp-teal text-white' : 'bg-mp-teal-50 text-mp-teal-700'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" aria-hidden />
                       </span>
-                      <span className="mt-0.5 block text-[12.5px] leading-snug text-muted">{n.body}</span>
-                      <span className="mt-1 block text-[11px] font-medium text-mp-teal-700">{n.time}</span>
-                    </span>
-                  </button>
-                </li>
-              )
-            })}
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-2">
+                          <span className="text-[13.5px] font-semibold text-navy">{n.title}</span>
+                          {n.unread ? (
+                            <span className="h-2 w-2 shrink-0 rounded-full bg-mp-coral" aria-label="Unread" />
+                          ) : null}
+                        </span>
+                        <span className="mt-0.5 block text-[12.5px] leading-snug text-muted">{n.body}</span>
+                        <span className="mt-1 block text-[11px] font-medium text-mp-teal-700">{n.time}</span>
+                      </span>
+                    </button>
+                  </li>
+                )
+              })
+            ) : (
+              <li className="px-4 py-6 text-center text-[13px] text-muted">No notifications yet.</li>
+            )}
           </ul>
 
           <div className="border-t border-line bg-canvas/50 px-4 py-2.5">

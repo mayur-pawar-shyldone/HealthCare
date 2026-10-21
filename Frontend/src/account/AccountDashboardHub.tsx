@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FileText, FlaskConical, Sparkles } from 'lucide-react'
-import { ACCOUNT_PACKAGES } from '@/account/account-data'
 import { useAccount } from '@/account/AccountContext'
 import { AccountCardWalletSection } from '@/account/AccountCardWalletSection'
 import { AccountDashboardFamilyPanel } from '@/account/dashboard/AccountDashboardFamilyPanel'
@@ -44,8 +43,8 @@ export function AccountDashboardPageContent() {
             <button
               type="button"
               onClick={() => {
-                acc.choosePackage(ACCOUNT_PACKAGES[0].id)
-                navigate('/account/book/member')
+                if (acc.packages[0]) acc.choosePackage(acc.packages[0].id)
+                navigate(acc.packages[0] ? '/account/book/member' : '/account/catalogue')
               }}
               className="inline-flex items-center gap-1.5 rounded-full bg-mp-coral px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-mp-coral-600"
             >

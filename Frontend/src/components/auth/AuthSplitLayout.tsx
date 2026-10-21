@@ -16,12 +16,17 @@ type AuthSplitLayoutProps = {
   /** Optional footer links below the form */
   footer?: ReactNode
   className?: string
+  onClose?: () => void
 }
 
-export function AuthSplitLayout({ title, subtitle, children, footer, className }: AuthSplitLayoutProps) {
+export function AuthSplitLayout({ title, subtitle, children, footer, className, onClose }: AuthSplitLayoutProps) {
   const navigate = useNavigate()
 
   function closeLogin() {
+    if (onClose) {
+      onClose()
+      return
+    }
     if (window.history.length > 1) {
       navigate(-1)
       return
@@ -80,6 +85,7 @@ export function AuthSplitLayout({ title, subtitle, children, footer, className }
                 </div>
 
                 <div className="auth-split-form">{children}</div>
+                <div id="recaptcha-container" className="mt-3 flex justify-center" />
                 {footer ? <div className="mt-6">{footer}</div> : null}
               </div>
             </div>

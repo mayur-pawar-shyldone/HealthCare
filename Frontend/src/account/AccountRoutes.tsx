@@ -1,6 +1,8 @@
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import { useAccount } from '@/account/AccountContext'
 import { AccountLoginPage } from '@/account/AccountLoginPage'
+import { OtpVerification } from '@/account/OtpVerification'
+import { consumeLoginReturn, loginReturnFromLocation } from '@/lib/auth-return'
 import { AccountShell } from '@/account/AccountShell'
 import {
   AccountBookDonePage,
@@ -19,8 +21,24 @@ import {
 /** OTP login from pasted HealthID account portal — use at `/login`. */
 export function AccountLoginGate() {
   const acc = useAccount()
-  if (acc.authed) return <Navigate to="/" replace />
+  const location = useLocation()
+  if (acc.authed) {
+    const dest = consumeLoginReturn(loginReturnFromLocation(location))
+    return <Navigate to={dest} replace />
+  }
+  loginReturnFromLocation(location)
   return <AccountLoginPage />
+}
+
+export function AccountEmailOtpGate() {
+  const acc = useAccount()
+  const location = useLocation()
+  if (acc.authed) {
+    const dest = consumeLoginReturn(loginReturnFromLocation(location))
+    return <Navigate to={dest} replace />
+  }
+  loginReturnFromLocation(location)
+  return <OtpVerification />
 }
 
 function AccountProtected() {

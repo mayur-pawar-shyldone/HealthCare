@@ -1,6 +1,8 @@
-import type { FormEvent } from 'react'
+import { useMemo, type FormEvent } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import { ACCOUNT_PACKAGES, BOOKING_DATES } from '@/account/account-data'
+import { useQuery } from '@tanstack/react-query'
+import { upcomingCollectionDates } from '@/lib/booking-dates'
+import api, { unwrap } from '@/services/api'
 import { AccountDashboardPageContent } from '@/account/AccountDashboardHub'
 import { AccountMpBookingsReportsPage } from '@/account/mp/AccountMpBookingsReportsPage'
 import { AccountMpHelpSupportPage } from '@/account/mp/AccountMpHelpSupportPage'
@@ -37,7 +39,7 @@ export function AccountBookingDetailPage() {
 
   return (
     <>
-      <PageHead title={`Booking ${b.id}`} text={`${acc.pkg(b.packageId).name} for ${acc.member(b.memberId)?.name || ''}`} />
+      <PageHead title={`Booking ${b.code || b.id}`} text={`${acc.pkg(b.packageId).name} for ${acc.member(b.memberId)?.name || ''}`} />
       <div className="grid-2">
         <article className="card">
           <span className={`badge ${b.status === 'Completed' ? 'ok' : ''}`}>{b.status}</span>
@@ -75,7 +77,7 @@ export function AccountBookingDetailPage() {
           <h3 style={{ marginTop: 0 }}>Manage</h3>
           {b.status === 'Upcoming' ? (
             <>
-              <button type="button" className="hid-btn hid-btn-primary hid-btn-block" onClick={() => { acc.rescheduleBooking(b.id); navigate('/account/bookings') }}>
+              <button type="button" className="hid-btn hid-btn-primary hid-btn-block" onClick={() => { acc.rescheduleBooking(b.id); navigate('/account/book/slot') }}>
                 Reschedule
               </button>
               <button
@@ -125,7 +127,7 @@ export function AccountCataloguePage() {
   const acc = useAccount()
   const navigate = useNavigate()
   const q = acc.search.trim().toLowerCase()
-  const filtered = ACCOUNT_PACKAGES.filter((p) => !q || (p.name + p.summary).toLowerCase().includes(q))
+  const filtered = acc.packages.filter((p) => !q || (p.name + p.summary).toLowerCase().includes(q))
 
   return (
     <>
@@ -225,7 +227,13 @@ export function AccountBookMemberPage() {
 export function AccountBookSlotPage() {
   const acc = useAccount()
   const navigate = useNavigate()
-  const slots = BOOKING_DATES.find((d) => d.id === acc.draft.date)?.slots ?? []
+  const dates = useMemo(() => upcomingCollectionDates(7), [])
+  const slotsQuery = useQuery({
+    queryKey: ['slots', acc.draft.date],
+    enabled: Boolean(acc.draft.date),
+    queryFn: async () => unwrap<{ slots: string[] }>((await api.get('/appointments/slots', { params: { date: acc.draft.date } })).data),
+  })
+  const slots = slotsQuery.data?.slots ?? []
 
   return (
     <>
@@ -239,22 +247,22 @@ export function AccountBookSlotPage() {
       >
         <h3>Date</h3>
         <div className="days">
-          {BOOKING_DATES.map((d) => (
+          {dates.map((d) => (
             <button
               key={d.id}
               type="button"
               className={`day ${acc.draft.date === d.id ? 'on' : ''}`}
-              disabled={!d.slots.length}
               onClick={() => acc.pickDate(d.id)}
             >
               {d.label}
-              {d.slots.length ? '' : ' · Full'}
             </button>
           ))}
         </div>
         <h3>Time</h3>
         <div className="slots">
-          {slots.length ? (
+          {slotsQuery.isLoading ? (
+            <p className="muted">Loading slots…</p>
+          ) : slots.length ? (
             slots.map((s) => (
               <button key={s} type="button" className={`slot ${acc.draft.slot === s ? 'on' : ''}`} onClick={() => acc.pickSlot(s)}>
                 {s}
@@ -282,7 +290,8 @@ export function AccountBookReviewPage() {
   const acc = useAccount()
   const navigate = useNavigate()
   const p = acc.pkg(acc.draft.packageId)
-  const d = BOOKING_DATES.find((x) => x.id === acc.draft.date)
+  const dates = useMemo(() => upcomingCollectionDates(7), [])
+  const d = dates.find((x) => x.id === acc.draft.date)
   const save = p.mrp - p.price
 
   return (
@@ -293,8 +302,9 @@ export function AccountBookReviewPage() {
         className="split"
         onSubmit={(e) => {
           e.preventDefault()
-          acc.confirmBooking()
-          navigate('/account/book/done')
+          void acc.confirmBooking().then((ok) => {
+            if (ok) navigate('/account/book/done')
+          })
         }}
       >
         <article className="card">
@@ -342,8 +352,9 @@ export function AccountBookReviewPage() {
               <span>{rupee(p.price)}</span>
             </div>
           </div>
-          <button className="hid-btn hid-btn-primary hid-btn-block" style={{ marginTop: 14 }} type="submit">
-            Confirm booking
+          {acc.error ? <p className="error">{acc.error}</p> : null}
+          <button className="hid-btn hid-btn-primary hid-btn-block" style={{ marginTop: 14 }} type="submit" disabled={acc.busy}>
+            {acc.busy ? 'Saving…' : 'Confirm booking'}
           </button>
         </aside>
       </form>
@@ -363,7 +374,7 @@ export function AccountBookDonePage() {
       <PageHead title="Booking confirmed" text="We’ve saved this visit on your account." />
       <article className="card">
         <span className="badge ok">Confirmed</span>
-        <h2 style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}>{b.id}</h2>
+        <h2 style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}>{b.code || b.id}</h2>
         <p>
           {acc.pkg(b.packageId).name} for {acc.member(b.memberId)?.name} · {b.date} · {b.slot}
         </p>

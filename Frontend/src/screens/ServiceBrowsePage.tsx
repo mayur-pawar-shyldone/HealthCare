@@ -1,26 +1,51 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { LandingFooter, LandingHeader } from '@/components/landing/LandingLayout'
 import { LandingShowcaseCard } from '@/components/landing/LandingShowcaseCard'
 import {
   BROWSE_CATEGORY_META,
-  browsePackagesForTab,
-  browseTabsForCategory,
   isBrowseCategoryId,
-  resolveBrowseTab,
   slugifyBrowseKey,
   type BrowseCategoryId,
 } from '@/data/service-browse'
+import { browseFilter, labTestToShowcase } from '@/lib/catalog'
+import api, { unwrap } from '@/services/api'
+import type { LabTest } from '@/types'
 
 function BrowseContent({ categoryId }: { categoryId: BrowseCategoryId }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const highlightItem = searchParams.get('item')
   const tabParam = searchParams.get('tab')
+  const catalog = useQuery({
+    queryKey: ['tests', 'browse', categoryId],
+    queryFn: async () => {
+      const [packages, all] = await Promise.all([
+        unwrap<LabTest[]>((await api.get('/tests', { params: { packages: 'true' } })).data),
+        unwrap<LabTest[]>((await api.get('/tests')).data),
+      ])
+      const merged = [...packages]
+      for (const row of all) {
+        if (!merged.some((p) => p.id === row.id)) merged.push(row)
+      }
+      return merged.filter((t) => browseFilter(categoryId, t)).map(labTestToShowcase)
+    },
+  })
 
   const meta = BROWSE_CATEGORY_META[categoryId]
-  const tabs = browseTabsForCategory(categoryId)
-  const activeTab = resolveBrowseTab(categoryId, tabParam)
-  const packages = useMemo(() => browsePackagesForTab(categoryId, activeTab), [categoryId, activeTab])
+  const allPackages = catalog.data ?? []
+  const tabs = useMemo(() => {
+    const names = [...new Set(allPackages.map((p) => p.category).filter(Boolean))]
+    return [{ id: 'all', label: 'All' }, ...names.map((n) => ({ id: slugifyBrowseKey(n), label: n }))]
+  }, [allPackages])
+  const activeTab = tabs.some((t) => t.id === tabParam) ? tabParam! : 'all'
+  const packages = useMemo(
+    () =>
+      activeTab === 'all'
+        ? allPackages
+        : allPackages.filter((p) => slugifyBrowseKey(p.category) === activeTab),
+    [allPackages, activeTab],
+  )
   const cardRefs = useRef<Record<string, HTMLElement | null>>({})
 
   useEffect(() => {
@@ -74,7 +99,9 @@ function BrowseContent({ categoryId }: { categoryId: BrowseCategoryId }) {
           </h1>
           <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-ink-soft">{meta.subtitle}</p>
         </div>
-        <p className="shrink-0 text-[13px] font-semibold text-ink-muted">{packages.length} options in this section</p>
+        <p className="shrink-0 text-[13px] font-semibold text-ink-muted">
+          {catalog.isLoading ? 'Loading…' : `${packages.length} options in this section`}
+        </p>
       </div>
 
       <div
@@ -103,6 +130,14 @@ function BrowseContent({ categoryId }: { categoryId: BrowseCategoryId }) {
         })}
       </div>
 
+      {catalog.isLoading ? (
+        <p className="mt-8 text-sm font-semibold text-ink-soft">Loading tests from the lab…</p>
+      ) : null}
+      {!catalog.isLoading && packages.length === 0 ? (
+        <p className="mt-8 rounded-2xl border border-dashed border-line bg-white px-6 py-14 text-center text-sm font-semibold text-ink-soft">
+          No tests are listed in this section yet.
+        </p>
+      ) : null}
       <ul className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {packages.map((pkg) => {
           const highlight =
@@ -133,16 +168,8 @@ export function ServiceBrowsePage() {
   const { categoryId } = useParams<{ categoryId: string }>()
 
   useEffect(() => {
-    document.body.style.overflow = 'auto'
-    document.documentElement.style.overflow = 'auto'
-    const root = document.getElementById('root')
-    if (root) root.style.overflow = 'auto'
-    return () => {
-      document.body.style.overflow = ''
-      document.documentElement.style.overflow = ''
-      if (root) root.style.overflow = ''
-    }
-  }, [])
+    window.scrollTo(0, 0)
+  }, [categoryId])
 
   if (!isBrowseCategoryId(categoryId)) {
     return <Navigate to="/" replace />

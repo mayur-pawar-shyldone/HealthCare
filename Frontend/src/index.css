@@ -57,18 +57,29 @@
   --color-alert-text: #c4472c;
 }
 
-html, body, #root {
-  height: 100%;
+html {
   width: 100%;
   margin: 0;
+  background: #fff;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
+  width: 100%;
+  min-height: 100dvh;
+  margin: 0;
   font-family: var(--font-sans);
   color: var(--color-ink);
   background: var(--color-cream);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
   -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100%;
+  min-height: 100dvh;
 }
 
 h1, h2, h3, .font-display {

@@ -1,14 +1,9 @@
-import type { ShowcasePackage } from '@/data/landing-showcase'
 import {
   AYURVEDA_VERTICALS,
   DOCTOR_VERTICALS,
   HEALTH_VERTICALS,
   PHARMACY_VERTICALS,
   RADIOLOGY_GROUPS,
-  type HealthVertical,
-  type LandingPackagePreview,
-  type RadiologyGroup,
-  type RadiologyItem,
 } from '@/data/landing-nav-data'
 
 export type BrowseCategoryId =
@@ -81,80 +76,6 @@ export function serviceBrowsePath(categoryId: BrowseCategoryId, tab?: string, it
   return `/browse/${categoryId}${q ? `?${q}` : ''}`
 }
 
-function parseInrPrice(price: string): number {
-  const match = price.match(/[\d,]+/)
-  if (!match) return 0
-  return Number(match[0].replace(/,/g, ''))
-}
-
-function reportHoursFromLabel(reportIn: string) {
-  const m = reportIn.match(/(\d+)/)
-  if (/instant/i.test(reportIn)) return 1
-  return m ? Number(m[1]) : 24
-}
-
-function packageToShowcase(pkg: LandingPackagePreview, vertical: HealthVertical): ShowcasePackage {
-  const tests = pkg.tests > 0 ? pkg.tests : 1
-  const includes =
-    pkg.tests > 1
-      ? [...vertical.quickLinks.slice(0, 4), `${tests} parameters in one booking`]
-      : [vertical.headline, ...vertical.quickLinks.slice(0, 3)]
-  const fasting = vertical.id === 'diabetes' || vertical.id === 'full-body' ? '8–12 hrs fasting' : 'No fasting'
-  return {
-    id: pkg.id,
-    name: pkg.name.toUpperCase(),
-    category: vertical.label,
-    testCount: tests,
-    includes,
-    tags: [fasting, 'Recommended for Everyone'],
-    memberPrice: pkg.price > 0 ? pkg.price : 399,
-    listPrice: pkg.mrp > 0 ? pkg.mrp : 999,
-    mrp: pkg.mrp > 0 ? pkg.mrp : 999,
-    reportHours: reportHoursFromLabel(pkg.reportIn),
-    tint: 'teal',
-  }
-}
-
-function radiologyItemToShowcase(group: RadiologyGroup, item: RadiologyItem): ShowcasePackage {
-  const price = parseInrPrice(item.price)
-  const mrp = price > 0 ? Math.round(price * 2.15) : 1999
-  const includes = item.detail
-    ? [item.detail, `${group.label} at NRI-affiliated centre`, 'Digital report on HealthID']
-    : [`${group.label} imaging study`, 'Radiologist-reviewed report', 'Member rate with HealthID Card']
-  return {
-    id: `rad-${group.id}-${slugifyBrowseKey(item.name)}`,
-    name: item.name.toUpperCase(),
-    category: group.label,
-    testCount: 1,
-    includes,
-    tags: ['No fasting', 'Recommended for Everyone'],
-    memberPrice: price > 0 ? price : 999,
-    listPrice: mrp,
-    mrp,
-    reportHours: 24,
-    tint: 'teal',
-  }
-}
-
-function quickLinkToShowcase(vertical: HealthVertical, link: string): ShowcasePackage {
-  const base = vertical.packages[0]
-  const price = base?.price && base.price > 0 ? Math.round(base.price * 0.35) : 399
-  const mrp = price > 0 ? Math.round(price * 2.4) : 900
-  return {
-    id: `${vertical.id}-${slugifyBrowseKey(link)}`,
-    name: link.toUpperCase(),
-    category: vertical.label,
-    testCount: 1,
-    includes: [link, ...vertical.points.slice(0, 2)],
-    tags: ['8–12 hrs fasting', 'Recommended for Everyone'],
-    memberPrice: price,
-    listPrice: mrp,
-    mrp,
-    reportHours: 6,
-    tint: 'teal',
-  }
-}
-
 export function browseTabsForCategory(categoryId: BrowseCategoryId): BrowseTab[] {
   switch (categoryId) {
     case 'radiology':
@@ -174,45 +95,8 @@ export function browseTabsForCategory(categoryId: BrowseCategoryId): BrowseTab[]
   }
 }
 
-function verticalsForCategory(categoryId: BrowseCategoryId): HealthVertical[] {
-  switch (categoryId) {
-    case 'blood-test':
-      return HEALTH_VERTICALS
-    case 'ecg':
-      return ECG_VERTICALS
-    case 'doctor':
-      return DOCTOR_VERTICALS
-    case 'ayurveda':
-      return AYURVEDA_VERTICALS
-    case 'pharmacy':
-      return PHARMACY_VERTICALS
-    default:
-      return []
-  }
-}
-
 export function defaultBrowseTab(categoryId: BrowseCategoryId) {
   return browseTabsForCategory(categoryId)[0]?.id ?? ''
-}
-
-export function browsePackagesForTab(categoryId: BrowseCategoryId, tabId: string): ShowcasePackage[] {
-  if (categoryId === 'radiology') {
-    const group = RADIOLOGY_GROUPS.find((g) => g.id === tabId) ?? RADIOLOGY_GROUPS[0]
-    return group.items.map((item) => radiologyItemToShowcase(group, item))
-  }
-
-  const verticals = verticalsForCategory(categoryId)
-  const vertical = verticals.find((v) => v.id === tabId) ?? verticals[0]
-  if (!vertical) return []
-
-  const fromPackages = vertical.packages.filter((p) => p.price > 0 || categoryId === 'pharmacy').map((p) => packageToShowcase(p, vertical))
-  const fromLinks = vertical.quickLinks.map((link) => quickLinkToShowcase(vertical, link))
-  const seen = new Set<string>()
-  return [...fromPackages, ...fromLinks].filter((p) => {
-    if (seen.has(p.id)) return false
-    seen.add(p.id)
-    return true
-  })
 }
 
 export function resolveBrowseTab(categoryId: BrowseCategoryId, tabParam: string | null) {

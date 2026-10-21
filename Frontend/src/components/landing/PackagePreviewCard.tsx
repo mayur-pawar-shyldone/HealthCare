@@ -1,6 +1,7 @@
 import { Activity, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { LandingPackagePreview } from '@/data/landing-nav-data'
+import { bookStartUrl } from '@/booking/booking-url'
 import { formatMoney } from '@/lib/utils'
 
 type Props = {
@@ -50,7 +51,13 @@ export function PackagePreviewCard({ pkg, onAction }: Props) {
           </span>
         ) : (
           <Link
-            to="/signup"
+            to={bookStartUrl({
+              id: pkg.id,
+              name: pkg.name,
+              memberPrice: pkg.price,
+              mrp: pkg.mrp,
+              testCount: pkg.tests,
+            })}
             onClick={onAction}
             className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition hover:bg-teal-dark"
           >

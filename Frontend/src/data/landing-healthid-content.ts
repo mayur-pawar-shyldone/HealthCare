@@ -10,56 +10,7 @@ export type FvPackage = {
   includes: string[]
 }
 
-export const FV_PACKAGES: FvPackage[] = [
-  {
-    id: 'full-body-advanced',
-    name: 'Full Body Advanced',
-    summary: 'Our most complete screening — 84 parameters across 12 organ systems, reviewed by a physician.',
-    tests: 84,
-    price: 1799,
-    mrp: 5600,
-    reportTime: '6 hours',
-    badge: 'Most booked',
-    includes: [
-      'Complete blood count, liver & kidney profile',
-      'Thyroid, diabetes and lipid panels',
-      'Free doctor call to walk through results',
-      'Vitamin D & B12 included at no extra cost',
-    ],
-  },
-  {
-    id: 'heart-health',
-    name: 'Heart Health',
-    summary: 'Lipid profile, homocysteine and cardiac risk markers.',
-    tests: 32,
-    price: 899,
-    mrp: 2999,
-    reportTime: '6 hours',
-    badge: 'Up to 70% off',
-    includes: ['Lipid profile with ratios', 'Homocysteine & hs-CRP', 'Apolipoprotein A1 & B'],
-  },
-  {
-    id: 'diabetes-care',
-    name: 'Diabetes Care',
-    summary: 'HbA1c with fasting glucose and kidney screening.',
-    tests: 18,
-    price: 649,
-    mrp: 1450,
-    reportTime: '6 hours',
-    includes: ['HbA1c (three-month average)', 'Fasting & post-meal glucose', 'Kidney screening with microalbumin'],
-  },
-  {
-    id: 'women-wellness',
-    name: 'Women’s Wellness',
-    summary: 'Hormones, iron studies, thyroid and vitamin levels.',
-    tests: 46,
-    price: 1299,
-    mrp: 3800,
-    reportTime: '6 hours',
-    badge: 'New',
-    includes: ['Hormone panel — LH, FSH, prolactin', 'Iron studies & ferritin', 'Thyroid, vitamin D & B12'],
-  },
-]
+export const FV_PACKAGES: FvPackage[] = []
 
 export const PANEL_TINTS = ['bg-panel-mint', 'bg-panel-peach', 'bg-panel-lilac', 'bg-panel-sand'] as const
 

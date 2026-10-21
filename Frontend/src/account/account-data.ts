@@ -28,20 +28,27 @@ export type Address = {
   label: string
   line: string
   note: string
+  city?: string
+  state?: string
+  pincode?: string
 }
 
 export type Booking = {
   id: string
+  code?: string
   packageId: string
+  packageName?: string
   memberId: string
   addressId: string
   /** Full line when addressId is custom or saved label is not enough */
   addressLine?: string
   date: string
+  dateIso?: string
   slot: string
   status: 'Upcoming' | 'Completed' | 'Cancelled' | 'Rescheduled'
   amount: number
   report?: boolean
+  reportId?: string
 }
 
 export type Ticket = {
@@ -57,54 +64,10 @@ export type BookDraft = {
   date: string
   slot: string
   newAddress: boolean
+  rescheduleId?: string
 }
 
-export const ACCOUNT_PACKAGES: AccountPackage[] = [
-  {
-    id: 'full-body',
-    name: 'Full Body Advanced',
-    summary: '84 parameters across organ systems, with a physician review.',
-    tests: 84,
-    price: 1799,
-    mrp: 5600,
-    time: '6 hours',
-    prep: '8–12 hours fasting',
-    includes: ['CBC, liver and kidney profile', 'Thyroid, diabetes and lipid panels', 'Vitamin D and B12'],
-  },
-  {
-    id: 'heart',
-    name: 'Heart Health',
-    summary: 'Lipid profile, homocysteine and cardiac risk markers.',
-    tests: 32,
-    price: 899,
-    mrp: 2999,
-    time: '6 hours',
-    prep: '10–12 hours fasting',
-    includes: ['Lipid profile with ratios', 'Homocysteine and hs-CRP', 'Apolipoprotein A1 and B'],
-  },
-  {
-    id: 'diabetes',
-    name: 'Diabetes Care',
-    summary: 'HbA1c with fasting glucose and kidney screening.',
-    tests: 18,
-    price: 649,
-    mrp: 1450,
-    time: '6 hours',
-    prep: 'Fasting required',
-    includes: ['HbA1c', 'Fasting and post-meal glucose', 'Kidney screening'],
-  },
-  {
-    id: 'women',
-    name: "Women's Wellness",
-    summary: 'Hormones, iron studies, thyroid and vitamin levels.',
-    tests: 46,
-    price: 1299,
-    mrp: 3800,
-    time: '6 hours',
-    prep: 'No fasting for most markers',
-    includes: ['LH, FSH, prolactin', 'Iron studies and ferritin', 'Thyroid, vitamin D and B12'],
-  },
-]
+export const ACCOUNT_PACKAGES: AccountPackage[] = []
 
 export const BOOKING_DATES = [
   { id: 'd1', label: 'Sat 11 Oct', slots: ['6:30–7:30 AM', '7:00–8:00 AM', '8:00–9:00 AM'] },

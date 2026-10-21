@@ -1,6 +1,7 @@
 import { ArrowRight, Check, Home, Timer } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { FvPackage } from '@/data/landing-healthid-content'
+import { bookStartUrl } from '@/booking/booking-url'
 
 const PREVIEW_COUNT = 3
 
@@ -60,7 +61,13 @@ export function HealthIdFvPackageCard({ pkg, tint }: Props) {
             <p className="mt-1 text-[11.5px] text-ink-muted">per person</p>
           </div>
           <Link
-            to="/signup"
+            to={bookStartUrl({
+              id: pkg.id,
+              name: pkg.name,
+              memberPrice: pkg.price,
+              mrp: pkg.mrp,
+              testCount: pkg.tests,
+            })}
             className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink px-5 text-[14px] font-semibold text-white transition hover:bg-brand-600 active:scale-[0.98]"
           >
             Book now

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   ArrowRight,
   Baby,
@@ -15,7 +15,9 @@ import {
 import { Link } from 'react-router-dom'
 import { RADIOLOGY_GROUPS } from '@/data/landing-nav-data'
 import { bookStartUrl } from '@/booking/booking-url'
-import { serviceBrowsePath, slugifyBrowseKey } from '@/data/service-browse'
+import { serviceBrowsePath } from '@/data/service-browse'
+import { useCatalogTests } from '@/hooks/useCatalogTests'
+import { filterTestsForNav, labTestToPreview } from '@/lib/catalog'
 
 const RAD_ICONS: Record<string, typeof Scan> = {
   usg: Scan,
@@ -29,16 +31,24 @@ const RAD_ICONS: Record<string, typeof Scan> = {
   other: FileText,
 }
 
-function parseRadPrice(price: string) {
-  const match = price.match(/[\d,]+/)
-  return match ? Number(match[0].replace(/,/g, '')) : 999
-}
-
 type Props = { onNavigate?: () => void }
 
 export function RadMenu({ onNavigate }: Props) {
+  const catalog = useCatalogTests()
+  const tests = catalog.data ?? []
   const [activeId, setActiveId] = useState(RADIOLOGY_GROUPS[0].id)
   const group = RADIOLOGY_GROUPS.find((g) => g.id === activeId) ?? RADIOLOGY_GROUPS[0]
+  const items = useMemo(
+    () => tests.filter((test) => filterTestsForNav(group.id, test)).map(labTestToPreview),
+    [tests, group.id],
+  )
+  const counts = useMemo(() => {
+    const map: Record<string, number> = {}
+    for (const cat of RADIOLOGY_GROUPS) {
+      map[cat.id] = tests.filter((test) => filterTestsForNav(cat.id, test)).length
+    }
+    return map
+  }, [tests])
 
   return (
     <div className="grid-cols-[280px_1fr] grid gap-0 overflow-hidden rounded-2xl border border-ink/10 bg-white shadow-lift lg:grid-cols-[320px_1fr]">
@@ -91,7 +101,7 @@ export function RadMenu({ onNavigate }: Props) {
                     {cat.label}
                   </span>
                   <span className={`mt-1 block text-[12px] leading-none ${isActive ? 'text-white/70' : 'text-ink-muted'}`}>
-                    {`${cat.items.length} studies`}
+                    {`${counts[cat.id] ?? 0} studies`}
                   </span>
                 </span>
                 <span
@@ -116,7 +126,7 @@ export function RadMenu({ onNavigate }: Props) {
             <p>{group.note ?? 'Nashik Radiological & Imaging Association'}</p>
           </div>
           <div className="shrink-0 text-right">
-            <p className="text-[12px] font-semibold text-[#5a7284]">{group.items.length} studies</p>
+            <p className="text-[12px] font-semibold text-[#5a7284]">{items.length} studies</p>
             <Link
               to={serviceBrowsePath('radiology', group.id)}
               onClick={onNavigate}
@@ -127,29 +137,32 @@ export function RadMenu({ onNavigate }: Props) {
           </div>
         </div>
         <div className="rad-list">
-          {group.items.map((item) => (
-            <div key={item.name} className="rad-row group">
-              <p className="rad-name">
-                {item.name}
-                {item.detail ? <span>{item.detail}</span> : null}
-              </p>
-              <span className="rad-price group-hover:opacity-0">{item.price}</span>
-              <Link
-                to={bookStartUrl({
-                  id: `rad-${group.id}-${slugifyBrowseKey(item.name)}`,
-                  name: item.name,
-                  memberPrice: parseRadPrice(item.price),
-                  mrp: Math.round(parseRadPrice(item.price) * 2.15) || 1999,
-                  testCount: 1,
-                })}
-                className="rad-book"
-                onClick={onNavigate}
-              >
-                Book now
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-              </Link>
-            </div>
-          ))}
+          {catalog.isLoading ? (
+            <p className="px-4 py-8 text-sm font-semibold text-ink-soft">Loading imaging from the lab…</p>
+          ) : items.length ? (
+            items.map((item) => (
+              <div key={item.id} className="rad-row group">
+                <p className="rad-name">{item.name}</p>
+                <span className="rad-price group-hover:opacity-0">₹{item.price.toLocaleString('en-IN')}</span>
+                <Link
+                  to={bookStartUrl({
+                    id: item.id,
+                    name: item.name,
+                    memberPrice: item.price,
+                    mrp: item.mrp,
+                    testCount: item.tests,
+                  })}
+                  className="rad-book"
+                  onClick={onNavigate}
+                >
+                  Book now
+                  <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                </Link>
+              </div>
+            ))
+          ) : (
+            <p className="px-4 py-8 text-sm font-semibold text-ink-soft">No imaging studies listed from the lab yet.</p>
+          )}
         </div>
         <div className="flex justify-center border-t border-ink/10 px-4 py-4">
           <Link

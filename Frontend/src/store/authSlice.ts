@@ -6,6 +6,22 @@ type AuthState = {
   accessToken: string | null
 }
 
+const HID_KEYS = ['hid_auth', 'hid_name', 'hid_mobile', 'hid_email', 'hid_city'] as const
+
+function persistHid(user: AuthUser) {
+  localStorage.setItem('hid_auth', '1')
+  localStorage.setItem('hid_name', user.fullName)
+  if (user.mobile) localStorage.setItem('hid_mobile', user.mobile)
+  sessionStorage.removeItem('hid_auth')
+}
+
+function clearHid() {
+  for (const key of HID_KEYS) {
+    localStorage.removeItem(key)
+    sessionStorage.removeItem(key)
+  }
+}
+
 function load(): AuthState {
   try {
     const user = localStorage.getItem('hc_user')
@@ -26,6 +42,7 @@ const authSlice = createSlice({
       localStorage.setItem('hc_user', JSON.stringify(action.payload.user))
       localStorage.setItem('hc_access', action.payload.accessToken)
       localStorage.setItem('hc_refresh', action.payload.refreshToken)
+      persistHid(action.payload.user)
     },
     clearSession: (state) => {
       state.user = null
@@ -33,6 +50,7 @@ const authSlice = createSlice({
       localStorage.removeItem('hc_user')
       localStorage.removeItem('hc_access')
       localStorage.removeItem('hc_refresh')
+      clearHid()
     },
     updateUser: (state, action: PayloadAction<Partial<AuthUser>>) => {
       if (!state.user) return

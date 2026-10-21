@@ -34,7 +34,7 @@ import { AdminPricingSettingsPage } from '@/screens/admin/AdminPricingSettingsPa
 import { TransactionsPage } from '@/screens/TransactionsPage'
 import { TransactionDetailPage } from '@/screens/TransactionDetailPage'
 import { InvoicePage } from '@/screens/InvoicePage'
-import { AccountLoginGate, AccountRoutes } from '@/account/AccountRoutes'
+import { AccountEmailOtpGate, AccountLoginGate, AccountRoutes } from '@/account/AccountRoutes'
 
 export default function App() {
   return (
@@ -46,6 +46,8 @@ export default function App() {
       <Route path="/splash" element={<SplashPage />} />
       <Route path="/onboarding" element={<OnboardingPage />} />
       <Route path="/login" element={<AccountLoginGate />} />
+      <Route path="/login/otp" element={<AccountEmailOtpGate />} />
+      <Route path="/login/email" element={<Navigate to="/login/otp" replace />} />
       <Route path="/login/password" element={<Navigate to="/login" replace />} />
       <Route path="/signup" element={<Navigate to="/login" replace />} />
       <Route path="/forgot-password" element={<Navigate to="/login" replace />} />

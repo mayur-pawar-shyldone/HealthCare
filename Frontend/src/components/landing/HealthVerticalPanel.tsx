@@ -30,6 +30,8 @@ import {
 import { HEALTH_VERTICALS, type HealthVertical } from '@/data/landing-nav-data'
 import { serviceBrowsePath, type BrowseCategoryId } from '@/data/service-browse'
 import { browseTabForQuickLink, packagesForQuickLink } from '@/lib/landing-quick-link-packages'
+import { labTestToPreview, pickTestsForNav } from '@/lib/catalog'
+import { useCatalogTests } from '@/hooks/useCatalogTests'
 import { Link } from 'react-router-dom'
 import { openHealthCard } from '@/lib/health-card-bus'
 import { LabBrowsePackageCard } from '@/components/landing/LabBrowsePackageCard'
@@ -95,9 +97,26 @@ export function HealthVerticalPanel({
 }: Props) {
   const initialId = defaultActiveId ?? verticals[0]?.id ?? HEALTH_VERTICALS[0].id
   const [activeId, setActiveId] = useState(initialId)
+  const catalog = useCatalogTests()
+  const tests = catalog.data ?? []
+  const liveVerticals = useMemo(
+    () =>
+      verticals.map((vertical) => {
+        const matched = pickTestsForNav(vertical.id, tests)
+        const fallback =
+          matched.length === 0 && (browseCategoryId === 'blood-test' || browseCategoryId == null)
+            ? tests.filter((test) => test.isPackage).slice(0, 6)
+            : []
+        return {
+          ...vertical,
+          packages: (matched.length ? matched : fallback).map(labTestToPreview),
+        }
+      }),
+    [verticals, tests, browseCategoryId],
+  )
   const active = useMemo(
-    () => verticals.find((v) => v.id === activeId) ?? verticals[0] ?? HEALTH_VERTICALS[0],
-    [activeId, verticals],
+    () => liveVerticals.find((v) => v.id === activeId) ?? liveVerticals[0] ?? HEALTH_VERTICALS[0],
+    [activeId, liveVerticals],
   )
 
   return (
@@ -106,7 +125,7 @@ export function HealthVerticalPanel({
         active={active}
         activeId={activeId}
         compact={compact}
-        verticals={verticals}
+        verticals={liveVerticals}
         sidebarEyebrow={sidebarEyebrow}
         sidebarBadge={sidebarBadge}
         onSelect={setActiveId}
@@ -114,11 +133,12 @@ export function HealthVerticalPanel({
       />
       <MainPanel
         active={active}
-        verticals={verticals}
+        verticals={liveVerticals}
         compact={compact}
         packageCountLabel={packageCountLabel}
         onNavigate={onNavigate}
         browseCategoryId={browseCategoryId}
+        isLoading={catalog.isLoading}
       />
     </div>
   )
@@ -251,6 +271,7 @@ function MainPanel({
   packageCountLabel,
   onNavigate,
   browseCategoryId,
+  isLoading,
 }: {
   active: HealthVertical
   verticals: HealthVertical[]
@@ -258,6 +279,7 @@ function MainPanel({
   packageCountLabel: string
   onNavigate?: () => void
   browseCategoryId?: BrowseCategoryId
+  isLoading?: boolean
 }) {
   const [hoveredQuickLink, setHoveredQuickLink] = useState<string | null>(null)
 
@@ -307,18 +329,26 @@ function MainPanel({
             )
           })}
         </div>
-        <ul className="mt-4 grid gap-3 md:grid-cols-3">
-          {displayPackages.map((pkg) => (
-            <li key={pkg.id} className="min-w-0">
-              <LabBrowsePackageCard
-                pkg={pkg}
-                onNavigate={onNavigate}
-                browseCategoryId={browseCategoryId}
-                browseTabId={browseTabId}
-              />
-            </li>
-          ))}
-        </ul>
+        {isLoading ? (
+          <p className="mt-4 text-sm font-semibold text-ink-soft">Loading packages from the lab…</p>
+        ) : displayPackages.length ? (
+          <ul className="mt-4 grid gap-3 md:grid-cols-3">
+            {displayPackages.map((pkg) => (
+              <li key={pkg.id} className="min-w-0">
+                <LabBrowsePackageCard
+                  pkg={pkg}
+                  onNavigate={onNavigate}
+                  browseCategoryId={browseCategoryId}
+                  browseTabId={browseTabId}
+                />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-4 rounded-2xl border border-dashed border-line bg-cream px-4 py-10 text-center text-sm font-semibold text-ink-soft">
+            No packages in this category yet.
+          </p>
+        )}
       </div>
       {compact ? (
         <div className="mt-6 flex justify-center">

@@ -6,19 +6,18 @@ import { useAccount } from '@/account/AccountContext'
 import { formatMoney } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 
-/** Demo wallet for OTP account portal (full wallet lives in JWT app). */
 export function AccountWalletPanel() {
   const acc = useAccount()
   const [copied, setCopied] = useState(false)
 
-  const balance = 180
-  const referralBalance = 0
-  const totalSpendable = balance + referralBalance
-  const referralPerTest = 200
-  const referralTestsRemaining = 0
-  const referralBonus = 1000
-  const base = acc.name.split(/\s+/)[0].toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5)
-  const referralPlain = `${base}${acc.mobile.slice(-1)}K2`
+  const w = acc.wallet
+  const balance = w?.balance ?? 0
+  const referralBalance = w?.referralBalance ?? 0
+  const totalSpendable = w?.totalSpendable ?? balance + referralBalance
+  const referralPerTest = w?.referralPerTest ?? w?.rules.REFERRAL_PER_TEST ?? 0
+  const referralTestsRemaining = w?.referralTestsRemaining ?? 0
+  const referralBonus = w?.rules.REFERRAL_BONUS ?? 0
+  const referralPlain = w?.referralCode || ''
   const referralCode = referralPlain.split('').join(' ')
 
   async function copyCode() {
@@ -105,7 +104,7 @@ export function AccountWalletPanel() {
         <p className="mt-2 text-xs text-ink-soft">Friend activates their card → you earn referral wallet credits</p>
       </div>
 
-      <Link to="/login/password" className="mt-auto">
+      <Link to="/transactions" className="mt-auto">
         <Button variant="secondary" className="h-11 w-full rounded-xl text-sm font-semibold">
           View transaction history
         </Button>

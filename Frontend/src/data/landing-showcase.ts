@@ -1,5 +1,3 @@
-import packages from './landing-showcase-packages.json'
-
 export type ShowcasePackage = {
   id: string
   name: string
@@ -14,7 +12,7 @@ export type ShowcasePackage = {
   tint: string
 }
 
-export const SHOWCASE_PACKAGES = packages as ShowcasePackage[]
+export const SHOWCASE_PACKAGES: ShowcasePackage[] = []
 
 export const SHOWCASE_CATEGORIES = [
   'Full body',

@@ -1,5 +1,8 @@
+import { useMemo } from 'react'
 import type { LandingNavCategory } from '@/data/landing-nav-data'
 import { PackagePreviewCard } from '@/components/landing/PackagePreviewCard'
+import { useCatalogTests } from '@/hooks/useCatalogTests'
+import { browseFilter, labTestToPreview } from '@/lib/catalog'
 
 type Props = {
   category: LandingNavCategory
@@ -8,6 +11,12 @@ type Props = {
 }
 
 export function CategoryMegaPanel({ category, compact, onNavigate }: Props) {
+  const catalog = useCatalogTests()
+  const packages = useMemo(() => {
+    const tests = catalog.data ?? []
+    return tests.filter((test) => browseFilter(category.id, test)).slice(0, 6).map(labTestToPreview)
+  }, [catalog.data, category.id])
+
   return (
     <div
       className={`grid gap-0 overflow-hidden rounded-2xl border border-ink/10 bg-white shadow-[0_12px_32px_rgba(16,52,74,0.12)] ${
@@ -51,13 +60,21 @@ export function CategoryMegaPanel({ category, compact, onNavigate }: Props) {
             </span>
           ))}
         </div>
-        <ul className="mt-4 grid gap-3 md:grid-cols-3">
-          {category.packages.map((pkg) => (
-            <li key={pkg.id} className="min-w-0">
-              <PackagePreviewCard pkg={pkg} onAction={onNavigate} />
-            </li>
-          ))}
-        </ul>
+        {catalog.isLoading ? (
+          <p className="mt-4 text-sm font-semibold text-ink-soft">Loading packages from the lab…</p>
+        ) : packages.length ? (
+          <ul className="mt-4 grid gap-3 md:grid-cols-3">
+            {packages.map((pkg) => (
+              <li key={pkg.id} className="min-w-0">
+                <PackagePreviewCard pkg={pkg} onAction={onNavigate} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-4 rounded-2xl border border-dashed border-line bg-cream px-4 py-10 text-center text-sm font-semibold text-ink-soft">
+            No packages in this category yet.
+          </p>
+        )}
       </div>
     </div>
   )

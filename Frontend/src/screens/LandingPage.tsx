@@ -21,27 +21,29 @@ export function LandingPage({ backdrop = false }: LandingPageProps) {
   const { hash } = useLocation()
 
   useEffect(() => {
-    if (backdrop || !hash) return
-    const id = hash.replace('#', '')
-    if (id === POPULAR_PLANS_SECTION_ID) {
-      scrollToPopularPlans('smooth')
-      return
-    }
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }, [hash])
-
-  useEffect(() => {
     if (backdrop) return
-    document.body.style.overflow = 'auto'
-    document.documentElement.style.overflow = 'auto'
-    const root = document.getElementById('root')
-    if (root) root.style.overflow = 'auto'
-    return () => {
-      document.body.style.overflow = ''
-      document.documentElement.style.overflow = ''
-      if (root) root.style.overflow = ''
+    const previous = history.scrollRestoration
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+    if (!hash) {
+      window.scrollTo(0, 0)
+      return () => {
+        if ('scrollRestoration' in history) history.scrollRestoration = previous
+      }
     }
-  }, [backdrop])
+    const id = hash.replace('#', '')
+    const jump = () => {
+      if (id === POPULAR_PLANS_SECTION_ID) {
+        scrollToPopularPlans('smooth')
+        return
+      }
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+    const t = window.setTimeout(jump, 50)
+    return () => {
+      window.clearTimeout(t)
+      if ('scrollRestoration' in history) history.scrollRestoration = previous
+    }
+  }, [hash, backdrop])
 
   return (
     <div

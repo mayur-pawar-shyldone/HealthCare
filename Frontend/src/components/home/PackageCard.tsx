@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, Clock, Layers, Package } from 'lucide-react'
 import { cn, formatMoney } from '@/lib/utils'
-import { findStaticPackage, packageIncludedTests } from '@/lib/packages'
+import { packageIncludedTests } from '@/lib/packages'
+import { testMemberPrice } from '@/lib/catalog'
 import type { LabTest } from '@/types'
 import { PaymentDiscountBadge, PaymentDiscountCardNote } from '@/components/brand/PaymentDiscountOffer'
 
@@ -24,10 +25,9 @@ type PackageCardProps = {
 
 export function PackageCard({ pkg, accentIndex = 0, compact, showIncluded }: PackageCardProps) {
   const [expanded, setExpanded] = useState(false)
-  const staticPkg = findStaticPackage(pkg)
   const included = packageIncludedTests(pkg)
-  const mrp = staticPkg?.mrp ?? Number(pkg.price)
-  const memberPrice = staticPkg?.specialPrice ?? Number(pkg.memberPrice ?? pkg.discountedPrice ?? pkg.price)
+  const mrp = Number(pkg.price)
+  const memberPrice = testMemberPrice(pkg)
   const savings = mrp - memberPrice
   const accent = ACCENTS[accentIndex % ACCENTS.length]
   const preview = included.slice(0, 4)

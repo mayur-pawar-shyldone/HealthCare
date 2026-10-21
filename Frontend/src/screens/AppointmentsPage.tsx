@@ -23,7 +23,6 @@ import {
   UserToolbar,
   UserTr,
 } from '@/components/user/UserUi'
-import { APPOINTMENT_TIME_SLOTS } from '@/lib/appointments'
 
 const STATUS_FILTERS = ['ALL', 'CONFIRMED', 'COMPLETED', 'CANCELLED'] as const
 
@@ -178,6 +177,11 @@ export function AppointmentDetailsPage() {
       navigate('/appointments')
     },
   })
+  const slotsQuery = useQuery({
+    queryKey: ['slots', date],
+    enabled: Boolean(date),
+    queryFn: async () => unwrap<{ slots: string[] }>((await api.get('/appointments/slots', { params: { date } })).data),
+  })
   const reschedule = useMutation({
     mutationFn: async () => api.patch(`/appointments/${id}`, { date, timeSlot }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['appointment', id] }),
@@ -246,7 +250,7 @@ export function AppointmentDetailsPage() {
             <div>
               <label className="mb-1.5 block text-sm font-medium text-ink">Time slot</label>
               <UserSelect value={timeSlot} onChange={setTimeSlot} className="w-full">
-                {APPOINTMENT_TIME_SLOTS.map((slot) => (
+                {(slotsQuery.data?.slots ?? [timeSlot]).map((slot) => (
                   <option key={slot} value={slot}>
                     {slot}
                   </option>

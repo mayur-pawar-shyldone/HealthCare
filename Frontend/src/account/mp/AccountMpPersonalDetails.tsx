@@ -13,11 +13,11 @@ const fields: { key: keyof Details; label: string }[] = [
 ]
 
 function loadEmail() {
-  return sessionStorage.getItem('hid_email') || 'rohit.menon@gmail.com'
+  return localStorage.getItem('hid_email') || sessionStorage.getItem('hid_email') || ''
 }
 
 function loadCity() {
-  return sessionStorage.getItem('hid_city') || 'Mumbai'
+  return localStorage.getItem('hid_city') || sessionStorage.getItem('hid_city') || ''
 }
 
 export function AccountMpPersonalDetails() {
@@ -37,8 +37,8 @@ export function AccountMpPersonalDetails() {
   const save = () => {
     setDetails(draft)
     acc.saveProfile(draft.fullName)
-    sessionStorage.setItem('hid_email', draft.email)
-    sessionStorage.setItem('hid_city', draft.city)
+    localStorage.setItem('hid_email', draft.email)
+    localStorage.setItem('hid_city', draft.city)
     setEditing(false)
     setSaved(true)
     window.setTimeout(() => setSaved(false), 2000)

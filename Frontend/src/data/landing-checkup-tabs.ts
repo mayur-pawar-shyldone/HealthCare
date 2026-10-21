@@ -1,5 +1,3 @@
-import tabs from './landing-checkup-tabs.json'
-
 export type CheckupPackage = {
   id: string
   name: string
@@ -18,7 +16,7 @@ export type CheckupTab = {
   packages: CheckupPackage[]
 }
 
-export const CHECKUP_TAB_DATA = tabs as CheckupTab[]
+export const CHECKUP_TAB_DATA: CheckupTab[] = []
 
 export const CHECKUP_SUBTITLE = 'Member special rates · Free home collection · NABL partner labs'
 

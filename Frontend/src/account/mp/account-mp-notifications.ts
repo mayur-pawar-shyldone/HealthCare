@@ -1,3 +1,5 @@
+import type { NotificationItem } from '@/types'
+
 export type AccountMpNotification = {
   id: string
   title: string
@@ -7,34 +9,33 @@ export type AccountMpNotification = {
   kind: 'report' | 'visit' | 'offer'
 }
 
-/** Sample notifications for dashboard UI (replace with API when wired). */
-export function accountMpNotifications(): AccountMpNotification[] {
-  return [
-    {
-      id: 'n1',
-      title: 'Report ready',
-      body: 'Full Body Advanced for Priya is ready to view in Reports.',
-      time: '2h ago',
-      unread: true,
-      kind: 'report',
-    },
-    {
-      id: 'n2',
-      title: 'Home visit tomorrow',
-      body: 'Phlebotomist arrives 7:00–9:00 AM. Keep 8–12 hrs fasting if required.',
-      time: '5h ago',
-      unread: true,
-      kind: 'visit',
-    },
-    {
-      id: 'n4',
-      title: 'Member pricing active',
-      body: 'Book any package on the landing page at card rates with free collection.',
-      time: '3 days ago',
-      unread: false,
-      kind: 'offer',
-    },
-  ]
+function relativeTime(iso: string) {
+  const t = new Date(iso).getTime()
+  if (Number.isNaN(t)) return ''
+  const mins = Math.max(0, Math.round((Date.now() - t) / 60000))
+  if (mins < 60) return `${Math.max(1, mins)}m ago`
+  const hours = Math.round(mins / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.round(hours / 24)
+  return `${days}d ago`
+}
+
+function kindFromType(type: string): AccountMpNotification['kind'] {
+  const v = type.toUpperCase()
+  if (v.includes('REPORT')) return 'report'
+  if (v.includes('APPOINT') || v.includes('VISIT') || v.includes('BOOK')) return 'visit'
+  return 'offer'
+}
+
+export function mapAccountNotifications(rows: NotificationItem[]): AccountMpNotification[] {
+  return rows.map((n) => ({
+    id: n.id,
+    title: n.title,
+    body: n.body,
+    time: relativeTime(n.createdAt),
+    unread: !n.isRead,
+    kind: kindFromType(n.type),
+  }))
 }
 
 export function unreadNotificationCount(items: AccountMpNotification[]) {

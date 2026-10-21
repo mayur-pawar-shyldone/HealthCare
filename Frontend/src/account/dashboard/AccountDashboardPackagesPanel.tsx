@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Check } from 'lucide-react'
-import { ACCOUNT_PACKAGES } from '@/account/account-data'
 import { useAccount } from '@/account/AccountContext'
 import { AccountDashboardPanel } from '@/account/dashboard/AccountDashboardPanel'
 import { PLATFORM } from '@/data/platform-content'
@@ -18,8 +17,11 @@ export function AccountDashboardPackagesPanel() {
         title="Book at member price"
         subtitle={`Free home collection · Reports in ${PLATFORM.reportHours} hours`}
       >
+        {acc.packages.length === 0 ? (
+          <p className="py-6 text-sm text-muted">No packages from the lab yet.</p>
+        ) : null}
         <ul className="grid gap-x-10 md:grid-cols-2">
-          {ACCOUNT_PACKAGES.map((p) => (
+          {acc.packages.map((p) => (
             <li key={p.id} className="flex items-center gap-4 border-t border-line py-4">
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium text-mp-teal-700">{p.tests} tests</p>

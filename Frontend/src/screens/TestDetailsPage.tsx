@@ -3,7 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import { CheckCircle2, Clock, Layers } from 'lucide-react'
 import api, { unwrap } from '@/services/api'
 import type { LabTest } from '@/types'
-import { findStaticPackage, packageIncludedTests } from '@/lib/packages'
+import { packageIncludedTests } from '@/lib/packages'
+import { testMemberPrice } from '@/lib/catalog'
 import { formatMoney } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -22,9 +23,8 @@ export function TestDetailsPage() {
   })
   if (q.isLoading || !q.data) return <Loading />
   const t = q.data
-  const staticPkg = findStaticPackage(t)
-  const memberPrice = staticPkg?.specialPrice ?? t.memberPrice ?? t.discountedPrice ?? t.price
-  const displayMrp = staticPkg?.mrp ?? t.price
+  const memberPrice = testMemberPrice(t)
+  const displayMrp = t.price
   const includedNames = t.isPackage ? packageIncludedTests(t) : []
   const included =
     t.packageTests?.map((pt) => pt.includedTest) ??

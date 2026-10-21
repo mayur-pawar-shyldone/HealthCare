@@ -1,9 +1,34 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Check, ChevronDown, ScanLine } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { SCAN_TESTS } from '@/data/landing-scans-data'
+import { useQuery } from '@tanstack/react-query'
+import { SCAN_TESTS, type ScanTest } from '@/data/landing-scans-data'
 import { bookStartUrl } from '@/booking/booking-url'
+import api, { unwrap } from '@/services/api'
+import type { LabTest } from '@/types'
+import { testIncludes, testMemberPrice } from '@/lib/catalog'
+
+const SCAN_IMAGES = SCAN_TESTS.map((t) => t.image)
+
+function toScanCard(test: LabTest, index: number): ScanTest {
+  const match = SCAN_TESTS.find(
+    (s) =>
+      test.name.toLowerCase().includes(s.name.toLowerCase()) || s.name.toLowerCase().includes(test.name.toLowerCase()),
+  )
+  const includes = testIncludes(test)
+  return {
+    id: test.id,
+    name: test.name,
+    originalPrice: Number(test.price),
+    offerPrice: testMemberPrice(test),
+    description: test.shortDescription || test.description || '',
+    features: includes.slice(0, 3).length
+      ? includes.slice(0, 3)
+      : [test.preparation, test.sampleType].filter(Boolean) as string[],
+    image: match?.image || SCAN_IMAGES[index % SCAN_IMAGES.length] || '/landing/scans/ultrasound.webp',
+  }
+}
 
 function ScanBottomSheetCard({ test }: { test: (typeof SCAN_TESTS)[0] }) {
   const [open, setOpen] = useState(false)
@@ -95,6 +120,12 @@ function ScanBottomSheetCard({ test }: { test: (typeof SCAN_TESTS)[0] }) {
 }
 
 export function LandingScansSection() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['tests', 'popular'],
+    queryFn: async () => unwrap<LabTest[]>((await api.get('/tests', { params: { popular: 'true' } })).data),
+  })
+  const scans = useMemo(() => (data ?? []).slice(0, 6).map(toScanCard), [data])
+
   return (
     <section id="scans" className="relative overflow-hidden bg-mint py-20" aria-labelledby="scans-heading">
       <div className="mx-auto max-w-7xl px-6">
@@ -107,15 +138,23 @@ export function LandingScansSection() {
             Health Scans &amp; Imaging Tests
           </h2>
           <p className="mt-4 text-[16px] leading-relaxed text-ink-soft">
-            Ultrasound, digital X-ray and ECG at member prices in Nashik — hover a card to see details and book.
+            Popular tests at member prices in Nashik — hover a card to see details and book.
           </p>
         </div>
 
-        <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-3">
-          {SCAN_TESTS.map((test) => (
-            <ScanBottomSheetCard key={test.id} test={test} />
-          ))}
-        </div>
+        {isLoading ? (
+          <p className="mt-14 text-center text-sm font-semibold text-ink-soft">Loading tests from the lab…</p>
+        ) : scans.length ? (
+          <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-3">
+            {scans.map((test) => (
+              <ScanBottomSheetCard key={test.id} test={test} />
+            ))}
+          </div>
+        ) : (
+          <p className="mx-auto mt-14 max-w-xl rounded-2xl border border-dashed border-line bg-white px-6 py-12 text-center text-sm font-semibold text-ink-soft">
+            No popular tests are listed yet.
+          </p>
+        )}
       </div>
     </section>
   )

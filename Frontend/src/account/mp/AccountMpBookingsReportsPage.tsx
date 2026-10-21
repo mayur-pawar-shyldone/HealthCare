@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CalendarX, Download, FileText } from 'lucide-react'
 import { useAccount } from '@/account/AccountContext'
 import { AccountDashboardPanel } from '@/account/dashboard/AccountDashboardPanel'
 import { memberShortName } from '@/account/dashboard/mp-utils'
 import { formatMoney } from '@/lib/utils'
+import { downloadAuthenticatedFile } from '@/lib/download'
 
 const bookingTabs = ['Upcoming', 'Completed', 'Cancelled'] as const
 type BookingTab = (typeof bookingTabs)[number]
@@ -25,6 +26,10 @@ export function AccountMpBookingsReportsPage() {
   const navigate = useNavigate()
   const [tab, setTab] = useState<BookingTab>('Upcoming')
   const [person, setPerson] = useState('All')
+
+  useEffect(() => {
+    void acc.refreshBookings()
+  }, [acc.refreshBookings])
 
   const visibleBookings = acc.bookings.filter((b) => b.status === tab)
   const reportRows = acc.bookings.filter(
@@ -59,7 +64,7 @@ export function AccountMpBookingsReportsPage() {
             return (
               <li key={b.id} className="flex flex-col gap-3 py-4 md:flex-row md:items-center">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[15px] font-bold text-navy">{pkg.name}</p>
+                  <p className="text-[15px] font-bold text-navy">{b.packageName || pkg.name}</p>
                   <p className="mt-0.5 text-[13px] text-muted">
                     {member?.name} · {b.date} · {b.slot}
                   </p>
@@ -73,7 +78,7 @@ export function AccountMpBookingsReportsPage() {
                       type="button"
                       onClick={() => {
                         acc.rescheduleBooking(b.id)
-                        navigate('/account/bookings')
+                        navigate('/account/book/slot')
                       }}
                       className="rounded-full border border-line px-4 py-2 text-[13px] font-semibold text-navy transition-colors duration-150 hover:bg-canvas"
                     >
@@ -141,7 +146,13 @@ export function AccountMpBookingsReportsPage() {
                 <button
                   type="button"
                   aria-label={`Download ${pkg.name} PDF`}
-                  onClick={() => acc.showToast('Report download is locked until the lab file is linked.')}
+                  onClick={() => {
+                    if (b.reportId) {
+                      void downloadAuthenticatedFile(`/reports/${b.reportId}/file`, `${pkg.name}.pdf`)
+                      return
+                    }
+                    acc.showToast('Report file is not ready yet.')
+                  }}
                   className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[13px] font-semibold text-navy transition-colors duration-150 hover:bg-mp-teal-50"
                 >
                   <Download className="h-3.5 w-3.5" aria-hidden />

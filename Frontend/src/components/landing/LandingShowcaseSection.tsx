@@ -1,19 +1,26 @@
 import { useMemo, useState } from 'react'
 import { MapPin } from 'lucide-react'
-import { SHOWCASE_CATEGORIES, SHOWCASE_PACKAGES, type ShowcaseCategory } from '@/data/landing-showcase'
+import { useHealthPackages } from '@/hooks/useHealthPackages'
+import { labTestToShowcase } from '@/lib/catalog'
 import { LandingShowcaseCard } from '@/components/landing/LandingShowcaseCard'
 
 function categoryTabId(category: string) {
   return `showcase-tab-${category.replace(/\s+/g, '-').toLowerCase()}`
 }
 
-/** Member-priced package grid with category tabs */
+/** Member-priced package grid from the lab catalog */
 export function LandingShowcaseSection() {
-  const [category, setCategory] = useState<ShowcaseCategory>('Full body')
-
+  const { data, isLoading } = useHealthPackages()
+  const packages = useMemo(() => (data ?? []).map(labTestToShowcase), [data])
+  const categories = useMemo(() => {
+    const names = [...new Set(packages.map((p) => p.category).filter(Boolean))]
+    return names.length ? names : ['Packages']
+  }, [packages])
+  const [category, setCategory] = useState('')
+  const active = category && categories.includes(category) ? category : categories[0]
   const visible = useMemo(
-    () => SHOWCASE_PACKAGES.filter((p) => p.category === category),
-    [category],
+    () => packages.filter((p) => !active || p.category === active),
+    [packages, active],
   )
 
   return (
@@ -35,34 +42,38 @@ export function LandingShowcaseSection() {
               Card holder rates below MRP, reports on WhatsApp, and one price per person for the whole family.
             </p>
           </div>
-          <div role="tablist" aria-label="Package categories" className="flex flex-wrap gap-2">
-            {SHOWCASE_CATEGORIES.map((cat) => {
-              const on = cat === category
-              return (
-                <button
-                  key={cat}
-                  type="button"
-                  role="tab"
-                  id={categoryTabId(cat)}
-                  aria-selected={on}
-                  aria-controls="showcase-grid"
-                  onClick={() => setCategory(cat)}
-                  className={`rounded-full px-4 py-2 text-[13.5px] font-bold transition-colors duration-150 ease-out ${
-                    on ? 'bg-ink text-white' : 'border border-line bg-white text-ink-soft hover:text-ink'
-                  }`}
-                >
-                  {cat}
-                </button>
-              )
-            })}
-          </div>
+          {categories.length > 1 ? (
+            <div role="tablist" aria-label="Package categories" className="flex flex-wrap gap-2">
+              {categories.map((cat) => {
+                const on = cat === active
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    role="tab"
+                    id={categoryTabId(cat)}
+                    aria-selected={on}
+                    aria-controls="showcase-grid"
+                    onClick={() => setCategory(cat)}
+                    className={`rounded-full px-4 py-2 text-[13.5px] font-bold transition-colors duration-150 ease-out ${
+                      on ? 'bg-ink text-white' : 'border border-line bg-white text-ink-soft hover:text-ink'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                )
+              })}
+            </div>
+          ) : null}
         </header>
 
-        {visible.length > 0 ? (
+        {isLoading ? (
+          <p className="mt-10 text-sm font-semibold text-ink-soft">Loading packages from the lab…</p>
+        ) : visible.length > 0 ? (
           <div
             id="showcase-grid"
             role="tabpanel"
-            aria-labelledby={categoryTabId(category)}
+            aria-labelledby={categoryTabId(active)}
             className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3"
           >
             {visible.map((pkg) => (

@@ -134,6 +134,12 @@
 
     }
 
+.landing-page {
+  min-height: 100dvh;
+  overflow: visible;
+  background: #fff;
+}
+
 /* Landing: Plus Jakarta for headings (matches live HealthID landing feel) */
 .landing-page .font-display,
 .landing-page h1,

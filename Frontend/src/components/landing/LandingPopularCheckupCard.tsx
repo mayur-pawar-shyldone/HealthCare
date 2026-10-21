@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { bookStartUrl } from '@/booking/booking-url'
 import {
   CHECKUP_TONE_CLASSES,
   CHECKUP_VISIBLE_TAGS,
@@ -107,7 +108,13 @@ export function LandingPopularCheckupCard({ pkg, tone }: Props) {
                   </span>
                 </p>
                 <Link
-                  to="/signup"
+                  to={bookStartUrl({
+                    id: pkg.id,
+                    name: pkg.name,
+                    memberPrice: pkg.price,
+                    mrp: pkg.mrp,
+                    testCount: pkg.testCount,
+                  })}
                   className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink px-5 text-[14px] font-semibold text-white transition-[transform,background-color] duration-150 ease-out hover:bg-brand-600 active:scale-[0.98]"
                 >
                   Book now
@@ -198,7 +205,13 @@ export function LandingPopularCheckupCard({ pkg, tone }: Props) {
               </button>
             </div>
             <Link
-              to="/signup"
+              to={bookStartUrl({
+                id: pkg.id,
+                name: pkg.name,
+                memberPrice: pkg.price,
+                mrp: pkg.mrp,
+                testCount: pkg.testCount,
+              })}
               onClick={() => setModalOpen(false)}
               className="mt-4 block w-full rounded-full bg-ink py-3 text-center text-sm font-semibold text-white hover:bg-brand-600"
             >

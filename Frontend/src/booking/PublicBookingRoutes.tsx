@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useSearchParams } from 'react-router-dom'
-import { loadBookingDraft, loadGuestBookings, patchBookingDraft, type BookingCartItem } from '@/booking/booking-session'
+import { loadBookingDraft, patchBookingDraft, type BookingCartItem } from '@/booking/booking-session'
 import { resolveCartPackageImage } from '@/lib/cart-package-image'
 import { PublicBookingConfirmedPage, PublicBookingCheckoutPage } from '@/booking/PublicBookingCheckoutPage'
 import { BookingCard, BookingPrimaryButton, PublicBookingShell } from '@/booking/PublicBookingShell'
+import { useAccount, validMobile } from '@/account/AccountContext'
+import { authErrorMessage, sendOtp, verifyOtp } from '@/services/otp'
+import api, { unwrap } from '@/services/api'
+import type { Appointment } from '@/types'
 
 function RequireCart({ children }: { children: React.ReactNode }) {
   const draft = loadBookingDraft()
@@ -49,14 +53,15 @@ export function PublicBookingStartPage() {
 }
 
 function LookupPage() {
+  const acc = useAccount()
   const [mobile, setMobile] = useState('')
   const [bookingId, setBookingId] = useState('')
   const [verified, setVerified] = useState(false)
   const [otp, setOtp] = useState('')
-
-  const rows = loadGuestBookings().filter(
-    (b) => (!bookingId || b.id === bookingId) && (!mobile || b.bookerMobile === mobile),
-  )
+  const [otpSent, setOtpSent] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [rows, setRows] = useState<Appointment[]>([])
 
   return (
     <PublicBookingShell>
@@ -76,7 +81,7 @@ function LookupPage() {
             onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
             className="h-12 w-full rounded-xl border border-line px-4"
           />
-          {!verified ? (
+          {!verified && otpSent ? (
             <input
               placeholder="OTP"
               value={otp}
@@ -84,12 +89,59 @@ function LookupPage() {
               className="h-12 w-full rounded-xl border border-line px-4"
             />
           ) : null}
+          {error ? <p className="text-[14px] font-semibold text-coral">{error}</p> : null}
           <BookingPrimaryButton
+            disabled={busy || verified}
             onClick={() => {
-              if (!verified && /^\d{6}$/.test(otp)) setVerified(true)
+              if (verified || busy) return
+              if (!validMobile(mobile)) {
+                setError('Enter the 10-digit mobile used when booking.')
+                return
+              }
+              if (!otpSent) {
+                setBusy(true)
+                setError('')
+                void sendOtp({ mobile, purpose: 'login' })
+                  .then((result) => {
+                    setOtpSent(true)
+                    setBusy(false)
+                    if (result.devCode) {
+                      setError(`SMS is not connected yet. Your OTP is ${result.devCode}.`)
+                    }
+                  })
+                  .catch((e) => {
+                    setBusy(false)
+                    setError(authErrorMessage(e))
+                  })
+                return
+              }
+              if (!/^\d{6}$/.test(otp)) {
+                setError('Enter the 6-digit OTP.')
+                return
+              }
+              setBusy(true)
+              setError('')
+              void verifyOtp({ mobile, otp, purpose: 'login' })
+                .then(async (result) => {
+                  if (!result.verified || !result.accessToken) {
+                    setBusy(false)
+                    setError('Could not verify OTP. Please try again.')
+                    return
+                  }
+                  acc.finishOtpLogin(result)
+                  const list = unwrap<Appointment[]>((await api.get('/appointments')).data)
+                  const q = bookingId.trim().toUpperCase()
+                  setRows(q ? list.filter((a) => (a.code || a.id).toUpperCase().includes(q)) : list)
+                  setBusy(false)
+                  setVerified(true)
+                })
+                .catch((e) => {
+                  setBusy(false)
+                  setError(authErrorMessage(e))
+                })
             }}
           >
-            {verified ? 'Verified' : 'Verify & lookup'}
+            {verified ? 'Verified' : busy ? 'Please wait…' : otpSent ? 'Verify & lookup' : 'Send OTP'}
           </BookingPrimaryButton>
         </div>
         {verified ? (
@@ -97,9 +149,9 @@ function LookupPage() {
             {rows.length ? (
               rows.map((b) => (
                 <li key={b.id} className="rounded-xl border border-line p-4">
-                  <p className="font-bold text-ink">{b.id}</p>
+                  <p className="font-bold text-ink">{b.code}</p>
                   <p className="text-[14px] text-ink-soft">
-                    {b.packageName} · {b.date} · {b.status}
+                    {b.test?.name} · {String(b.date).slice(0, 10)} · {b.status}
                   </p>
                 </li>
               ))
