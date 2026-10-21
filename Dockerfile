@@ -6,12 +6,14 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 COPY package.json package-lock.json ./
-COPY Backend/package.json Backend/package-lock.json ./Backend/
-COPY Frontend/package.json Frontend/package-lock.json ./Frontend/
+COPY Backend/package.json ./Backend/
+COPY Frontend/package.json ./Frontend/
 COPY Backend/prisma ./Backend/prisma
 COPY scripts ./scripts
 
-RUN npm ci
+ENV npm_config_optional=true
+RUN npm ci --include=optional \
+  && npm install @rolldown/binding-linux-x64-gnu@1.2.8 --workspace=healthcart-frontend --no-save --no-package-lock
 
 COPY Backend ./Backend
 COPY Frontend ./Frontend
