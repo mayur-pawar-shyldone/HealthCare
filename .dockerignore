@@ -1,0 +1,15 @@
+**/.git
+**/.env
+**/.env.*
+!**/.env.example
+**/node_modules
+**/dist
+**/public
+**/*.log
+**/.DS_Store
+Frontend/dist
+Backend/dist
+Backend/public
+Backend/uploads
+**/.vscode
+**/.cursor
