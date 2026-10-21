@@ -1,0 +1,15 @@
+{
+  "name": "health-cart",
+  "private": true,
+  "workspaces": [
+    "Backend",
+    "Frontend"
+  ],
+  "scripts": {
+    "build": "npm run build -w healthcart-frontend && npm run build -w healthcart-backend && node scripts/copy-frontend.mjs",
+    "start": "npm run db:deploy -w healthcart-backend && npm run start:prod -w healthcart-backend"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
