@@ -24,40 +24,59 @@ function mysqlUrlFromParts() {
 function relatedEnvKeys() {
   return Object.keys(process.env)
     .filter((key) =>
-      /^(DATABASE|MYSQL|MARIA|POSTGRES|PG|DB_|JWT_|RAILWAY_)/i.test(key),
+      /^(DATABASE|MYSQL|MARIA|POSTGRES|PG|DB_|JWT_|RAILWAY_SERVICE)/i.test(key),
     )
     .sort()
 }
 
+function describeValue(raw) {
+  if (raw == null) return 'missing'
+  const value = String(raw)
+  if (!value.trim()) return `empty (${value.length} chars)`
+  if (/\$\{\{/.test(value)) return 'unresolved Railway template (MySQL service name is wrong or MySQL was not created)'
+  if (/^postgres(ql)?:\/\//i.test(value)) return 'postgres URL (this app needs MySQL)'
+  if (/^mysql:\/\//i.test(value)) return `mysql URL (${value.length} chars)`
+  return `set but not a mysql:// URL (${value.length} chars)`
+}
+
+function usableDatabaseUrl(raw) {
+  const value = String(raw || '').trim()
+  if (!value) return ''
+  if (/\$\{\{/.test(value)) return ''
+  return value
+}
+
 function ensureDatabaseUrl() {
-  const existing = firstEnv(
-    'DATABASE_URL',
-    'MYSQL_URL',
-    'MYSQL_PRIVATE_URL',
-    'MYSQL_DATABASE_URL',
-    'MYSQL_PUBLIC_URL',
+  const existing = usableDatabaseUrl(
+    firstEnv(
+      'DATABASE_URL',
+      'MYSQL_URL',
+      'MYSQL_PRIVATE_URL',
+      'MYSQL_DATABASE_URL',
+      'MYSQL_PUBLIC_URL',
+    ),
   )
   process.env.DATABASE_URL = existing || mysqlUrlFromParts()
   if (process.env.DATABASE_URL) return
 
   const service = process.env.RAILWAY_SERVICE_NAME || 'this app service'
-  const keys = relatedEnvKeys()
   console.error(`
-DATABASE_URL is not set on ${service}.
-This is a Railway project setting, not an app bug.
+DATABASE_URL on ${service}: ${describeValue(process.env.DATABASE_URL)}
+MYSQL_URL on ${service}: ${describeValue(process.env.MYSQL_URL)}
+Visible keys: ${relatedEnvKeys().join(', ') || '(none)'}
 
-On the Railway canvas:
-1. Click + New → Database → MySQL
-2. Wait until the MySQL card is Running
-3. Click THIS app service (the one printing this log), then Variables
-4. New Variable:
-     DATABASE_URL = \${{MySQL.MYSQL_URL}}
-   Use the exact MySQL card name if it is not "MySQL"
-5. Save. Railway will redeploy by itself.
+The HealthCare service has the DATABASE_URL name, but no MySQL connection string.
+The canvas must show TWO cards: HealthCare and MySQL. One card is not enough.
 
-Do not paste a localhost URL. Do not add this in GitHub secrets.
-
-Env keys visible here: ${keys.length ? keys.join(', ') : '(none — MySQL is not attached to this service)'}
+Fix in Railway:
+1. Canvas → + New → Database → MySQL. Wait until that card is Running.
+2. Open the MySQL card → Variables. Confirm MYSQL_URL looks like mysql://...
+3. Open the HealthCare card → Variables → DATABASE_URL.
+4. Delete the current DATABASE_URL if it is blank.
+5. New Variable → click the variable-reference picker (do not type this by hand if the picker exists):
+     DATABASE_URL  =  MYSQL_URL from the MySQL card
+6. The value must become a mysql://... URL, not blank and not \${{MySQL.MYSQL_URL}} as leftover text.
+7. Railway redeploys by itself after save.
 `)
   process.exit(1)
 }

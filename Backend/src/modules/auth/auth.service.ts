@@ -251,39 +251,9 @@ export class AuthService {
     const mobile = dto.mobile.trim();
     const purpose = dto.purpose;
     const fullName = dto.fullName?.trim();
-
-    if (purpose === OtpPurpose.signup && (!fullName || fullName.length < 2)) {
-      throw new BadRequestException({
-        message: 'Enter the name for this account.',
-        error: 'NAME_REQUIRED',
-      });
-    }
-
     const existing = await this.prisma.user.findFirst({
       where: { mobile, deletedAt: null },
     });
-
-    if (purpose === OtpPurpose.login) {
-      if (!existing) {
-        throw new BadRequestException({
-          message: 'No account found for this mobile. Create an account.',
-          error: 'ACCOUNT_NOT_FOUND',
-        });
-      }
-      if (!existing.isActive) {
-        throw new UnauthorizedException({
-          message: 'Account is deactivated',
-          error: 'ACCOUNT_INACTIVE',
-        });
-      }
-    }
-
-    if (purpose === OtpPurpose.signup && existing) {
-      throw new ConflictException({
-        message: 'This mobile is already registered. Please log in.',
-        error: 'DUPLICATE_ACCOUNT',
-      });
-    }
 
     const hourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const sentLastHour = await this.prisma.otpChallenge.count({
@@ -380,7 +350,7 @@ export class AuthService {
     const otp = dto.otp.trim();
     const purpose = dto.purpose;
     const challenge = await this.prisma.otpChallenge.findFirst({
-      where: { mobile, purpose, consumedAt: null, expiresAt: { gt: new Date() } },
+      where: { mobile, consumedAt: null, expiresAt: { gt: new Date() } },
       orderBy: { createdAt: 'desc' },
     });
     if (!challenge) {
@@ -463,7 +433,7 @@ export class AuthService {
     }
 
     const challenge = await this.prisma.otpChallenge.findFirst({
-      where: { mobile, purpose: dto.purpose, consumedAt: null, expiresAt: { gt: new Date() } },
+      where: { mobile, consumedAt: null, expiresAt: { gt: new Date() } },
       orderBy: { createdAt: 'desc' },
     });
     if (!challenge) {
@@ -499,29 +469,17 @@ export class AuthService {
       where: { mobile, deletedAt: null },
     });
 
-    if (purpose === OtpPurpose.login) {
-      if (!user) {
-        throw new BadRequestException({
-          message: 'No account found for this mobile. Create an account.',
-          error: 'ACCOUNT_NOT_FOUND',
-        });
-      }
-      if (!user.isActive) {
-        throw new UnauthorizedException({
-          message: 'Account is deactivated',
-          error: 'ACCOUNT_INACTIVE',
-        });
-      }
-    } else {
-      if (!fullName || fullName.length < 2) {
-        throw new BadRequestException({
-          message: 'Enter the name for this account.',
-          error: 'NAME_REQUIRED',
-        });
-      }
-      if (!user) {
-        user = await this.createOtpUser(fullName, mobile);
-      }
+    if (user && !user.isActive) {
+      throw new UnauthorizedException({
+        message: 'Account is deactivated',
+        error: 'ACCOUNT_INACTIVE',
+      });
+    }
+    if (!user) {
+      const createdName = fullName.length >= 2 ? fullName : `Member ${mobile.slice(-4)}`;
+      user = await this.createOtpUser(createdName, mobile);
+    } else if (purpose === OtpPurpose.signup && fullName.length >= 2 && fullName !== user.fullName) {
+      user = await this.prisma.user.update({ where: { id: user.id }, data: { fullName } });
     }
 
     const session = await this.issueTokens(
