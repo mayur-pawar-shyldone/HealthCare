@@ -444,10 +444,11 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         setState((prev) => ({ ...prev, busy: true, error: '' }))
         try {
           const purpose = s.loginMode === 'create' ? 'signup' : 'login'
+          const typedName = s.nameInput.trim()
           const result = await sendOtp({
             mobile,
             purpose,
-            fullName: purpose === 'signup' ? s.nameInput.trim() : undefined,
+            fullName: typedName.length >= 2 ? typedName : undefined,
           })
           setState((prev) => ({
             ...prev,
@@ -494,27 +495,25 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         const mobileInput = data.mobile.trim()
         const nameInput = (data.name || '').trim()
         if (s.busy) return false
-        if (s.loginMode === 'create' && nameInput.length < 2) {
-          setState((prev) => ({ ...prev, mobileInput, nameInput, error: 'Enter the name for this account.' }))
-          return false
-        }
         if (!validMobile(mobileInput)) {
           setState((prev) => ({ ...prev, mobileInput, nameInput, error: 'Enter a valid 10-digit mobile number.' }))
           return false
         }
+        const fullName = nameInput.length >= 2 ? nameInput : undefined
         const purpose = s.loginMode === 'create' ? 'signup' : 'login'
-        if (!s.otpSent) {
+        if (!s.otpSent || mobileInput !== s.mobileInput) {
           setState((prev) => ({ ...prev, mobileInput, nameInput, error: '', notice: '', busy: true }))
           try {
             const result = await sendOtp({
               mobile: mobileInput,
               purpose,
-              fullName: purpose === 'signup' ? nameInput : undefined,
+              fullName,
             })
             setState((prev) => ({
               ...prev,
               mobileInput,
               nameInput,
+              otp: '',
               busy: false,
               otpSent: true,
               notice: channelNotice(result.channel, result.delivered, result.devCode),
@@ -536,7 +535,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
             mobile: mobileInput,
             otp,
             purpose,
-            fullName: purpose === 'signup' ? nameInput : undefined,
+            fullName,
           })
           if (!result.verified || !result.accessToken || !result.refreshToken || !result.user) {
             setState((prev) => ({ ...prev, busy: false, error: 'Could not verify OTP. Please try again.' }))

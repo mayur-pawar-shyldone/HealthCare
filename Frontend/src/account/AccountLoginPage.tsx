@@ -51,7 +51,6 @@ export function AccountLoginPage({ onClose }: { onClose?: () => void }) {
                 className={authSplitInputClass}
                 placeholder="Full name (as on card)"
                 defaultValue={acc.nameInput}
-                required
               />
             </label>
           ) : null}
@@ -72,6 +71,7 @@ export function AccountLoginPage({ onClose }: { onClose?: () => void }) {
               <label className="block">
                 <span className="sr-only">OTP</span>
                 <input
+                  key={acc.mobileInput}
                   name="otp"
                   className={authSplitInputClass}
                   inputMode="numeric"
