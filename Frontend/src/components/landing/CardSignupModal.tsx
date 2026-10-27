@@ -1,6 +1,7 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { ArrowRight, Calendar, X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import api, { unwrap } from '@/services/api'
+import { authErrorMessage } from '@/services/otp'
 import { subscribeHealthCard } from '@/lib/health-card-bus'
 
 type FormState = {
@@ -31,12 +32,6 @@ function blankForm(): FormState {
   }
 }
 
-function ddMmYyyyToIso(value: string): string {
-  const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(value.trim())
-  if (!match) return ''
-  return `${match[3]}-${match[2]}-${match[1]}`
-}
-
 function mapGender(value: string): 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY' {
   if (value === 'Male') return 'MALE'
   if (value === 'Female') return 'FEMALE'
@@ -45,16 +40,20 @@ function mapGender(value: string): 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_
 }
 
 export function CardSignupModal() {
-  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState(blankForm)
   const [errors, setErrors] = useState<FormErrors>({})
   const [done, setDone] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [serverError, setServerError] = useState('')
+  const [cardNumber, setCardNumber] = useState('')
 
   useEffect(() => subscribeHealthCard(() => {
     setForm(blankForm())
     setErrors({})
     setDone(false)
+    setServerError('')
+    setCardNumber('')
     setOpen(true)
   }), [])
 
@@ -89,31 +88,43 @@ export function CardSignupModal() {
     if (!/^\d{2}-\d{2}-\d{4}$/.test(form.dob.trim())) next.dob = 'Use dd-mm-yyyy'
     if (!form.gender) next.gender = 'Select gender'
     if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) next.email = 'Enter a valid email'
-    if (!form.address.trim()) next.address = 'Enter your address as on Aadhaar'
+    if (form.address.trim().length < 8) next.address = 'Enter your full address as on Aadhaar'
     if (!/^\d{6}$/.test(form.pin.trim())) next.pin = 'Enter a 6-digit PIN code'
     if (!form.consent) next.consent = 'Consent is required to create your HealthID Card'
     return next
   }
 
-  function submit(e: FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault()
     const next = validate()
     setErrors(next)
+    setServerError('')
     if (Object.keys(next).length) return
-    setDone(true)
-  }
-
-  function continueToSignup() {
-    setOpen(false)
-    navigate('/signup', {
-      state: {
-        fullName: form.name.trim(),
-        mobile: form.mobile.trim(),
-        email: form.email.trim() || undefined,
-        dateOfBirth: ddMmYyyyToIso(form.dob),
-        gender: mapGender(form.gender),
-      },
-    })
+    setBusy(true)
+    try {
+      const result = unwrap<{ cardNumber: string }>(
+        (
+          await api.post('/membership/free-card', {
+            fullName: form.name.trim(),
+            mobile: form.mobile.trim(),
+            aadhaar: form.aadhaar.trim(),
+            dateOfBirth: form.dob.trim(),
+            gender: mapGender(form.gender),
+            email: form.email.trim() || undefined,
+            address: form.address.trim(),
+            pincode: form.pin.trim(),
+            city: 'Nashik',
+            state: 'Maharashtra',
+          })
+        ).data,
+      )
+      setCardNumber(result.cardNumber)
+      setDone(true)
+    } catch (error) {
+      setServerError(authErrorMessage(error))
+    } finally {
+      setBusy(false)
+    }
   }
 
   function field(
@@ -162,17 +173,13 @@ export function CardSignupModal() {
 
         {done ? (
           <div className="hid-body hid-done">
-            <h3>Details received</h3>
+            <h3>HealthID Card saved</h3>
             <p>
-              Next, create your member account to book tests and manage family cards. We&apos;ll pre-fill what you
-              entered.
+              Card <strong>{cardNumber}</strong> is saved for {form.mobile}. When you book a test, choose{' '}
+              <strong>I have a HealthIDCard</strong> and enter this mobile. We will send an OTP to verify it.
             </p>
-            <button type="button" className="hid-create mt-[18px] w-full" onClick={continueToSignup}>
-              Continue to account setup
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </button>
-            <button type="button" className="hid-cancel mt-3 w-full" onClick={() => setOpen(false)}>
-              Close
+            <button type="button" className="hid-create mt-[18px] w-full" onClick={() => setOpen(false)}>
+              Done
             </button>
           </div>
         ) : (
@@ -306,17 +313,18 @@ export function CardSignupModal() {
               </p>
             </label>
             {errors.consent ? <p className="hid-error mt-2">{errors.consent}</p> : null}
+            {serverError ? <p className="hid-error mt-2">{serverError}</p> : null}
 
             <div className="hid-actions">
-              <button type="submit" className="hid-create">
-                Create HealthID Card
+              <button type="submit" className="hid-create" disabled={busy}>
+                {busy ? 'Saving card…' : 'Create HealthID Card'}
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </button>
               <button type="button" className="hid-cancel" onClick={() => setOpen(false)}>
                 Cancel
               </button>
             </div>
-            <p className="hid-note">No fees · Takes 2 mins · OTP verification on next step</p>
+            <p className="hid-note">No fees. Your card is saved now and verified by OTP when you book.</p>
           </form>
         )}
       </div>

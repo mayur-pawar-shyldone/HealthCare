@@ -22,6 +22,7 @@ import { BOOKING_RETURN_PATH, rememberLoginReturn } from '@/lib/auth-return'
 import { isBookingDateIso, upcomingCollectionDates } from '@/lib/booking-dates'
 import { useQuery } from '@tanstack/react-query'
 import api, { unwrap } from '@/services/api'
+import { authErrorMessage, channelNotice, type OtpChannel, type VerifyOtpResult } from '@/services/otp'
 import { BookingAccordionSection, type AccordionSectionState } from '@/booking/BookingAccordionSection'
 import {
   cartSubtotal,
@@ -48,17 +49,14 @@ const SECTION_ICONS: Record<SectionId, LucideIcon> = {
   review: ClipboardCheck,
 }
 
-function sectionComplete(id: SectionId, draft: PublicBookingDraft, acc?: ReturnType<typeof useAccount>): boolean {
+function sectionComplete(id: SectionId, draft: PublicBookingDraft, _acc?: ReturnType<typeof useAccount>): boolean {
   switch (id) {
     case 'test':
       return draft.cart.length > 0
     case 'route':
       return draft.route !== null
     case 'identity':
-      if (draft.route === 'member') {
-        if (!acc?.authed) return true
-        return Boolean(draft.memberId)
-      }
+      if (draft.route === 'member') return Boolean(draft.memberId)
       if (draft.route === 'guest') return draft.patientName.trim().length >= 2
       return false
     case 'collection':
@@ -119,6 +117,7 @@ export function PublicBookingCheckoutPage() {
   const stepHeaderRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   const [guestMobile, setGuestMobile] = useState(draft.bookerMobile || '')
+  const [cardVerifyOpen, setCardVerifyOpen] = useState(false)
   const [successModal, setSuccessModal] = useState<{
     bookingId: string
     total: number
@@ -130,7 +129,9 @@ export function PublicBookingCheckoutPage() {
 
   useEffect(() => {
     bookingCart.refreshFromStorage()
-  }, [bookingCart])
+    // Mount-only. Depending on the cart object retriggers refresh forever.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (draft.date && !isBookingDateIso(draft.date)) {
@@ -152,8 +153,8 @@ export function PublicBookingCheckoutPage() {
   }, [acc.authed])
 
   useEffect(() => {
-    if (!acc.authed && open === 'review') rememberLoginReturn(BOOKING_RETURN_PATH)
-  }, [acc.authed, open])
+    if (!acc.authed && open === 'review' && draft.route !== 'member') rememberLoginReturn(BOOKING_RETURN_PATH)
+  }, [acc.authed, open, draft.route])
 
   useEffect(() => {
     const ctxIds = bookingCart.cart.map((c) => c.id).join('|')
@@ -381,12 +382,16 @@ export function PublicBookingCheckoutPage() {
             <button
               type="button"
               onClick={() => {
-                update({
-                  route: 'member',
-                  memberVerified: acc.authed,
-                  guestOtpVerified: false,
-                })
-                advance('route')
+                if (acc.authed) {
+                  update({
+                    route: 'member',
+                    memberVerified: true,
+                    guestOtpVerified: false,
+                  })
+                  advance('route')
+                  return
+                }
+                setCardVerifyOpen(true)
               }}
               className={`flex flex-col rounded-xl border p-5 text-left transition ${
                 draft.route === 'member' ? 'border-mp-teal bg-mp-teal-50' : 'border-line hover:border-mp-teal/40'
@@ -423,7 +428,13 @@ export function PublicBookingCheckoutPage() {
           )}
         >
           {draft.route === 'member' ? (
-            <MemberIdentityBlock acc={acc} draft={draft} update={update} onDone={() => advance('identity')} />
+            <MemberIdentityBlock
+              acc={acc}
+              draft={draft}
+              update={update}
+              onDone={() => advance('identity')}
+              onVerify={() => setCardVerifyOpen(true)}
+            />
           ) : draft.route === 'guest' ? (
             <GuestIdentityBlock
               draft={draft}
@@ -494,12 +505,27 @@ export function PublicBookingCheckoutPage() {
         </BookingAccordionSection>
 
         <BookingAccordionSection {...sectionProps('review', 5, 6, 'Confirm', 'Review & confirm')}>
-          {!acc.authed ? (
+          {draft.route === 'member' && !acc.authed ? (
+            <div className="space-y-4">
+              <p className="text-[15px] leading-relaxed text-muted">
+                Verify the mobile saved on your HealthID Card, then pick the member this test is for.
+              </p>
+              <BookingPrimaryButton type="button" onClick={() => setCardVerifyOpen(true)}>
+                Verify HealthID Card
+              </BookingPrimaryButton>
+            </div>
+          ) : !acc.authed ? (
             <p className="text-[15px] leading-relaxed text-muted">
               Log in to verify your HealthID Card, pick the member this test is for, then confirm.
             </p>
           ) : !draft.memberId ? (
-            <MemberIdentityBlock acc={acc} draft={draft} update={update} onDone={() => setOpen('review')} />
+            <MemberIdentityBlock
+              acc={acc}
+              draft={draft}
+              update={update}
+              onDone={() => setOpen('review')}
+              onVerify={() => setCardVerifyOpen(true)}
+            />
           ) : (
             <form onSubmit={confirmBooking} className="space-y-4">
               <dl className="divide-y divide-line rounded-xl border border-line text-[15px]">
@@ -567,11 +593,29 @@ export function PublicBookingCheckoutPage() {
         onExplore={() => finishAfterSuccess(false)}
       />
     </PublicBookingShell>
-      {!acc.authed && open === 'review' ? (
+      {!acc.authed && open === 'review' && draft.route !== 'member' ? (
         <div className="fixed inset-0 z-[80]">
           <AccountLoginPage onClose={() => setOpen('schedule')} />
         </div>
       ) : null}
+      <MembershipVerifyModal
+        open={cardVerifyOpen}
+        onClose={() => setCardVerifyOpen(false)}
+        onMemberSelected={(member) => {
+          update({
+            route: 'member',
+            memberVerified: true,
+            guestOtpVerified: false,
+            memberId: member.id,
+            patientName: member.name,
+            memberDiscountEligible: true,
+            mobile: member.mobile,
+            cardId: member.cardId,
+          })
+          setCardVerifyOpen(false)
+          setOpen('collection')
+        }}
+      />
     </>
   )
 }
@@ -774,20 +818,22 @@ function MemberIdentityBlock({
   draft,
   update,
   onDone,
+  onVerify,
 }: {
   acc: ReturnType<typeof useAccount>
   draft: PublicBookingDraft
   update: (p: Partial<PublicBookingDraft>) => PublicBookingDraft
   onDone: () => void
+  onVerify: () => void
 }) {
   if (!acc.authed) {
     return (
       <div className="space-y-4">
         <p className="text-[15px] leading-relaxed text-muted">
-          You can finish tests, location and slot first. We’ll ask you to verify your HealthID Card in the last step, then show members on that card.
+          Verify the mobile saved on your HealthID Card. We’ll send an OTP, then you can choose who this test is for.
         </p>
-        <BookingPrimaryButton type="button" onClick={onDone}>
-          Continue
+        <BookingPrimaryButton type="button" onClick={onVerify}>
+          Verify HealthID Card
         </BookingPrimaryButton>
       </div>
     )
@@ -884,7 +930,7 @@ function GuestIdentityBlock({
         onDone()
       }}
     >
-      <p className="text-[14px] text-muted">Patient details now. You’ll verify the HealthID Card in the last step.</p>
+      <p className="text-[14px] text-muted">Patient details for this visit. Sign-in stays on the last step so the booking can be saved.</p>
       <label className="block text-[15px] font-semibold text-navy">
         Patient full name
         <input name="patientName" required defaultValue={draft.patientName} className="mt-2 h-12 w-full rounded-xl border border-line px-4 text-base" />
@@ -908,6 +954,247 @@ function GuestIdentityBlock({
       {err ? <p className="text-[15px] text-coral">{err}</p> : null}
       <BookingPrimaryButton type="submit">Continue</BookingPrimaryButton>
     </form>
+  )
+}
+
+type CardMember = { id: string; name: string; relation: string; isPrimary: boolean }
+
+type CardOtpSendResult = {
+  sent: boolean
+  delivered?: boolean
+  channel: OtpChannel
+  maskedMobile: string
+  devCode?: string
+}
+
+function MembershipVerifyModal({
+  open,
+  onClose,
+  onMemberSelected,
+}: {
+  open: boolean
+  onClose: () => void
+  onMemberSelected: (member: { id: string; name: string; mobile: string; cardId: string }) => void
+}) {
+  const acc = useAccount()
+  const [step, setStep] = useState<'ask' | 'otp' | 'members'>('ask')
+  const [identifier, setIdentifier] = useState('')
+  const [otp, setOtp] = useState('')
+  const [masked, setMasked] = useState('')
+  const [notice, setNotice] = useState('')
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [members, setMembers] = useState<CardMember[]>([])
+  const [memberId, setMemberId] = useState('')
+  const [mobile, setMobile] = useState('')
+
+  useEffect(() => {
+    if (!open) return
+    setStep('ask')
+    setOtp('')
+    setError('')
+    setNotice('')
+    setBusy(false)
+    setMembers([])
+    setMemberId('')
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    function onKey(e: globalThis.KeyboardEvent) {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, onClose])
+
+  if (!open) return null
+
+  async function sendCode() {
+    const value = identifier.trim()
+    if (value.length < 4) {
+      setError('Enter the HealthID Card number or the mobile saved on that card.')
+      return
+    }
+    setBusy(true)
+    setError('')
+    setNotice('')
+    try {
+      const result = unwrap<CardOtpSendResult>((await api.post('/membership/card-otp', { identifier: value })).data)
+      setMasked(result.maskedMobile)
+      setNotice(channelNotice(result.channel, result.delivered, result.devCode))
+      setStep('otp')
+    } catch (e) {
+      setError(authErrorMessage(e))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function confirmOtp() {
+    if (!/^\d{6}$/.test(otp)) {
+      setError('Enter the 6-digit OTP.')
+      return
+    }
+    setBusy(true)
+    setError('')
+    try {
+      const result = unwrap<VerifyOtpResult & { maskedMobile?: string; members?: CardMember[] }>(
+        (await api.post('/membership/card-otp/verify', { identifier: identifier.trim(), otp })).data,
+      )
+      if (!acc.finishOtpLogin(result)) {
+        setError('Could not verify this OTP. Please try again.')
+        return
+      }
+      const list = result.members?.length
+        ? result.members
+        : [{ id: 'self', name: result.user?.fullName || 'Member', relation: 'Self', isPrimary: true }]
+      setMembers(list)
+      setMemberId(list[0]?.id || '')
+      setMobile(result.user?.mobile || '')
+      setMasked(result.maskedMobile || masked)
+      setStep('members')
+      setNotice('')
+    } catch (e) {
+      setError(authErrorMessage(e))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const selected = members.find((m) => m.id === memberId) ?? members[0]
+
+  return (
+    <div className="fixed inset-0 z-[90] grid place-items-center bg-navy/45 px-4 py-8" role="presentation" onMouseDown={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="card-verify-title"
+        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <h2 id="card-verify-title" className="text-xl font-bold text-navy">
+          {step === 'members' ? 'Who is this booking for?' : 'Verify HealthID Card'}
+        </h2>
+        {step === 'ask' ? (
+          <p className="mt-2 text-[15px] leading-relaxed text-muted">
+            We’ll send an OTP to the mobile number saved on this card. You don’t need the login screen.
+          </p>
+        ) : null}
+        {step === 'otp' ? (
+          <p className="mt-2 text-[15px] leading-relaxed text-muted">
+            Enter the OTP sent to <strong className="text-navy">{masked || 'the mobile on this card'}</strong>.
+          </p>
+        ) : null}
+        {step === 'members' ? (
+          <p className="mt-2 text-[15px] leading-relaxed text-muted">
+            These members are on this HealthID Card. Pick one, then continue.
+          </p>
+        ) : null}
+
+        {step === 'ask' ? (
+          <label className="mt-5 block text-[15px] font-semibold text-navy">
+            Card number or registered mobile
+            <input
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              autoFocus
+              placeholder="HIC-… or 10-digit mobile"
+              className="mt-2 h-12 w-full rounded-xl border border-line px-4 text-base font-normal"
+            />
+          </label>
+        ) : null}
+
+        {step === 'otp' ? (
+          <label className="mt-5 block text-[15px] font-semibold text-navy">
+            OTP
+            <input
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              inputMode="numeric"
+              autoFocus
+              placeholder="6-digit OTP"
+              className="mt-2 h-12 w-full rounded-xl border border-line px-4 text-base font-normal tracking-[0.3em]"
+            />
+          </label>
+        ) : null}
+
+        {step === 'members' ? (
+          <div className="mt-5 max-h-72 space-y-3 overflow-y-auto">
+            {members.map((m) => (
+              <label
+                key={m.id}
+                className="flex gap-4 rounded-xl border border-line p-4 has-[:checked]:border-mp-teal has-[:checked]:bg-mp-teal-50"
+              >
+                <input
+                  type="radio"
+                  name="card-member"
+                  value={m.id}
+                  checked={memberId === m.id}
+                  onChange={() => setMemberId(m.id)}
+                  className="mt-1 scale-125"
+                />
+                <span className="text-[15px]">
+                  <strong className="text-base text-navy">{m.name}</strong>
+                  <br />
+                  <span className="text-muted">{m.relation}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        ) : null}
+
+        {notice ? <p className="mt-4 text-[14px] font-semibold text-mp-teal-700">{notice}</p> : null}
+        {error ? <p className="mt-4 text-[14px] font-semibold text-coral">{error}</p> : null}
+
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex min-h-12 items-center justify-center rounded-full border border-line px-6 text-base font-semibold text-navy hover:bg-canvas"
+          >
+            Cancel
+          </button>
+          {step === 'ask' ? (
+            <BookingPrimaryButton type="button" disabled={busy} onClick={() => void sendCode()}>
+              {busy ? 'Sending…' : 'Verify'}
+            </BookingPrimaryButton>
+          ) : null}
+          {step === 'otp' ? (
+            <BookingPrimaryButton type="button" disabled={busy} onClick={() => void confirmOtp()}>
+              {busy ? 'Checking…' : 'Confirm OTP'}
+            </BookingPrimaryButton>
+          ) : null}
+          {step === 'members' ? (
+            <BookingPrimaryButton
+              type="button"
+              disabled={!selected}
+              onClick={() => {
+                if (!selected) return
+                onMemberSelected({
+                  id: selected.id,
+                  name: selected.name,
+                  mobile,
+                  cardId: identifier.trim(),
+                })
+              }}
+            >
+              Continue
+            </BookingPrimaryButton>
+          ) : null}
+        </div>
+        {step === 'otp' ? (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void sendCode()}
+            className="mt-4 text-[14px] font-semibold text-mp-teal-700 underline-offset-2 hover:underline disabled:opacity-60"
+          >
+            Resend OTP
+          </button>
+        ) : null}
+      </div>
+    </div>
   )
 }
 

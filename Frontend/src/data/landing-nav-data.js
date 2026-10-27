@@ -1,0 +1,400 @@
+export const LANDING_NAV_CATEGORIES = [
+    {
+        id: 'blood-test',
+        label: 'Blood Test',
+        headline: 'Complete blood picture, at home',
+        points: [
+            'CBC, thyroid & lipids in one draw',
+            'NABL labs, barcoded & temp-tracked',
+            'Reports in 6 hours + free doctor call',
+        ],
+        quickLinks: ['CBC', 'Thyroid Profile', 'Lipid Profile', 'Vitamin D & B12'],
+        packages: [],
+    },
+    {
+        id: 'radiology',
+        label: 'Radiology',
+        headline: 'Imaging with clarity — X-ray, CT & MRI',
+        points: [
+            'Digital X-ray, CT-Scan & MRI at partner centres',
+            'NABL & NABH accredited imaging labs',
+            'Reports reviewed by radiologists',
+        ],
+        quickLinks: ['X-ray', 'CT-Scan', 'MRI', 'Ultrasound'],
+        packages: [],
+    },
+    {
+        id: 'ecg',
+        label: 'ECG',
+        headline: 'Heart rhythm, checked at home',
+        points: [
+            '12-lead ECG with cardiologist review',
+            'Portable device, 5-minute test',
+            'Report in 6 hours with guidance',
+        ],
+        quickLinks: ['ECG at Home', 'Cardiac Consultation', 'Heart Packages'],
+        packages: [],
+    },
+    {
+        id: 'doctor',
+        label: 'Doctor Consultation',
+        headline: 'Talk to a doctor, anytime',
+        points: [
+            'GP & specialist video consultations',
+            'Prescription & follow-up on app',
+            'Free call with every lab report',
+        ],
+        quickLinks: ['GP Consultation', 'Specialist', 'Second Opinion'],
+        packages: [],
+    },
+    {
+        id: 'ayurveda',
+        label: 'Ayurveda',
+        headline: 'Ancient wellness, modern care',
+        points: [
+            'Authentic Ayurvedic consultations',
+            'Personalized diet & lifestyle plans',
+            'Herbal & panchakarma guidance',
+        ],
+        quickLinks: ['Ayurvedic Consultation', 'Panchakarma', 'Herbal Care'],
+        packages: [],
+    },
+    {
+        id: 'pharmacy',
+        label: 'Pharmacy',
+        badge: 'Coming Soon',
+        headline: 'Medicines at your doorstep — coming soon',
+        points: [
+            'Genuine medicines from licensed pharmacies',
+            'Prescription upload & verification',
+            'Same-day delivery in 6 cities — upcoming',
+        ],
+        quickLinks: ['Medicines', 'Health Supplements', 'Coming Soon'],
+        packages: [],
+    },
+];
+const _heartVertical = {
+    id: 'heart',
+    label: 'Heart',
+    subtitle: 'ECG + lipids',
+    headline: 'Keep your heart in check — ECG, lipids & more',
+    points: [
+        '12-lead ECG with cardiologist review',
+        'Lipid & cardiac risk markers',
+        'NABL accredited labs',
+    ],
+    quickLinks: ['ECG', 'Lipid Profile', 'Cardiac Risk'],
+    packages: [],
+};
+export const HEALTH_VERTICALS = [
+    {
+        id: 'full-body',
+        label: 'Full Body Checkup',
+        subtitle: '52-112 tests',
+        headline: 'Complete blood picture, at home',
+        points: [
+            'CBC, thyroid & lipids in one draw',
+            'NABL labs, barcoded & temp-tracked',
+            'Reports in 6 hours + free doctor call',
+        ],
+        quickLinks: ['CBC', 'Thyroid Profile', 'Lipid Profile', 'Vitamin D & B12'],
+        packages: [],
+    },
+    _heartVertical,
+    {
+        id: 'cancer',
+        label: 'Cancer',
+        subtitle: 'Tumor markers',
+        headline: 'Early detection saves lives',
+        points: [
+            'Tumor markers for men & women',
+            'Barcoded, temp-tracked samples',
+            'Oncologist consultation available',
+        ],
+        quickLinks: ['CA 125', 'PSA', 'CEA'],
+        packages: [],
+    },
+    {
+        id: 'thyroid',
+        label: 'Thyroid',
+        subtitle: 'T3 T4 TSH',
+        headline: 'Thyroid health, simplified',
+        points: ['T3, T4 & TSH in one draw', 'No fasting required', 'Reports in 6 hours'],
+        quickLinks: ['TSH', 'T3 T4', 'Thyroid Profile'],
+        packages: [],
+    },
+    {
+        id: 'diabetes',
+        label: 'Diabetes',
+        subtitle: 'HbA1c & more',
+        headline: 'Manage diabetes with confidence',
+        points: ['HbA1c & glucose panels', 'Home collection, 6-hr reports', 'Track trends over time'],
+        quickLinks: ['HbA1c', 'Fasting Glucose', 'Diabetes Panel'],
+        packages: [],
+    },
+    {
+        id: 'pregnancy',
+        label: 'Pregnancy',
+        subtitle: 'Antenatal',
+        headline: 'Care for you and your baby',
+        points: [
+            'Antenatal screenings & NIPT',
+            'NABL labs, doctor guidance',
+            'Safe home sample collection',
+        ],
+        quickLinks: ['Beta hCG', 'Antenatal Panel', 'NIPT'],
+        packages: [],
+    },
+    {
+        id: 'hormone',
+        label: 'Hormone',
+        subtitle: 'Hormones',
+        headline: 'Balance your hormones',
+        points: ['LH, FSH, Prolactin & more', 'For men & women', 'Endocrinologist reviewed reports'],
+        quickLinks: ['LH FSH', 'Prolactin', 'Testosterone'],
+        packages: [],
+    },
+];
+export const DOCTOR_VERTICALS = [
+    {
+        id: 'doc-gp-care',
+        label: 'GP & primary care',
+        subtitle: 'Video · Instant',
+        headline: 'Talk to a doctor, anytime',
+        points: [
+            'GP & family physician video calls',
+            'Prescription & follow-up on app',
+            'Free call with every lab report',
+        ],
+        quickLinks: ['GP Consultation', 'Follow-up', 'Prescription'],
+        packages: [],
+    },
+    {
+        id: 'doc-specialist',
+        label: 'Specialist',
+        subtitle: 'Expert opinion',
+        headline: 'Specialist video consultations',
+        points: ['Cardiology, dermatology & more', 'Share reports before the call', 'Follow-up slots available'],
+        quickLinks: ['Specialist', 'Second opinion', 'Report review'],
+        packages: [],
+    },
+    {
+        id: 'doc-cardio',
+        label: 'Heart & BP',
+        subtitle: 'Cardiac consult',
+        headline: 'Cardiologist guidance after labs or ECG',
+        points: ['Ideal after ECG or cardiac panels', 'Medication & lifestyle advice', 'Member pricing on packages'],
+        quickLinks: ['Cardiology', 'ECG follow-up', 'BP management'],
+        packages: [],
+    },
+    {
+        id: 'doc-women',
+        label: "Women's health",
+        subtitle: 'Gynaec · wellness',
+        headline: 'Consults for women’s health concerns',
+        points: ['Gynaecology & wellness', 'Antenatal guidance', 'Private video consults'],
+        quickLinks: ['Gynaecology', 'Antenatal', 'PCOS'],
+        packages: [],
+    },
+    {
+        id: 'doc-peds',
+        label: 'Child & family',
+        subtitle: 'Pediatrics',
+        headline: 'Paediatrician for your child',
+        points: ['Fever, growth & vaccination queries', 'Family plans on HealthID Card', 'Evening slots available'],
+        quickLinks: ['Pediatrics', 'Vaccination', 'Family plan'],
+        packages: [],
+    },
+    {
+        id: 'doc-mental',
+        label: 'Mind & sleep',
+        subtitle: 'Counselling',
+        headline: 'Mental wellness consults',
+        points: ['Stress, anxiety & sleep', 'Confidential video sessions', 'Follow-up care plans'],
+        quickLinks: ['Counselling', 'Sleep', 'Stress'],
+        packages: [],
+    },
+];
+export const AYURVEDA_VERTICALS = [
+    {
+        id: 'ayu-consult-root',
+        label: 'Ayurvedic consult',
+        subtitle: 'Prakriti · diet',
+        headline: 'Ancient wellness, modern care',
+        points: [
+            'Authentic Ayurvedic consultations',
+            'Personalized diet & lifestyle plans',
+            'Herbal & panchakarma guidance',
+        ],
+        quickLinks: ['Ayurvedic Consultation', 'Prakriti', 'Diet plan'],
+        packages: [],
+    },
+    {
+        id: 'ayu-pancha',
+        label: 'Panchakarma',
+        subtitle: 'Detox programs',
+        headline: 'Panchakarma & detox guidance',
+        points: ['Centre & home protocols', 'Licensed Ayurveda partners', 'Member advisory support'],
+        quickLinks: ['Panchakarma', 'Detox', 'Rejuvenation'],
+        packages: [],
+    },
+    {
+        id: 'ayu-herbal',
+        label: 'Herbal care',
+        subtitle: 'Formulations',
+        headline: 'Herbal wellness plans',
+        points: ['Classical & safe formulations', 'Guidance on interactions', 'Ships where available'],
+        quickLinks: ['Herbal Care', 'Immunity', 'Digestion'],
+        packages: [],
+    },
+    {
+        id: 'ayu-women',
+        label: "Women's Ayurveda",
+        subtitle: 'Hormonal balance',
+        headline: 'Ayurveda for women’s health',
+        points: ['PCOS & hormonal support', 'Antenatal Ayurveda', 'Skin & hair care'],
+        quickLinks: ['PCOS', 'Antenatal', 'Skin & hair'],
+        packages: [],
+    },
+    {
+        id: 'ayu-stress',
+        label: 'Stress & sleep',
+        subtitle: 'Rasayana',
+        headline: 'Calm mind, balanced body',
+        points: ['Stress & sleep protocols', 'Breath & routine coaching', 'Follow-up check-ins'],
+        quickLinks: ['Stress', 'Sleep', 'Rasayana'],
+        packages: [],
+    },
+    {
+        id: 'ayu-weight',
+        label: 'Weight & metabolism',
+        subtitle: 'Agni balance',
+        headline: 'Metabolic balance with Ayurveda',
+        points: ['Weight & metabolism focus', 'Works with lab reports', 'Sustainable routines'],
+        quickLinks: ['Weight', 'Metabolism', 'Diabetes support'],
+        packages: [],
+    },
+];
+export const PHARMACY_VERTICALS = [
+    {
+        id: 'ph-rx',
+        label: 'Prescription medicines',
+        subtitle: 'Coming soon',
+        headline: 'Medicines at your doorstep — coming soon',
+        points: [
+            'Genuine medicines from licensed pharmacies',
+            'Prescription upload & verification',
+            'Same-day delivery in 6 cities — upcoming',
+        ],
+        quickLinks: ['Medicines', 'Upload Rx', 'Refills'],
+        packages: [],
+    },
+    {
+        id: 'ph-supplements',
+        label: 'Health supplements',
+        subtitle: 'Vitamins · protein',
+        headline: 'Supplements with pharmacist check',
+        points: ['Member-priced catalogue upcoming', 'Quality-assured brands', 'Advisory on interactions'],
+        quickLinks: ['Vitamins', 'Protein', 'Immunity'],
+        packages: [],
+    },
+    {
+        id: 'ph-essentials',
+        label: 'Daily essentials',
+        subtitle: 'OTC · hygiene',
+        headline: 'Everyday health essentials',
+        points: ['OTC & personal care', 'Bundled with lab bookings', 'Launching with pharmacy'],
+        quickLinks: ['OTC', 'Hygiene', 'First aid'],
+        packages: [],
+    },
+    {
+        id: 'ph-chronic',
+        label: 'Chronic care',
+        subtitle: 'Diabetes · BP',
+        headline: 'Refills for long-term therapy',
+        points: ['Diabetes & BP refills', 'Reminders on HealthID app', 'Pharmacist verification'],
+        quickLinks: ['Diabetes', 'BP', 'Thyroid meds'],
+        packages: [],
+    },
+    {
+        id: 'ph-family',
+        label: 'Family on card',
+        subtitle: '5 members',
+        headline: 'Order for anyone on your card',
+        points: ['Family profiles on HealthID Card', 'Single checkout upcoming', 'Member pricing on every test'],
+        quickLinks: ['Family', 'HealthID Card'],
+        packages: [],
+    },
+];
+export const RADIOLOGY_GROUPS = [
+    {
+        id: 'usg',
+        label: 'Ultrasonography',
+        items: [],
+    },
+    {
+        id: 'obs',
+        label: 'Obstetrics',
+        items: [],
+    },
+    {
+        id: 'vasc',
+        label: 'Vascular studies',
+        items: [],
+    },
+    {
+        id: 'xray',
+        label: 'Radiograph',
+        items: [],
+    },
+    {
+        id: 'proc',
+        label: 'Procedures',
+        items: [],
+    },
+    {
+        id: 'ir',
+        label: 'Interventional',
+        note: 'Consumables and medicines extra',
+        items: [],
+    },
+    {
+        id: 'mri',
+        label: 'MRI',
+        items: [],
+    },
+    {
+        id: 'ct',
+        label: 'CT scan',
+        items: [],
+    },
+    {
+        id: 'other',
+        label: 'Other charges',
+        items: [],
+    },
+];
+function quickLinksForRadiologyGroup(group) {
+    const links = [];
+    for (const item of group.items) {
+        const label = item.name.length > 30 ? `${item.name.slice(0, 28)}…` : item.name;
+        if (links.length >= 4)
+            break;
+        links.push(label);
+    }
+    return links;
+}
+/** Radiology mega-menu panels — same shape as blood-test / ECG verticals. */
+export const RADIOLOGY_VERTICALS = RADIOLOGY_GROUPS.map((group) => ({
+    id: group.id,
+    label: group.label,
+    subtitle: `${group.items.length} studies`,
+    headline: group.note ?? `${group.label} at member rates in Nashik`,
+    points: [
+        'NRI-affiliated imaging centres in Nashik',
+        'Digital reports with radiologist review',
+        'HealthID Card member pricing on every study',
+    ],
+    quickLinks: quickLinksForRadiologyGroup(group),
+    packages: [],
+}));

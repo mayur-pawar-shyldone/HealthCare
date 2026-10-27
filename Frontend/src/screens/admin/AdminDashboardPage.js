@@ -1,0 +1,17 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import api, { unwrap } from '@/services/api';
+import { formatMoney, formatDate } from '@/lib/utils';
+import { Loading } from '@/components/ui/Loading';
+import { AdminPage, AdminPageHeader, AdminPanel, AdminQuickLink, AdminSection, AdminTHead, AdminTh, AdminTr, AdminTd, Badge, StatCard, AdminTable, } from '@/components/admin/AdminUi';
+export function AdminDashboardPage() {
+    const { data, isLoading } = useQuery({
+        queryKey: ['admin-dashboard'],
+        queryFn: async () => unwrap((await api.get('/admin/dashboard')).data),
+    });
+    if (isLoading)
+        return _jsx(Loading, { label: "Loading dashboard" });
+    const s = data.stats;
+    return (_jsxs(AdminPage, { children: [_jsx(AdminPageHeader, { title: "Dashboard", subtitle: "Platform overview and recent activity" }), _jsxs("div", { className: "grid gap-4 sm:grid-cols-2 xl:grid-cols-3", children: [_jsx(StatCard, { label: "Customers", value: s.totalUsers, hint: `${s.activeUsers} active` }), _jsx(StatCard, { label: "Active memberships", value: s.activeMemberships }), _jsx(StatCard, { label: "Today's appointments", value: s.todayAppointments, hint: `${s.totalAppointments} total`, tone: "accent" }), _jsx(StatCard, { label: "Revenue collected", value: formatMoney(s.totalRevenue) }), _jsx(StatCard, { label: "Tests in catalog", value: s.activeTests, hint: `${s.totalTests} total` }), _jsx(StatCard, { label: "Pending reports", value: s.pendingReports, tone: s.pendingReports > 0 ? 'warn' : 'default' })] }), _jsxs("div", { className: "grid gap-6 lg:grid-cols-3", children: [_jsx("div", { className: "lg:col-span-2", children: _jsx(AdminSection, { title: "Recent appointments", action: _jsx(Link, { to: "/admin/appointments", className: "text-sm font-semibold text-teal hover:underline", children: "View all" }), children: _jsx(AdminTable, { children: _jsxs("table", { className: "w-full min-w-[600px] text-left text-sm", children: [_jsxs(AdminTHead, { children: [_jsx(AdminTh, { children: "Code" }), _jsx(AdminTh, { children: "Customer" }), _jsx(AdminTh, { children: "Test" }), _jsx(AdminTh, { children: "Date" }), _jsx(AdminTh, { children: "Status" })] }), _jsx("tbody", { children: data.recentAppointments.map((a) => (_jsxs(AdminTr, { children: [_jsx(AdminTd, { className: "font-mono text-xs", children: a.code }), _jsxs(AdminTd, { children: [_jsx("p", { className: "font-semibold", children: a.user.fullName }), _jsx("p", { className: "text-xs text-ink-soft", children: a.user.email })] }), _jsx(AdminTd, { children: a.test.name }), _jsx(AdminTd, { className: "text-ink-soft", children: formatDate(a.date) }), _jsx(AdminTd, { children: _jsx(Badge, { tone: a.status === 'COMPLETED' ? 'success' : a.status === 'CANCELLED' ? 'danger' : 'teal', children: a.status }) })] }, a.id))) })] }) }) }) }), _jsx(AdminPanel, { title: "Quick actions", subtitle: "Jump to common tasks", children: _jsxs("div", { className: "space-y-2", children: [_jsx(AdminQuickLink, { to: "/admin/customers", label: "Manage customers" }), _jsx(AdminQuickLink, { to: "/admin/tests", label: "Edit test rates" }), _jsx(AdminQuickLink, { to: "/admin/reports", label: "Upload reports" }), _jsx(AdminQuickLink, { to: "/admin/memberships", label: "Grant membership" }), _jsx(AdminQuickLink, { to: "/admin/payments", label: "Payments ledger" }), _jsx(AdminQuickLink, { to: "/admin/settings/pricing", label: "Payment promo settings" })] }) })] })] }));
+}
