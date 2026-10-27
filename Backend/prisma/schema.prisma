@@ -115,6 +115,7 @@ model UserProfile {
   theme           String   @default("system")
   notificationsOn Boolean  @default(true)
   whatsappOn      Boolean  @default(true)
+  aadhaarLast4    String?  @db.VarChar(4)
   locationLat     Decimal? @db.Decimal(10, 7)
   locationLng     Decimal? @db.Decimal(10, 7)
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
